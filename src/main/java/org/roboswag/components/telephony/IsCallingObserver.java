@@ -35,13 +35,15 @@ import rx.subjects.BehaviorSubject;
 public final class IsCallingObserver {
 
     @Nullable
-    private static IsCallingObserver instance;
+    private volatile static IsCallingObserver instance;
 
     @NonNull
     public static IsCallingObserver getInstance(@NonNull final Context context) {
-        synchronized (IsCallingObserver.class) {
-            if (instance == null) {
-                instance = new IsCallingObserver(context);
+        if (instance == null) {
+            synchronized (IsCallingObserver.class) {
+                if (instance == null) {
+                    instance = new IsCallingObserver(context);
+                }
             }
         }
         return instance;
