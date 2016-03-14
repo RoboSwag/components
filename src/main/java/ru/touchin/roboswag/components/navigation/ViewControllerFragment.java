@@ -19,41 +19,103 @@
 
 package ru.touchin.roboswag.components.navigation;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
-import ru.touchin.roboswag.components.services.LogicService;
+import java.io.Serializable;
+import java.lang.reflect.Constructor;
+
 import ru.touchin.roboswag.core.log.Lc;
+import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 import ru.touchin.roboswag.core.utils.android.RxAndroidUtils;
-
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.exceptions.OnErrorThrowable;
 import rx.subjects.BehaviorSubject;
 
 /**
  * Created by Gavriil Sitnikov on 21/10/2015.
- * TODO: fill description
+ * Fragment instantiated in specific activity of {@link TActivity} type that is holding {@link ViewController} inside.
  */
-public abstract class ViewControllerFragment<TLogicBridge, TActivity extends AppCompatActivity> extends ViewFragment<TActivity> {
+public abstract class ViewControllerFragment<TState extends Serializable, TLogicBridge, TActivity extends ViewControllerActivity<TLogicBridge>>
+        extends ViewFragment<TActivity> {
 
-    private final BehaviorSubject<TActivity> activitySubject = BehaviorSubject.create();
-    private final BehaviorSubject<Pair<View, Bundle>> viewSubject = BehaviorSubject.create();
-    @Nullable
-    private ViewController viewController;
-    @Nullable
-    private Subscription viewControllerSubscription;
+    private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
 
     /**
-     * It should return specific Service class where from this fragment should get interface to logic.
+     * Creates {@link Bundle} which will store state.
      *
-     * @return Returns class of specific LogicService.
+     * @param state State to use into ViewController.
+     * @return Returns bundle with state inside.
      */
     @NonNull
-    protected abstract Class<LogicService<TLogicBridge>> getLogicServiceClass();
+    public static Bundle createState(@Nullable final Serializable state) {
+        final Bundle result = new Bundle();
+        result.putSerializable(VIEW_CONTROLLER_STATE_EXTRA, state);
+        return result;
+    }
+
+    private final BehaviorSubject<TActivity> activitySubject = BehaviorSubject.create();
+    private final BehaviorSubject<Pair<ViewGroup, Bundle>> viewSubject = BehaviorSubject.create();
+    private final Scheduler backgroundScheduler = RxAndroidUtils.createLooperScheduler();
+    @Nullable
+    private ViewController viewController;
+    private Subscription viewControllerSubscription;
+    private TState state;
+
+    private final Observable<ViewController> viewControllerObservable = Observable
+            .combineLatest(activitySubject
+                            .switchMap(activity -> activity != null ? activity.observeLogicBridge() : Observable.just(null))
+                            .distinctUntilChanged()
+                            .observeOn(backgroundScheduler),
+                    activitySubject.distinctUntilChanged().observeOn(backgroundScheduler),
+                    viewSubject.distinctUntilChanged().observeOn(backgroundScheduler),
+                    (logicBridge, activity, viewInfo) -> {
+                        if (logicBridge == null || activity == null || viewInfo == null) {
+                            return null;
+                        }
+
+                        final ViewController.CreationContext<TLogicBridge, TActivity,
+                                ? extends ViewControllerFragment<TState, TLogicBridge, TActivity>> creationContext
+                                = new ViewController.CreationContext<>(logicBridge, activity, this, viewInfo.first);
+                        if (getViewControllerClass().getConstructors().length != 1) {
+                            throw OnErrorThrowable
+                                    .from(new ShouldNotHappenException("There should be single constructor for " + getViewControllerClass()));
+                        }
+                        final Constructor<?> constructor = getViewControllerClass().getConstructors()[0];
+                        try {
+                            switch (constructor.getParameterTypes().length) {
+                                case 2:
+                                    return (ViewController) constructor.newInstance(creationContext, viewInfo.second);
+                                case 3:
+                                    return (ViewController) constructor.newInstance(this, creationContext, viewInfo.second);
+                                default:
+                                    Lc.assertion("Wrong constructor parameters count: " + constructor.getParameterTypes().length);
+                                    return null;
+                            }
+                        } catch (final Exception exception) {
+                            throw OnErrorThrowable.from(exception);
+                        }
+                    })
+            .observeOn(AndroidSchedulers.mainThread());
+
+    /**
+     * Returns specific object which contains state of ViewController.
+     *
+     * @return Object of TState type.
+     */
+    public TState getState() {
+        return state;
+    }
 
     /**
      * It should return specific ViewController class to control instantiated view by logic bridge after activity creation.
@@ -61,48 +123,38 @@ public abstract class ViewControllerFragment<TLogicBridge, TActivity extends App
      * @return Returns class of specific ViewController.
      */
     @NonNull
-    protected abstract Class<ViewController<TLogicBridge, TActivity,
-            ? extends ViewControllerFragment<TLogicBridge, TActivity>>> getViewControllerClass();
+    public abstract Class<? extends ViewController<TLogicBridge, TActivity,
+            ? extends ViewControllerFragment<TState, TLogicBridge, TActivity>>> getViewControllerClass();
 
-    // need throwable for app stability
-    @SuppressWarnings("PMD.AvoidCatchingThrowable")
+    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getContext() != null) {
-            viewControllerSubscription = Observable.combineLatest(activitySubject.distinctUntilChanged(), viewSubject.distinctUntilChanged(),
-                    RxAndroidUtils.observeService(getContext(), getLogicServiceClass())
-                            .map(service -> service != null ? service.getLogicBridge() : null)
-                            .distinctUntilChanged(),
-                    (activity, view, logicBridge) -> {
-                        if (activity == null || view == null || logicBridge == null) {
-                            return null;
-                        }
-
-                        final ViewController.CreationContext<TLogicBridge, TActivity,
-                                ? extends ViewControllerFragment<TLogicBridge, TActivity>> creationContext
-                                = new ViewController.CreationContext<>(logicBridge, activity, this, view.first);
-                        if (getViewControllerClass().getConstructors().length == 1) {
-                            try {
-                                return (ViewController) getViewControllerClass().getConstructors()[0].newInstance(creationContext, view.second);
-                            } catch (Throwable throwable) {
-                                Lc.assertion(throwable);
-                            }
-                        } else {
-                            Lc.assertion("There should be single constructor for " + getViewControllerClass());
-                        }
-                        return null;
-                    }).subscribe(this::onViewControllerChanged);
-        } else {
-            Lc.assertion("Context is null in onCreate.");
+        if (getContext() == null) {
+            Lc.assertion("Context is null in onCreate");
+            return;
         }
+
+        state = savedInstanceState != null
+                ? (TState) savedInstanceState.getSerializable(VIEW_CONTROLLER_STATE_EXTRA)
+                : (getArguments() != null ? (TState) getArguments().getSerializable(VIEW_CONTROLLER_STATE_EXTRA) : null);
+    }
+
+    @Deprecated
+    @NonNull
+    @Override
+    public View onCreateView(@NonNull final LayoutInflater inflater,
+                             @Nullable final ViewGroup container,
+                             @Nullable final Bundle savedInstanceState) {
+        return new PlaceholderView(inflater.getContext());
     }
 
     @Override
-    public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //TODO...
+        viewSubject.onNext(new Pair<>(new FrameLayout(view.getContext()), savedInstanceState));
+        viewControllerSubscription = viewControllerObservable.subscribe(this::onViewControllerChanged, Lc::assertion);
     }
 
     @Override
@@ -116,27 +168,50 @@ public abstract class ViewControllerFragment<TLogicBridge, TActivity extends App
             this.viewController.onDestroy();
         }
         this.viewController = viewController;
+        if (this.viewController == null) {
+            return;
+        }
+        if (getView() == null || !(getView() instanceof PlaceholderView)) {
+            Lc.assertion("View of fragment should be PlaceholderView");
+            return;
+        }
+        ((PlaceholderView) getView()).removeAllViews();
+        ((PlaceholderView) getView())
+                .addView(this.viewController.getContainer(), ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        viewController.getActivity().supportInvalidateOptionsMenu();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        if (viewController != null) {
+            viewController.onSaveInstanceState(savedInstanceState);
+            savedInstanceState.putSerializable(VIEW_CONTROLLER_STATE_EXTRA, state);
+        } else if (getArguments() != null && getArguments().containsKey(VIEW_CONTROLLER_STATE_EXTRA)) {
+            savedInstanceState.putSerializable(VIEW_CONTROLLER_STATE_EXTRA, getArguments().getSerializable(VIEW_CONTROLLER_STATE_EXTRA));
+        }
     }
 
     @Override
     protected void onDestroyView(@NonNull final View view) {
+        viewControllerSubscription.unsubscribe();
+        viewControllerSubscription = null;
         viewSubject.onNext(null);
         super.onDestroyView(view);
-    }
-
-    @Override
-    public void onDestroy() {
-        if (viewControllerSubscription != null) {
-            viewControllerSubscription.unsubscribe();
-            viewControllerSubscription = null;
-        }
-        super.onDestroy();
     }
 
     @Override
     public void onDetach() {
         activitySubject.onNext(null);
         super.onDetach();
+    }
+
+    private static class PlaceholderView extends FrameLayout {
+
+        public PlaceholderView(@NonNull final Context context) {
+            super(context);
+        }
+
     }
 
 }

@@ -19,16 +19,12 @@
 
 package ru.touchin.roboswag.components.navigation;
 
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import java.io.Serializable;
 
 /**
- * Created by Gavriil Sitnikov on 08/10/2014.
- * Base interface to listen fragment changing
+ * Created by Gavriil Sitnikov on 12/03/2016.
+ * TODO: fill description
  */
-public interface OnFragmentStartedListener {
-
-    /* Raises by fragment to notify that it is started */
-    void onFragmentStarted(@NonNull Fragment fragment);
-
+public class StatelessViewControllerFragment<TLogicBridge, TActivity extends ViewControllerActivity<TLogicBridge>>
+        extends SimpleViewControllerFragment<Serializable, TLogicBridge, TActivity> {
 }
