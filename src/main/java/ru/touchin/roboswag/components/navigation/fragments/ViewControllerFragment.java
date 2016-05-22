@@ -47,6 +47,9 @@ import rx.subjects.BehaviorSubject;
 /**
  * Created by Gavriil Sitnikov on 21/10/2015.
  * Fragment instantiated in specific activity of {@link TActivity} type that is holding {@link ViewController} inside.
+ *
+ * @param <TState>    Type of object which is representing it's fragment state;
+ * @param <TActivity> Type of {@link ViewControllerActivity} where fragment could be attached to.
  */
 public abstract class ViewControllerFragment<TState extends AbstractState, TActivity extends ViewControllerActivity<?>>
         extends ViewFragment<TActivity> {
@@ -75,18 +78,18 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     private boolean isStarted;
 
     /**
-     * Returns specific object which contains state of ViewController.
+     * Returns specific {@link AbstractState} which contains state of fragment and it's {@link ViewController}.
      *
-     * @return Object of TState type.
+     * @return Object represents state.
      */
     public TState getState() {
         return state;
     }
 
     /**
-     * It should return specific ViewController class to control instantiated view by logic after activity creation.
+     * It should return specific {@link ViewController} class to control instantiated view by logic after activity creation.
      *
-     * @return Returns class of specific ViewController.
+     * @return Returns class of specific {@link ViewController}.
      */
     @NonNull
     public abstract Class<? extends ViewController<TActivity,
@@ -97,7 +100,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setHasOptionsMenu(getParentFragment() == null);
+        setHasOptionsMenu(!isChildFragment());
 
         state = savedInstanceState != null
                 ? (TState) savedInstanceState.getSerializable(VIEW_CONTROLLER_STATE_EXTRA)
@@ -171,6 +174,13 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         }
     }
 
+    /**
+     * Calls when activity configuring ActionBar, Toolbar, Sidebar etc.
+     * If it will be called or not depends on {@link #hasOptionsMenu()} and {@link #isMenuVisible()}.
+     *
+     * @param menu     The options menu in which you place your items;
+     * @param inflater Helper to inflate menu items.
+     */
     protected void onConfigureNavigation(@NonNull final Menu menu, @NonNull final MenuInflater inflater) {
         if (viewController != null) {
             viewController.onConfigureNavigation(menu, inflater);

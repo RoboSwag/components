@@ -1,78 +1,97 @@
+/*
+ *  Copyright (c) 2015 RoboSwag (Gavriil Sitnikov, Vsevolod Ivanov)
+ *
+ *  This file is part of RoboSwag library.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package ru.touchin.roboswag.components.navigation.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import java.util.ArrayList;
 
-import ru.touchin.roboswag.components.navigation.BaseUiBindable;
-import ru.touchin.roboswag.components.navigation.UiBindable;
+import ru.touchin.roboswag.components.observables.ui.BaseUiBindable;
+import ru.touchin.roboswag.components.observables.ui.UiBindable;
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
+import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * Created by Gavriil Sitnikov on 08/03/2016.
- * TODO: fill description
+ * Base activity to use in components repository.
  */
 public abstract class BaseActivity extends AppCompatActivity
         implements UiBindable {
 
+    @NonNull
     private final ArrayList<OnBackPressedListener> onBackPressedListeners = new ArrayList<>();
     @NonNull
-    private final BehaviorSubject<Boolean> isCreatedSubject = BehaviorSubject.create();
-    @NonNull
-    private final BehaviorSubject<Boolean> isStartedSubject = BehaviorSubject.create();
-    @NonNull
-    private final BaseUiBindable baseUiBindable = new BaseUiBindable(isCreatedSubject, isStartedSubject);
+    private final BaseUiBindable baseUiBindable = new BaseUiBindable();
 
     @Override
-    public void onCreate(final Bundle savedInstanceState, final PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
-        isCreatedSubject.onNext(true);
+    protected void onCreate(@Nullable final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        baseUiBindable.onCreate();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        isStartedSubject.onNext(true);
+        baseUiBindable.onStart();
     }
 
     @Override
     protected void onStop() {
-        isStartedSubject.onNext(false);
+        baseUiBindable.onStop();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        isCreatedSubject.onNext(false);
+        baseUiBindable.onDestroy();
         super.onDestroy();
     }
 
     @NonNull
     @Override
-    public <T> Observable<T> bind(@NonNull final Observable<T> observable) {
-        return baseUiBindable.bind(observable);
+    public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return baseUiBindable.bind(observable, onNextAction);
     }
 
     @NonNull
+    @Override
     public <T> Observable<T> untilDestroy(@NonNull final Observable<T> observable) {
         return baseUiBindable.untilDestroy(observable);
     }
 
     @NonNull
+    @Override
     public <T> Observable<T> untilStop(@NonNull final Observable<T> observable) {
         return baseUiBindable.untilStop(observable);
     }
 
     /**
      * Hides device keyboard that is showing over {@link Activity}.
-     * Do not use it if keyboard is over {@link android.app.Dialog} - it won't work as they have different {@link Activity#getWindow()}.
+     * Do NOT use it if keyboard is over {@link android.app.Dialog} - it won't work as they have different {@link Activity#getWindow()}.
      */
     public void hideSoftInput() {
         if (getCurrentFocus() == null) {
@@ -85,7 +104,9 @@ public abstract class BaseActivity extends AppCompatActivity
 
     /**
      * Shows device keyboard over {@link Activity} and focuses {@link View}.
-     * Do not use it if keyboard is over {@link android.app.Dialog} - it won't work as they have different {@link Activity#getWindow()}.
+     * Do NOT use it if keyboard is over {@link android.app.Dialog} - it won't work as they have different {@link Activity#getWindow()}.
+     * Do NOT use it if you are not sure that view is already added on screen.
+     * Better use it onStart of element if view is part of it or onConfigureNavigation if view is part of navigation.
      *
      * @param view View to get focus for input from keyboard.
      */
@@ -114,12 +135,20 @@ public abstract class BaseActivity extends AppCompatActivity
         if (getSupportFragmentManager().getBackStackEntryCount() <= 1) {
             supportFinishAfterTransition();
         } else {
-            getSupportFragmentManager().popBackStackImmediate();
+            getSupportFragmentManager().popBackStack();
         }
     }
 
+    /**
+     * Interface to be implemented for someone who want to intercept device back button pressing event.
+     */
     public interface OnBackPressedListener {
 
+        /**
+         * Calls when user presses device back button.
+         *
+         * @return True if it is processed by this object.
+         */
         boolean onBackPressed();
 
     }

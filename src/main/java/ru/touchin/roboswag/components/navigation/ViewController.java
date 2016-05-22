@@ -27,16 +27,23 @@ import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 
 import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivity;
 import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment;
+import ru.touchin.roboswag.components.observables.ui.BaseUiBindable;
+import ru.touchin.roboswag.components.observables.ui.UiBindable;
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
+import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * Created by Gavriil Sitnikov on 21/10/2015.
  * Class to control view of specific fragment, activity and application by logic bridge.
+ *
+ * @param <TActivity> Type of activity where such {@link ViewController} could be;
+ * @param <TFragment> Type of fragment where such {@link ViewController} could be;
  */
 public class ViewController<TActivity extends ViewControllerActivity<?>,
         TFragment extends ViewControllerFragment<?, TActivity>>
@@ -49,29 +56,23 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @NonNull
     private final ViewGroup container;
     @NonNull
-    private final BehaviorSubject<Boolean> isCreatedSubject = BehaviorSubject.create(true);
-    @NonNull
-    private final BehaviorSubject<Boolean> isStartedSubject = BehaviorSubject.create();
-    @NonNull
-    private final BaseUiBindable baseUiBindable = new BaseUiBindable(isCreatedSubject, isStartedSubject);
+    private final BaseUiBindable baseUiBindable = new BaseUiBindable();
+    private boolean destroyed;
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
+    @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
     //UnusedFormalParameter: savedInstanceState could be used by children
     public ViewController(@NonNull final CreationContext creationContext,
                           @Nullable final Bundle savedInstanceState) {
         this.activity = (TActivity) creationContext.activity;
         this.fragment = (TFragment) creationContext.fragment;
         this.container = creationContext.container;
-    }
-
-    public boolean isDestroyed() {
-        return !isCreatedSubject.getValue();
+        baseUiBindable.onCreate();
     }
 
     /**
-     * Returns view's activity.
+     * Returns activity where {@link ViewController} could be.
      *
-     * @return Returns activity;
+     * @return Returns activity.
      */
     @NonNull
     public TActivity getActivity() {
@@ -79,9 +80,9 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     }
 
     /**
-     * Returns view's activity.
+     * Returns fragment where {@link ViewController} could be.
      *
-     * @return Returns activity;
+     * @return Returns fragment.
      */
     @NonNull
     public TFragment getFragment() {
@@ -89,13 +90,23 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     }
 
     /**
-     * Returns view instantiated in {@link #getFragment} fragment attached to {@link #getActivity} activity.
+     * Returns view instantiated in {@link #getFragment()} fragment attached to {@link #getActivity()} activity.
+     * Use it to inflate your views into at construction of this {@link ViewController}.
      *
-     * @return Returns view;
+     * @return Returns view.
      */
     @NonNull
     public ViewGroup getContainer() {
         return container;
+    }
+
+    /**
+     * Returns if {@link ViewController} destroyed or not.
+     *
+     * @return True if it is destroyed.
+     */
+    public boolean isDestroyed() {
+        return destroyed;
     }
 
     /**
@@ -114,7 +125,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * @param resId      Resource id for the format string
      * @param formatArgs The format arguments that will be used for substitution.
      */
-    public final String getString(@StringRes final int resId, final Object... formatArgs) {
+    public final String getString(@StringRes final int resId, @NonNull final Object... formatArgs) {
         return getActivity().getString(resId, formatArgs);
     }
 
@@ -130,11 +141,13 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     }
 
     @NonNull
-    public <T> Observable<T> bind(@NonNull final Observable<T> observable) {
-        return baseUiBindable.bind(observable);
+    @Override
+    public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return baseUiBindable.bind(observable, onNextAction);
     }
 
     @NonNull
+    @Override
     public <T> Observable<T> untilStop(@NonNull final Observable<T> observable) {
         return baseUiBindable.untilStop(observable);
     }
@@ -145,28 +158,52 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
         return baseUiBindable.untilDestroy(observable);
     }
 
+    /**
+     * Calls when {@link ViewController} have started.
+     * Happens at {@link ViewControllerFragment#onStart(View, ViewControllerActivity)}.
+     */
     public void onStart() {
-        isStartedSubject.onNext(true);
+        baseUiBindable.onStart();
     }
 
+    /**
+     * Calls when {@link ViewController} should save it's state.
+     * Happens at {@link ViewControllerFragment#onSaveInstanceState(Bundle)}.
+     * Try not to use such method for saving state but use {@link ViewControllerFragment#getState()} from {@link #getFragment()}.
+     */
     public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
         // do nothing
     }
 
+    /**
+     * Calls when {@link ViewController} have stopped.
+     * Happens at {@link ViewControllerFragment#onStop(View, ViewControllerActivity)}.
+     */
     public void onStop() {
-        isStartedSubject.onNext(false);
+        baseUiBindable.onStop();
     }
 
+    /**
+     * Calls when {@link ViewController} have destroyed.
+     * Happens usually at {@link ViewControllerFragment#onDestroyView(View)}. In some cases at {@link ViewControllerFragment#onDestroy()}.
+     */
     public void onDestroy() {
-        isCreatedSubject.onNext(false);
+        baseUiBindable.onDestroy();
+        destroyed = true;
     }
 
+    /**
+     * Similar to {@link ViewControllerFragment#onOptionsItemSelected(MenuItem)}.
+     *
+     * @param item Selected menu item;
+     * @return True if selection processed.
+     */
     public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
         return false;
     }
 
     /**
-     * Class to simplify constructor override.
+     * Helper class to simplify constructor override.
      */
     public static class CreationContext {
 

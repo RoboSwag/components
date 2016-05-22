@@ -34,8 +34,9 @@ import rx.functions.Action2;
 
 /**
  * Created by Gavriil Sitnikov on 21/10/2015.
- * Fragment that have specific activity as a parent and can't be background.
- * [phase 1]
+ * Non-background fragment that have specific activity as a parent.
+ *
+ * @param <TActivity> Type of activity which to such fragment could be attached.
  */
 public abstract class ViewFragment<TActivity extends AppCompatActivity> extends Fragment
         implements OnFragmentStartedListener {

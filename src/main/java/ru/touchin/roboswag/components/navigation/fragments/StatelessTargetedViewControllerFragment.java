@@ -26,8 +26,11 @@ import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivi
 import ru.touchin.roboswag.core.log.Lc;
 
 /**
- * Created by Gavriil Sitnikov on 12/03/2016.
- * TODO: fill description
+ * Created by Gavriil Sitnikov on 11/04/2016.
+ * Simple {@link ViewControllerFragment} with no state and with attached {@link #getTargetFragment()}
+ * which is using by {@link ru.touchin.roboswag.components.navigation.ViewControllerNavigation}.
+ *
+ * @param <TActivity> Type of {@link ViewControllerActivity} where fragment could be attached to.
  */
 public class StatelessTargetedViewControllerFragment<TTargetState extends AbstractState,
         TActivity extends ViewControllerActivity<?>>
