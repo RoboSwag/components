@@ -18,23 +18,7 @@ android {
 
 dependencies {
     compile project(':libraries:core')
-
+    
     provided 'com.android.support:appcompat-v7:23.4.0'
-    provided 'com.android.support:recyclerview-v7:23.4.0'
-
-    provided 'io.reactivex:rxandroid:1.1.0'
-
-    provided('com.google.http-client:google-http-client-android:1.21.0') {
-        exclude(group: 'org.apache.httpcomponents', module: 'httpclient')
-    }
-    provided('com.google.http-client:google-http-client-jackson2:1.21.0') {
-        exclude(group: 'org.apache.httpcomponents', module: 'httpclient')
-    }
-    provided 'com.squareup.okhttp:okhttp:2.7.5'
-    provided 'com.facebook.fresco:fbcore:0.10.0'
-    provided 'com.facebook.fresco:imagepipeline-okhttp3:0.10.0'
-
-    provided('io.socket:socket.io-client:0.7.0') {
-        exclude group: 'org.json', module: 'json'
-    }
+    provided 'io.reactivex:rxandroid:1.2.0'
 }
