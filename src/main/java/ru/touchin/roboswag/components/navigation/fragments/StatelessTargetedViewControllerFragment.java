@@ -19,9 +19,12 @@
 
 package ru.touchin.roboswag.components.navigation.fragments;
 
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import ru.touchin.roboswag.components.navigation.AbstractState;
+import ru.touchin.roboswag.components.navigation.ViewController;
 import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivity;
 import ru.touchin.roboswag.core.log.Lc;
 
@@ -35,6 +38,17 @@ import ru.touchin.roboswag.core.log.Lc;
 public class StatelessTargetedViewControllerFragment<TTargetState extends AbstractState,
         TActivity extends ViewControllerActivity<?>>
         extends TargetedViewControllerFragment<AbstractState, TTargetState, TActivity> {
+
+    /**
+     * Creates {@link Bundle} which will store state and {@link ViewController}'s class.
+     *
+     * @param viewControllerClass Class of {@link ViewController} which will be instantiated inside this fragment;
+     * @return Returns {@link Bundle} with state inside.
+     */
+    @NonNull
+    public static Bundle createState(@NonNull final Class<? extends ViewController> viewControllerClass) {
+        return createState(viewControllerClass, null);
+    }
 
     @Nullable
     @Override

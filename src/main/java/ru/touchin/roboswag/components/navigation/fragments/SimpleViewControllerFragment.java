@@ -42,8 +42,8 @@ public class SimpleViewControllerFragment<TState extends AbstractState, TActivit
     /**
      * Creates {@link Bundle} which will store state and {@link ViewController}'s class.
      *
-     * @param viewControllerClass Class of {@link ViewController} which will be instantiated inside this fragment.
-     * @param state               State to use into {@link ViewController}.
+     * @param viewControllerClass Class of {@link ViewController} which will be instantiated inside this fragment;
+     * @param state               State to use into {@link ViewController};
      * @return Returns {@link Bundle} with state inside.
      */
     @NonNull
