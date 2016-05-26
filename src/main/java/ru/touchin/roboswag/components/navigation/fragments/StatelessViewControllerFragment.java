@@ -34,6 +34,8 @@ import ru.touchin.roboswag.core.log.Lc;
  *
  * @param <TActivity> Type of {@link ViewControllerActivity} where fragment could be attached to.
  */
+@SuppressWarnings("PMD.UseUtilityClass")
+//UseUtilityClass: PMD bug
 public class StatelessViewControllerFragment<TActivity extends ViewControllerActivity<?>>
         extends SimpleViewControllerFragment<AbstractState, TActivity> {
 
