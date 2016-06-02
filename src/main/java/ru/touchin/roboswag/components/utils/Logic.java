@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -49,7 +50,7 @@ import rx.Observable;
  */
 public class Logic {
 
-    private static final Map<Class<? extends Logic>, WeakReference<Logic>> LOGIC_INSTANCES = new TreeMap<>();
+    private static final Map<Class<? extends Logic>, WeakReference<Logic>> LOGIC_INSTANCES = new HashMap<>();
 
     /**
      * Returns instance of {@link Logic} depends on class. There should be no more than one instance per class.
