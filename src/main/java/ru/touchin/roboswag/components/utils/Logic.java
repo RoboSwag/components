@@ -26,7 +26,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import rx.Observable;
 
