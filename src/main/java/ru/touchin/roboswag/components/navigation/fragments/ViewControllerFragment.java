@@ -21,6 +21,7 @@ package ru.touchin.roboswag.components.navigation.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Pair;
@@ -32,6 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 
 import ru.touchin.roboswag.components.navigation.AbstractState;
@@ -55,6 +57,32 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         extends ViewFragment<TActivity> {
 
     private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
+
+    private static boolean isInDebugMode = false;
+
+    /**
+     * Enables debugging features like serialization of {@link #getState()} every creation.
+     *
+     * @param isInDebugMode True if such fragments should work in debug mode.
+     */
+    public static void setIsInDebugMode(final boolean isInDebugMode) {
+        ViewControllerFragment.isInDebugMode = isInDebugMode;
+    }
+
+    @SuppressWarnings("unchecked")
+    @NonNull
+    private static <T extends Serializable> T reserialize(@NonNull final T serializable) {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeSerializable(serializable);
+        final byte[] serializableBytes = parcel.marshall();
+        parcel.recycle();
+        parcel = Parcel.obtain();
+        parcel.unmarshall(serializableBytes, 0, serializableBytes.length);
+        parcel.setDataPosition(0);
+        final T result = (T) parcel.readSerializable();
+        parcel.recycle();
+        return result;
+    }
 
     /**
      * Creates {@link Bundle} which will store state.
@@ -106,6 +134,9 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
                 ? (TState) savedInstanceState.getSerializable(VIEW_CONTROLLER_STATE_EXTRA)
                 : (getArguments() != null ? (TState) getArguments().getSerializable(VIEW_CONTROLLER_STATE_EXTRA) : null);
         if (state != null) {
+            if (isInDebugMode) {
+                state = reserialize(state);
+            }
             state.onCreate();
         }
         viewControllerSubscription = Observable
