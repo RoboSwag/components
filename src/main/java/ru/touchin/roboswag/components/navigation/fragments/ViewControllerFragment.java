@@ -58,7 +58,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
 
     private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
 
-    private static boolean isInDebugMode = false;
+    private static boolean isInDebugMode;
 
     /**
      * Enables debugging features like serialization of {@link #getState()} every creation.
