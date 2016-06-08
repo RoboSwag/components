@@ -66,7 +66,6 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
         this.activity = (TActivity) creationContext.activity;
         this.fragment = (TFragment) creationContext.fragment;
         this.container = creationContext.container;
-        baseUiBindable.onCreate();
     }
 
     /**
@@ -156,6 +155,14 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @Override
     public <T> Observable<T> untilDestroy(@NonNull final Observable<T> observable) {
         return baseUiBindable.untilDestroy(observable);
+    }
+
+    /**
+     * Calls right after construction of {@link ViewController}.
+     * Happens at {@link ViewControllerFragment#onActivityCreated(View, ViewControllerActivity, Bundle)}.
+     */
+    public void onCreate() {
+        baseUiBindable.onCreate();
     }
 
     /**
