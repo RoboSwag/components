@@ -20,6 +20,7 @@
 package ru.touchin.roboswag.components.navigation.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -57,7 +58,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      */
     @SuppressWarnings("unchecked")
     @Nullable
-    protected TActivity getBaseActivity() {
+    protected final TActivity getBaseActivity() {
         if (getActivity() == null) {
             return null;
         }
@@ -79,6 +80,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
     }
 
     @Override
+    @CallSuper
     public void onFragmentStarted(@NonNull final Fragment fragment) {
         //do nothing
     }
@@ -101,6 +103,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param activity           Activity which fragment attached to.
      * @param savedInstanceState If the fragment is being re-created from a previous saved state, this is the state.
      */
+    @CallSuper
     public void onActivityCreated(@NonNull final View view, @NonNull final TActivity activity, @Nullable final Bundle savedInstanceState) {
         //do nothing
     }
@@ -126,6 +129,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param view     Instantiated view.
      * @param activity Activity which fragment attached to.
      */
+    @CallSuper
     protected void onStart(@NonNull final View view, @NonNull final TActivity activity) {
         if (getParentFragment() instanceof OnFragmentStartedListener) {
             ((OnFragmentStartedListener) getParentFragment()).onFragmentStarted(this);
@@ -147,6 +151,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param view     Instantiated view.
      * @param activity Activity which fragment attached to.
      */
+    @CallSuper
     protected void onResume(@NonNull final View view, @NonNull final TActivity activity) {
         //do nothing
     }
@@ -164,6 +169,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param view     Instantiated view.
      * @param activity Activity which fragment attached to.
      */
+    @CallSuper
     protected void onPause(@NonNull final View view, @NonNull final TActivity activity) {
         //do nothing
     }
@@ -181,6 +187,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param view     Instantiated view.
      * @param activity Activity which fragment attached to.
      */
+    @CallSuper
     protected void onStop(@NonNull final View view, @NonNull final TActivity activity) {
         //do nothing
     }
@@ -201,6 +208,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      *
      * @param view Instantiated view.
      */
+    @CallSuper
     protected void onDestroyView(@NonNull final View view) {
         //do nothing
     }

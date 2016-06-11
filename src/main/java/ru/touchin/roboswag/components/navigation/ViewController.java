@@ -20,6 +20,7 @@
 package ru.touchin.roboswag.components.navigation;
 
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -74,7 +75,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * @return Returns activity.
      */
     @NonNull
-    public TActivity getActivity() {
+    public final TActivity getActivity() {
         return activity;
     }
 
@@ -84,7 +85,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * @return Returns fragment.
      */
     @NonNull
-    public TFragment getFragment() {
+    public final TFragment getFragment() {
         return fragment;
     }
 
@@ -95,7 +96,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * @return Returns view.
      */
     @NonNull
-    public ViewGroup getContainer() {
+    public final ViewGroup getContainer() {
         return container;
     }
 
@@ -104,7 +105,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      *
      * @return True if it is destroyed.
      */
-    public boolean isDestroyed() {
+    public final boolean isDestroyed() {
         return destroyed;
     }
 
@@ -141,19 +142,19 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
 
     @NonNull
     @Override
-    public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+    public final <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
         return baseUiBindable.bind(observable, onNextAction);
     }
 
     @NonNull
     @Override
-    public <T> Observable<T> untilStop(@NonNull final Observable<T> observable) {
+    public final <T> Observable<T> untilStop(@NonNull final Observable<T> observable) {
         return baseUiBindable.untilStop(observable);
     }
 
     @NonNull
     @Override
-    public <T> Observable<T> untilDestroy(@NonNull final Observable<T> observable) {
+    public final <T> Observable<T> untilDestroy(@NonNull final Observable<T> observable) {
         return baseUiBindable.untilDestroy(observable);
     }
 
@@ -161,6 +162,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * Calls right after construction of {@link ViewController}.
      * Happens at {@link ViewControllerFragment#onActivityCreated(View, ViewControllerActivity, Bundle)}.
      */
+    @CallSuper
     public void onCreate() {
         baseUiBindable.onCreate();
     }
@@ -169,6 +171,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * Calls when {@link ViewController} have started.
      * Happens at {@link ViewControllerFragment#onStart(View, ViewControllerActivity)}.
      */
+    @CallSuper
     public void onStart() {
         baseUiBindable.onStart();
     }
@@ -178,6 +181,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * Happens at {@link ViewControllerFragment#onSaveInstanceState(Bundle)}.
      * Try not to use such method for saving state but use {@link ViewControllerFragment#getState()} from {@link #getFragment()}.
      */
+    @CallSuper
     public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
         // do nothing
     }
@@ -186,6 +190,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * Calls when {@link ViewController} have stopped.
      * Happens at {@link ViewControllerFragment#onStop(View, ViewControllerActivity)}.
      */
+    @CallSuper
     public void onStop() {
         baseUiBindable.onStop();
     }
@@ -194,6 +199,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * Calls when {@link ViewController} have destroyed.
      * Happens usually at {@link ViewControllerFragment#onDestroyView(View)}. In some cases at {@link ViewControllerFragment#onDestroy()}.
      */
+    @CallSuper
     public void onDestroy() {
         baseUiBindable.onDestroy();
         destroyed = true;
