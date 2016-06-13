@@ -21,6 +21,7 @@ package ru.touchin.roboswag.components.navigation.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -58,15 +59,13 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
 
     private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
 
-    private static boolean isInDebugMode;
+    private static boolean inDebugMode;
 
     /**
      * Enables debugging features like serialization of {@link #getState()} every creation.
-     *
-     * @param isInDebugMode True if such fragments should work in debug mode.
      */
-    public static void setIsInDebugMode(final boolean isInDebugMode) {
-        ViewControllerFragment.isInDebugMode = isInDebugMode;
+    public static void setInDebugMode() {
+        inDebugMode = true;
     }
 
     @SuppressWarnings("unchecked")
@@ -134,7 +133,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
                 ? (TState) savedInstanceState.getSerializable(VIEW_CONTROLLER_STATE_EXTRA)
                 : (getArguments() != null ? (TState) getArguments().getSerializable(VIEW_CONTROLLER_STATE_EXTRA) : null);
         if (state != null) {
-            if (isInDebugMode) {
+            if (inDebugMode) {
                 state = reserialize(state);
             }
             state.onCreate();
