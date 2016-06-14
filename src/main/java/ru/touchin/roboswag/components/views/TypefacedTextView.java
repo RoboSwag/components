@@ -157,7 +157,7 @@ public class TypefacedTextView extends AppCompatTextView {
             throws NoSuchFieldException, IllegalAccessException {
         if (!lineStrategy.scalable) {
             AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_textSize"), true,
-                    "textSize required parameter");
+                    "textSize required parameter. If it's dynamic then use '0sp'");
         }
         if (lineStrategy.multiline) {
             if (typedArray.getInt(AttributesCheckUtils.getField(androidRes, "TextView_lines"), -1) == 1) {

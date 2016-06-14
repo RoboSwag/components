@@ -167,7 +167,7 @@ public class TypefacedEditText extends AppCompatEditText {
         }
 
         AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_textSize"), true,
-                "textSize required parameter");
+                "textSize required parameter. If it's dynamic then use '0sp'");
         AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_inputType"), true,
                 "inputType required parameter");
         AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_imeOptions"), true,

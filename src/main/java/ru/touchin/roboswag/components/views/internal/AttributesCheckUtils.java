@@ -98,7 +98,8 @@ public final class AttributesCheckUtils {
                 "remove singleLine and use " + lineStrategyParameterName);
         checkAttribute(typedArray, errors, getField(androidRes, "TextView_ellipsize"), false,
                 "remove ellipsize and use " + lineStrategyParameterName);
-        checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_textColor"), true, "textColor required parameter");
+        checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_textColor"), true,
+                "textColor required parameter. If it's dynamic then use 'android:color/transparent'");
     }
 
     /**
