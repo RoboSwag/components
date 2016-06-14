@@ -184,6 +184,19 @@ public class TypefacedTextView extends AppCompatTextView {
     public void setLineStrategy(@NonNull final LineStrategy lineStrategy) {
         this.lineStrategy = lineStrategy;
         super.setSingleLine(!lineStrategy.multiline);
+        switch (lineStrategy) {
+            case SINGLE_LINE_ELLIPSIZE:
+            case MULTILINE_ELLIPSIZE:
+                super.setEllipsize(TextUtils.TruncateAt.END);
+                break;
+            case SINGLE_LINE_MARQUEE:
+            case MULTILINE_MARQUEE:
+                super.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+                break;
+            case SINGLE_LINE_AUTO_SCALE:
+                super.setEllipsize(null);
+                break;
+        }
         if (lineStrategy.scalable) {
             requestLayout();
         }
