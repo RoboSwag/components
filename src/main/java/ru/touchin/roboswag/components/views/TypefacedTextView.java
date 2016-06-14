@@ -35,7 +35,7 @@ import java.util.List;
 import ru.touchin.roboswag.components.R;
 import ru.touchin.roboswag.components.utils.Typefaces;
 import ru.touchin.roboswag.components.utils.UiUtils;
-import ru.touchin.roboswag.components.views.internal.AttributesCheckUtils;
+import ru.touchin.roboswag.components.views.internal.AttributesUtils;
 import ru.touchin.roboswag.core.log.Lc;
 
 /**
@@ -83,8 +83,13 @@ public class TypefacedTextView extends AppCompatTextView {
         super.setIncludeFontPadding(false);
         if (attrs != null) {
             final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TypefacedTextView);
-            setLineStrategy(LineStrategy.byResIndex(typedArray.getInt(R.styleable.TypefacedTextView_lineStrategy,
-                    LineStrategy.MULTILINE_ELLIPSIZE.ordinal())));
+            final LineStrategy lineStrategy = LineStrategy
+                    .byResIndex(typedArray.getInt(R.styleable.TypefacedTextView_lineStrategy, LineStrategy.MULTILINE_ELLIPSIZE.ordinal()));
+            if (lineStrategy.multiline) {
+                setLineStrategy(lineStrategy, AttributesUtils.getMaxLinesFromAttrs(context, attrs));
+            } else {
+                setLineStrategy(lineStrategy);
+            }
             if (!isInEditMode()) {
                 setTypeface(Typefaces.getFromAttributes(context, attrs, R.styleable.TypefacedTextView, R.styleable.TypefacedTextView_customTypeface));
             }
@@ -99,9 +104,9 @@ public class TypefacedTextView extends AppCompatTextView {
         final List<String> errors = new ArrayList<>();
         LineStrategy lineStrategy = null;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TypefacedTextView);
-        AttributesCheckUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedTextView_customTypeface, true,
+        AttributesUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedTextView_customTypeface, true,
                 "customTypeface required parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedTextView_lineStrategy, true,
+        AttributesUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedTextView_lineStrategy, true,
                 "lineStrategy required parameter");
         if (typedArray.hasValue(R.styleable.TypefacedTextView_lineStrategy)) {
             lineStrategy = LineStrategy.byResIndex(typedArray.getInt(R.styleable.TypefacedTextView_lineStrategy, -1));
@@ -111,8 +116,8 @@ public class TypefacedTextView extends AppCompatTextView {
         try {
             final Class androidRes = Class.forName("com.android.internal.R$styleable");
 
-            typedArray = context.obtainStyledAttributes(attrs, AttributesCheckUtils.getField(androidRes, "TextView"));
-            AttributesCheckUtils.checkRegularTextViewAttributes(typedArray, androidRes, errors, "lineStrategy");
+            typedArray = context.obtainStyledAttributes(attrs, AttributesUtils.getField(androidRes, "TextView"));
+            AttributesUtils.checkRegularTextViewAttributes(typedArray, androidRes, errors, "lineStrategy");
             checkTextViewSpecificAttributes(typedArray, androidRes, errors);
 
             if (lineStrategy != null) {
@@ -121,34 +126,34 @@ public class TypefacedTextView extends AppCompatTextView {
         } catch (final Exception exception) {
             Lc.cutAssertion(exception);
         }
-        AttributesCheckUtils.handleErrors(this, errors);
+        AttributesUtils.handleErrors(this, errors);
         typedArray.recycle();
     }
 
     private void checkTextViewSpecificAttributes(@NonNull final TypedArray typedArray, @NonNull final Class androidRes,
                                                  @NonNull final List<String> errors)
             throws NoSuchFieldException, IllegalAccessException {
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_phoneNumber"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_phoneNumber"), false,
                 "phoneNumber forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_password"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_password"), false,
                 "password forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_numeric"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_numeric"), false,
                 "numeric forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_inputType"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_inputType"), false,
                 "inputType forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_imeOptions"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_imeOptions"), false,
                 "imeOptions forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_imeActionId"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_imeActionId"), false,
                 "imeActionId forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_imeActionLabel"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_imeActionLabel"), false,
                 "imeActionLabel forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_hint"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_hint"), false,
                 "hint forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_editable"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_editable"), false,
                 "editable forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_digits"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_digits"), false,
                 "digits forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_cursorVisible"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_cursorVisible"), false,
                 "cursorVisible forbid parameter");
     }
 
@@ -156,22 +161,22 @@ public class TypefacedTextView extends AppCompatTextView {
                                              @NonNull final List<String> errors, @NonNull final LineStrategy lineStrategy)
             throws NoSuchFieldException, IllegalAccessException {
         if (!lineStrategy.scalable) {
-            AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_textSize"), true,
+            AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_textSize"), true,
                     "textSize required parameter. If it's dynamic then use '0sp'");
         }
         if (lineStrategy.multiline) {
-            if (typedArray.getInt(AttributesCheckUtils.getField(androidRes, "TextView_lines"), -1) == 1) {
+            if (typedArray.getInt(AttributesUtils.getField(androidRes, "TextView_lines"), -1) == 1) {
                 errors.add("lines should be more than 1 if lineStrategy is true");
             }
-            if (typedArray.getInt(AttributesCheckUtils.getField(androidRes, "TextView_maxLines"), -1) == 1) {
+            if (typedArray.getInt(AttributesUtils.getField(androidRes, "TextView_maxLines"), -1) == 1) {
                 errors.add("maxLines should be more than 1 if lineStrategy is true");
             }
         } else {
-            AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_lines"), false,
+            AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_lines"), false,
                     "remove lines and use lineStrategy");
-            AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_maxLines"), false,
+            AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_maxLines"), false,
                     "remove maxLines and use lineStrategy");
-            AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_minLines"), false,
+            AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_minLines"), false,
                     "remove minLines and use lineStrategy");
         }
     }
@@ -182,8 +187,22 @@ public class TypefacedTextView extends AppCompatTextView {
      * @param lineStrategy Specific {@link LineStrategy}.
      */
     public void setLineStrategy(@NonNull final LineStrategy lineStrategy) {
+        setLineStrategy(lineStrategy, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Sets behavior of text if there is no space for it in one line.
+     *
+     * @param lineStrategy Specific {@link LineStrategy};
+     * @param maxLines     Max lines if line strategy is multiline.
+     */
+    public void setLineStrategy(@NonNull final LineStrategy lineStrategy, final int maxLines) {
         this.lineStrategy = lineStrategy;
-        super.setSingleLine(!lineStrategy.multiline);
+        if (!lineStrategy.multiline) {
+            super.setLines(1);
+        } else {
+            super.setMaxLines(maxLines);
+        }
         switch (lineStrategy) {
             case SINGLE_LINE_ELLIPSIZE:
             case MULTILINE_ELLIPSIZE:
@@ -195,6 +214,9 @@ public class TypefacedTextView extends AppCompatTextView {
                 break;
             case SINGLE_LINE_AUTO_SCALE:
                 super.setEllipsize(null);
+                break;
+            default:
+                Lc.assertion("Unknown line strategy: " + lineStrategy);
                 break;
         }
         if (lineStrategy.scalable) {
@@ -217,7 +239,7 @@ public class TypefacedTextView extends AppCompatTextView {
         if (!constructed) {
             return;
         }
-        Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
+        Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
     }
 
     @Override
@@ -225,13 +247,13 @@ public class TypefacedTextView extends AppCompatTextView {
         if (!constructed) {
             return;
         }
-        Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
+        Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
     }
 
     @Override
     public void setLines(final int lines) {
         if (constructed && lineStrategy.multiline && lines == 1) {
-            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "lines = 1 is illegal if lineStrategy is multiline")));
+            Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "lines = 1 is illegal if lineStrategy is multiline")));
             return;
         }
         super.setLines(lines);
@@ -241,20 +263,10 @@ public class TypefacedTextView extends AppCompatTextView {
     public void setMaxLines(final int maxLines) {
         if (constructed && !lineStrategy.multiline && maxLines > 1) {
             Lc.assertion(new IllegalStateException(
-                    AttributesCheckUtils.viewError(this, "maxLines > 1 is illegal if lineStrategy is single line")));
+                    AttributesUtils.viewError(this, "maxLines > 1 is illegal if lineStrategy is single line")));
             return;
         }
         super.setMaxLines(maxLines);
-    }
-
-    @Override
-    public void setMinLines(final int minLines) {
-        if (constructed && !lineStrategy.multiline && minLines > 1) {
-            Lc.assertion(new IllegalStateException(
-                    AttributesCheckUtils.viewError(this, "minLines > 1 is illegal if lineStrategy is single line")));
-            return;
-        }
-        super.setMinLines(minLines);
     }
 
     @Override
@@ -263,7 +275,17 @@ public class TypefacedTextView extends AppCompatTextView {
             return;
         }
         Lc.assertion(new IllegalStateException(
-                AttributesCheckUtils.viewError(this, "Do not specify font padding as it is hard to make pixel-perfect design with such option")));
+                AttributesUtils.viewError(this, "Do not specify font padding as it is hard to make pixel-perfect design with such option")));
+    }
+
+    @Override
+    public void setMinLines(final int minLines) {
+        if (constructed && !lineStrategy.multiline && minLines > 1) {
+            Lc.assertion(new IllegalStateException(
+                    AttributesUtils.viewError(this, "minLines > 1 is illegal if lineStrategy is single line")));
+            return;
+        }
+        super.setMinLines(minLines);
     }
 
     @Override
@@ -271,7 +293,7 @@ public class TypefacedTextView extends AppCompatTextView {
         if (!constructed) {
             return;
         }
-        Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify ellipsize use setLineStrategy instead")));
+        Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "Do not specify ellipsize use setLineStrategy instead")));
     }
 
     /**
@@ -294,7 +316,7 @@ public class TypefacedTextView extends AppCompatTextView {
     @Override
     public void setTextSize(final float size) {
         if (constructed && lineStrategy.scalable) {
-            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "textSize call is illegal if lineStrategy is scalable")));
+            Lc.cutAssertion(new IllegalStateException(AttributesUtils.viewError(this, "textSize call is illegal if lineStrategy is scalable")));
             return;
         }
         super.setTextSize(size);
@@ -303,7 +325,7 @@ public class TypefacedTextView extends AppCompatTextView {
     @Override
     public void setTextSize(final int unit, final float size) {
         if (constructed && lineStrategy.scalable) {
-            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "textSize call is illegal if lineStrategy is scalable")));
+            Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "textSize call is illegal if lineStrategy is scalable")));
             return;
         }
         super.setTextSize(unit, size);

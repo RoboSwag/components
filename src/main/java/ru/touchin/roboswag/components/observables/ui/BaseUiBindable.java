@@ -98,18 +98,18 @@ public class BaseUiBindable implements UiBindable {
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable,
-                                      @NonNull final Action1<T> onNextAction, @NonNull final Action1<Throwable> onErrorAction) {
+                                      @NonNull final Action1<T> onNextAction,
+                                      @NonNull final Action1<Throwable> onErrorAction) {
         return untilStop(observable, onNextAction, onErrorAction, Actions.empty());
     }
 
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable,
-                                      @NonNull final Action1<T> onNextAction, @NonNull final Action1<Throwable> onErrorAction, @NonNull final Action0 onCompletedAction) {
-        return isCreatedSubject.first()
-                .switchMap(isCreated -> isCreated ? observable.observeOn(AndroidSchedulers.mainThread()) : Observable.empty())
-                .takeUntil(isStartedSubject.filter(started -> !started))
-                .subscribe(onNextAction, onErrorAction, onCompletedAction);
+                                      @NonNull final Action1<T> onNextAction,
+                                      @NonNull final Action1<Throwable> onErrorAction,
+                                      @NonNull final Action0 onCompletedAction) {
+        return until(observable, isStartedSubject.map(started -> !started), onNextAction, onErrorAction, onCompletedAction);
     }
 
     @NonNull
@@ -120,24 +120,36 @@ public class BaseUiBindable implements UiBindable {
 
     @NonNull
     @Override
-    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
+                                         @NonNull final Action1<T> onNextAction) {
         return untilDestroy(observable, onNextAction, Lc::assertion, Actions.empty());
     }
 
     @NonNull
     @Override
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
-                                         @NonNull final Action1<T> onNextAction, @NonNull final Action1<Throwable> onErrorAction) {
+                                         @NonNull final Action1<T> onNextAction,
+                                         @NonNull final Action1<Throwable> onErrorAction) {
         return untilDestroy(observable, onNextAction, onErrorAction, Actions.empty());
     }
 
     @NonNull
     @Override
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
-                                         @NonNull final Action1<T> onNextAction, @NonNull final Action1<Throwable> onErrorAction, @NonNull final Action0 onCompletedAction) {
+                                         @NonNull final Action1<T> onNextAction,
+                                         @NonNull final Action1<Throwable> onErrorAction,
+                                         @NonNull final Action0 onCompletedAction) {
+        return until(observable, isCreatedSubject.map(created -> !created), onNextAction, onErrorAction, onCompletedAction);
+    }
+
+    private <T> Subscription until(@NonNull final Observable<T> observable,
+                                   @NonNull final Observable<Boolean> conditionSubject,
+                                   @NonNull final Action1<T> onNextAction,
+                                   @NonNull final Action1<Throwable> onErrorAction,
+                                   @NonNull final Action0 onCompletedAction) {
         return isCreatedSubject.first()
                 .switchMap(isCreated -> isCreated ? observable.observeOn(AndroidSchedulers.mainThread()) : Observable.empty())
-                .takeUntil(isCreatedSubject.filter(created -> !created))
+                .takeUntil(conditionSubject.filter(condition -> condition))
                 .subscribe(onNextAction, onErrorAction, onCompletedAction);
     }
 

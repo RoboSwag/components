@@ -141,6 +141,65 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
         // do nothing
     }
 
+    /**
+     * Calls right after construction of {@link ViewController}.
+     * Happens at {@link ViewControllerFragment#onActivityCreated(View, ViewControllerActivity, Bundle)}.
+     */
+    @CallSuper
+    public void onCreate() {
+        baseUiBindable.onCreate();
+    }
+
+    /**
+     * Calls when {@link ViewController} have started.
+     * Happens at {@link ViewControllerFragment#onStart(View, ViewControllerActivity)}.
+     */
+    @CallSuper
+    public void onStart() {
+        baseUiBindable.onStart();
+    }
+
+    /**
+     * Calls when {@link ViewController} should save it's state.
+     * Happens at {@link ViewControllerFragment#onSaveInstanceState(Bundle)}.
+     * Try not to use such method for saving state but use {@link ViewControllerFragment#getState()} from {@link #getFragment()}.
+     */
+    @CallSuper
+    public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
+        // do nothing
+    }
+
+    /**
+     * Calls when {@link ViewController} have stopped.
+     * Happens at {@link ViewControllerFragment#onStop(View, ViewControllerActivity)}.
+     */
+    @CallSuper
+    public void onStop() {
+        baseUiBindable.onStop();
+    }
+
+    /**
+     * Calls when {@link ViewController} have destroyed.
+     * Happens usually at {@link ViewControllerFragment#onDestroyView(View)}. In some cases at {@link ViewControllerFragment#onDestroy()}.
+     */
+    @CallSuper
+    public void onDestroy() {
+        baseUiBindable.onDestroy();
+        destroyed = true;
+    }
+
+    /**
+     * Similar to {@link ViewControllerFragment#onOptionsItemSelected(MenuItem)}.
+     *
+     * @param item Selected menu item;
+     * @return True if selection processed.
+     */
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
+        return false;
+    }
+
+    @SuppressWarnings("CPD-START")
+    //CPD: it is same as in other implementation based on BaseUiBindable
     @NonNull
     @Override
     public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
@@ -205,63 +264,8 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
         return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
-    /**
-     * Calls right after construction of {@link ViewController}.
-     * Happens at {@link ViewControllerFragment#onActivityCreated(View, ViewControllerActivity, Bundle)}.
-     */
-    @CallSuper
-    public void onCreate() {
-        baseUiBindable.onCreate();
-    }
-
-    /**
-     * Calls when {@link ViewController} have started.
-     * Happens at {@link ViewControllerFragment#onStart(View, ViewControllerActivity)}.
-     */
-    @CallSuper
-    public void onStart() {
-        baseUiBindable.onStart();
-    }
-
-    /**
-     * Calls when {@link ViewController} should save it's state.
-     * Happens at {@link ViewControllerFragment#onSaveInstanceState(Bundle)}.
-     * Try not to use such method for saving state but use {@link ViewControllerFragment#getState()} from {@link #getFragment()}.
-     */
-    @CallSuper
-    public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
-        // do nothing
-    }
-
-    /**
-     * Calls when {@link ViewController} have stopped.
-     * Happens at {@link ViewControllerFragment#onStop(View, ViewControllerActivity)}.
-     */
-    @CallSuper
-    public void onStop() {
-        baseUiBindable.onStop();
-    }
-
-    /**
-     * Calls when {@link ViewController} have destroyed.
-     * Happens usually at {@link ViewControllerFragment#onDestroyView(View)}. In some cases at {@link ViewControllerFragment#onDestroy()}.
-     */
-    @CallSuper
-    public void onDestroy() {
-        baseUiBindable.onDestroy();
-        destroyed = true;
-    }
-
-    /**
-     * Similar to {@link ViewControllerFragment#onOptionsItemSelected(MenuItem)}.
-     *
-     * @param item Selected menu item;
-     * @return True if selection processed.
-     */
-    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
-        return false;
-    }
-
+    @SuppressWarnings("CPD-END")
+    //CPD: it is same as in other implementation based on BaseUiBindable
     /**
      * Helper class to simplify constructor override.
      */

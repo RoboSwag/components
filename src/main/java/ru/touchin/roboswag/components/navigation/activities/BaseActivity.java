@@ -72,70 +72,6 @@ public abstract class BaseActivity extends AppCompatActivity
         super.onDestroy();
     }
 
-    @NonNull
-    @Override
-    public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return baseUiBindable.bind(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Subscription untilStop(@NonNull final Observable<T> observable) {
-        return baseUiBindable.untilStop(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Subscription untilStop(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return baseUiBindable.untilStop(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Subscription untilStop(@NonNull final Observable<T> observable,
-                                      @NonNull final Action1<T> onNextAction,
-                                      @NonNull final Action1<Throwable> onErrorAction) {
-        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Subscription untilStop(@NonNull final Observable<T> observable,
-                                      @NonNull final Action1<T> onNextAction,
-                                      @NonNull final Action1<Throwable> onErrorAction,
-                                      @NonNull final Action0 onCompletedAction) {
-        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable) {
-        return baseUiBindable.untilDestroy(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return baseUiBindable.untilDestroy(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
-                                         @NonNull final Action1<T> onNextAction,
-                                         @NonNull final Action1<Throwable> onErrorAction) {
-        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
-                                         @NonNull final Action1<T> onNextAction,
-                                         @NonNull final Action1<Throwable> onErrorAction,
-                                         @NonNull final Action0 onCompletedAction) {
-        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
     /**
      * Hides device keyboard that is showing over {@link Activity}.
      * Do NOT use it if keyboard is over {@link android.app.Dialog} - it won't work as they have different {@link Activity#getWindow()}.
@@ -186,6 +122,74 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     }
 
+    @SuppressWarnings("CPD-START")
+    //CPD: it is same as in other implementation based on BaseUiBindable
+    @NonNull
+    @Override
+    public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return baseUiBindable.bind(observable, onNextAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable,
+                                      @NonNull final Action1<T> onNextAction,
+                                      @NonNull final Action1<Throwable> onErrorAction) {
+        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable,
+                                      @NonNull final Action1<T> onNextAction,
+                                      @NonNull final Action1<Throwable> onErrorAction,
+                                      @NonNull final Action0 onCompletedAction) {
+        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable) {
+        return baseUiBindable.untilStop(observable);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return baseUiBindable.untilStop(observable, onNextAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable) {
+        return baseUiBindable.untilDestroy(observable);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return baseUiBindable.untilDestroy(observable, onNextAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
+                                         @NonNull final Action1<T> onNextAction,
+                                         @NonNull final Action1<Throwable> onErrorAction) {
+        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
+                                         @NonNull final Action1<T> onNextAction,
+                                         @NonNull final Action1<Throwable> onErrorAction,
+                                         @NonNull final Action0 onCompletedAction) {
+        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
+    }
+
+    @SuppressWarnings("CPD-END")
+    //CPD: it is same as in other implementation based on BaseUiBindable
     /**
      * Interface to be implemented for someone who want to intercept device back button pressing event.
      */

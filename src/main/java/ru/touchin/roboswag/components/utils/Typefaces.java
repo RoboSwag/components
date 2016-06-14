@@ -82,8 +82,8 @@ public final class Typefaces {
      *
      * @param context     Context of assets where typeface file stored in;
      * @param attrs       Attributes of view to get font from;
-     * @param styleableId Id of attribute set (e.g. {@link ru.touchin.roboswag.components.R.styleable#TypefacedTextView});
-     * @param attributeId Id of attribute (e.g. {@link ru.touchin.roboswag.components.R.styleable#TypefacedTextView_customTypeface});
+     * @param styleableId Id of attribute set;
+     * @param attributeId Id of attribute;
      * @return {@link Typeface} from assets.
      */
     @NonNull

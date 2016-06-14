@@ -34,7 +34,7 @@ import java.util.List;
 
 import ru.touchin.roboswag.components.R;
 import ru.touchin.roboswag.components.utils.Typefaces;
-import ru.touchin.roboswag.components.views.internal.AttributesCheckUtils;
+import ru.touchin.roboswag.components.views.internal.AttributesUtils;
 import ru.touchin.roboswag.core.log.Lc;
 
 /**
@@ -87,9 +87,9 @@ public class TypefacedEditText extends AppCompatEditText {
         initializeTextChangedListener();
         if (attrs != null) {
             final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TypefacedEditText);
-            boolean multiline = typedArray.getBoolean(R.styleable.TypefacedEditText_isMultiline, false);
+            final boolean multiline = typedArray.getBoolean(R.styleable.TypefacedEditText_isMultiline, false);
             if (multiline) {
-                setMultiline(getMaxLinesFromAttrs(context, attrs));
+                setMultiline(AttributesUtils.getMaxLinesFromAttrs(context, attrs));
             } else {
                 setLines(1);
             }
@@ -104,25 +104,13 @@ public class TypefacedEditText extends AppCompatEditText {
         }
     }
 
-    private int getMaxLinesFromAttrs(@NonNull final Context context, @NonNull final AttributeSet attrs) {
-        try {
-            final Class androidRes = Class.forName("com.android.internal.R$styleable");
-            final TypedArray typedArray = context.obtainStyledAttributes(attrs, AttributesCheckUtils.getField(androidRes, "TextView"));
-            final int result = typedArray.getInt(AttributesCheckUtils.getField(androidRes, "TextView_fontFamily"), Integer.MAX_VALUE);
-            typedArray.recycle();
-            return result;
-        } catch (Exception e) {
-            return Integer.MAX_VALUE;
-        }
-    }
-
     private void checkAttributes(@NonNull final Context context, @NonNull final AttributeSet attrs) {
         final List<String> errors = new ArrayList<>();
         Boolean multiline = null;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TypefacedEditText);
-        AttributesCheckUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedEditText_customTypeface, true,
+        AttributesUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedEditText_customTypeface, true,
                 "customTypeface required parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedEditText_isMultiline, true,
+        AttributesUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedEditText_isMultiline, true,
                 "isMultiline required parameter");
         if (typedArray.hasValue(R.styleable.TypefacedEditText_isMultiline)) {
             multiline = typedArray.getBoolean(R.styleable.TypefacedEditText_isMultiline, false);
@@ -132,8 +120,8 @@ public class TypefacedEditText extends AppCompatEditText {
         try {
             final Class androidRes = Class.forName("com.android.internal.R$styleable");
 
-            typedArray = context.obtainStyledAttributes(attrs, AttributesCheckUtils.getField(androidRes, "TextView"));
-            AttributesCheckUtils.checkRegularTextViewAttributes(typedArray, androidRes, errors, "isMultiline");
+            typedArray = context.obtainStyledAttributes(attrs, AttributesUtils.getField(androidRes, "TextView"));
+            AttributesUtils.checkRegularTextViewAttributes(typedArray, androidRes, errors, "isMultiline");
             checkEditTextSpecificAttributes(typedArray, androidRes, errors);
             if (multiline != null) {
                 checkMultilineAttributes(typedArray, androidRes, errors, multiline);
@@ -141,36 +129,36 @@ public class TypefacedEditText extends AppCompatEditText {
         } catch (final Exception exception) {
             Lc.cutAssertion(exception);
         }
-        AttributesCheckUtils.handleErrors(this, errors);
+        AttributesUtils.handleErrors(this, errors);
         typedArray.recycle();
     }
 
     private void checkEditTextSpecificAttributes(@NonNull final TypedArray typedArray, @NonNull final Class androidRes,
                                                  @NonNull final List<String> errors)
             throws NoSuchFieldException, IllegalAccessException {
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_typeface"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_typeface"), false,
                 "remove typeface and use customTypeface");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_textStyle"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_textStyle"), false,
                 "remove textStyle and use customTypeface");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_fontFamily"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_fontFamily"), false,
                 "remove fontFamily and use customTypeface");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_singleLine"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_singleLine"), false,
                 "remove singleLine and use isMultiline");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_includeFontPadding"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_includeFontPadding"), false,
                 "includeFontPadding forbid parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_ellipsize"), false,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_ellipsize"), false,
                 "ellipsize forbid parameter");
 
-        if (typedArray.hasValue(AttributesCheckUtils.getField(androidRes, "TextView_hint"))) {
-            AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_textColorHint"), true,
+        if (typedArray.hasValue(AttributesUtils.getField(androidRes, "TextView_hint"))) {
+            AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_textColorHint"), true,
                     "textColorHint required parameter if hint is not null");
         }
 
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_textSize"), true,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_textSize"), true,
                 "textSize required parameter. If it's dynamic then use '0sp'");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_inputType"), true,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_inputType"), true,
                 "inputType required parameter");
-        AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_imeOptions"), true,
+        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_imeOptions"), true,
                 "imeOptions required parameter");
     }
 
@@ -178,24 +166,24 @@ public class TypefacedEditText extends AppCompatEditText {
                                           @NonNull final List<String> errors, final boolean multiline)
             throws NoSuchFieldException, IllegalAccessException {
         if (multiline) {
-            if (typedArray.getInt(AttributesCheckUtils.getField(androidRes, "TextView_lines"), -1) == 1) {
+            if (typedArray.getInt(AttributesUtils.getField(androidRes, "TextView_lines"), -1) == 1) {
                 errors.add("lines should be more than 1 if isMultiline is true");
             }
-            if (typedArray.getInt(AttributesCheckUtils.getField(androidRes, "TextView_maxLines"), -1) == 1) {
+            if (typedArray.getInt(AttributesUtils.getField(androidRes, "TextView_maxLines"), -1) == 1) {
                 errors.add("maxLines should be more than 1 if isMultiline is true");
             }
-            if (!typedArray.hasValue(AttributesCheckUtils.getField(androidRes, "TextView_maxLines"))
-                    && !typedArray.hasValue(AttributesCheckUtils.getField(androidRes, "TextView_maxLength"))) {
+            if (!typedArray.hasValue(AttributesUtils.getField(androidRes, "TextView_maxLines"))
+                    && !typedArray.hasValue(AttributesUtils.getField(androidRes, "TextView_maxLength"))) {
                 errors.add("specify maxLines or maxLength if isMultiline is true");
             }
         } else {
-            AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_lines"), false,
+            AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_lines"), false,
                     "remove lines and use isMultiline");
-            AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_maxLines"), false,
+            AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_maxLines"), false,
                     "maxLines remove and use isMultiline");
-            AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_minLines"), false,
+            AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_minLines"), false,
                     "minLines remove and use isMultiline");
-            AttributesCheckUtils.checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_maxLength"), true,
+            AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_maxLength"), true,
                     "maxLength required parameter if isMultiline is false");
         }
     }
@@ -251,7 +239,7 @@ public class TypefacedEditText extends AppCompatEditText {
     @Override
     public void setLines(final int lines) {
         if (constructed && multiline && lines == 1) {
-            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "lines = 1 is illegal if multiline is set to true")));
+            Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "lines = 1 is illegal if multiline is set to true")));
             return;
         }
         super.setLines(lines);
@@ -260,7 +248,7 @@ public class TypefacedEditText extends AppCompatEditText {
     @Override
     public void setMaxLines(final int maxLines) {
         if (constructed && !multiline && maxLines > 1) {
-            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "maxLines > 1 is illegal if multiline is set to false")));
+            Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "maxLines > 1 is illegal if multiline is set to false")));
             return;
         }
         super.setMaxLines(maxLines);
@@ -269,7 +257,7 @@ public class TypefacedEditText extends AppCompatEditText {
     @Override
     public void setMinLines(final int minLines) {
         if (constructed && !multiline && minLines > 1) {
-            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "minLines > 1 is illegal if multiline is set to false")));
+            Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "minLines > 1 is illegal if multiline is set to false")));
             return;
         }
         super.setMinLines(minLines);
@@ -281,7 +269,7 @@ public class TypefacedEditText extends AppCompatEditText {
             return;
         }
         Lc.assertion(new IllegalStateException(
-                AttributesCheckUtils.viewError(this, "Do not specify font padding as it is hard to make pixel-perfect design with such option")));
+                AttributesUtils.viewError(this, "Do not specify font padding as it is hard to make pixel-perfect design with such option")));
     }
 
     @Override
@@ -289,7 +277,7 @@ public class TypefacedEditText extends AppCompatEditText {
         if (!constructed) {
             return;
         }
-        Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify ellipsize for EditText")));
+        Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "Do not specify ellipsize for EditText")));
     }
 
     /**

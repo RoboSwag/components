@@ -19,10 +19,12 @@
 
 package ru.touchin.roboswag.components.views.internal;
 
+import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
 import android.support.annotation.StyleableRes;
 import android.text.TextUtils;
+import android.util.AttributeSet;
 import android.view.View;
 
 import java.lang.reflect.Field;
@@ -36,7 +38,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  * Created by Gavriil Sitnikov on 13/06/2016.
  * Bunch of inner helper library methods to validate attributes of custom views.
  */
-public final class AttributesCheckUtils {
+public final class AttributesUtils {
 
     /**
      * Gets static field of class.
@@ -98,7 +100,7 @@ public final class AttributesCheckUtils {
                 "remove singleLine and use " + lineStrategyParameterName);
         checkAttribute(typedArray, errors, getField(androidRes, "TextView_ellipsize"), false,
                 "remove ellipsize and use " + lineStrategyParameterName);
-        checkAttribute(typedArray, errors, AttributesCheckUtils.getField(androidRes, "TextView_textColor"), true,
+        checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_textColor"), true,
                 "textColor required parameter. If it's dynamic then use 'android:color/transparent'");
     }
 
@@ -116,6 +118,25 @@ public final class AttributesCheckUtils {
     }
 
     /**
+     * Returns max lines attribute value for views extended from {@link android.widget.TextView}.
+     *
+     * @param context Context of attributes;
+     * @param attrs   TextView based attributes;
+     * @return Max lines value.
+     */
+    public static int getMaxLinesFromAttrs(@NonNull final Context context, @NonNull final AttributeSet attrs) {
+        try {
+            final Class androidRes = Class.forName("com.android.internal.R$styleable");
+            final TypedArray typedArray = context.obtainStyledAttributes(attrs, AttributesUtils.getField(androidRes, "TextView"));
+            final int result = typedArray.getInt(AttributesUtils.getField(androidRes, "TextView_fontFamily"), Integer.MAX_VALUE);
+            typedArray.recycle();
+            return result;
+        } catch (Exception e) {
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    /**
      * Creates readable view error.
      *
      * @param view      View of error;
@@ -127,7 +148,7 @@ public final class AttributesCheckUtils {
         return "Errors for view id=" + UiUtils.OfViews.getViewIdString(view) + ":\n" + errorText;
     }
 
-    private AttributesCheckUtils() {
+    private AttributesUtils() {
     }
 
 }
