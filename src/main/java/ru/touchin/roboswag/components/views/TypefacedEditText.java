@@ -61,6 +61,7 @@ public class TypefacedEditText extends AppCompatEditText {
     }
 
     private boolean multiline;
+    private boolean constructed;
 
     @Nullable
     private OnTextChangedListener onTextChangedListener;
@@ -81,6 +82,7 @@ public class TypefacedEditText extends AppCompatEditText {
     }
 
     private void initialize(@NonNull final Context context, @Nullable final AttributeSet attrs) {
+        constructed = true;
         super.setIncludeFontPadding(false);
         initializeTextChangedListener();
         if (attrs != null) {
@@ -248,8 +250,8 @@ public class TypefacedEditText extends AppCompatEditText {
 
     @Override
     public void setLines(final int lines) {
-        if (multiline && lines == 1) {
-            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "lines = 1 is illegal if multiline is set to true")));
+        if (constructed && multiline && lines == 1) {
+            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "lines = 1 is illegal if multiline is set to true")));
             return;
         }
         super.setLines(lines);
@@ -257,8 +259,8 @@ public class TypefacedEditText extends AppCompatEditText {
 
     @Override
     public void setMaxLines(final int maxLines) {
-        if (!multiline && maxLines > 1) {
-            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "maxLines > 1 is illegal if multiline is set to false")));
+        if (constructed && !multiline && maxLines > 1) {
+            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "maxLines > 1 is illegal if multiline is set to false")));
             return;
         }
         super.setMaxLines(maxLines);
@@ -266,8 +268,8 @@ public class TypefacedEditText extends AppCompatEditText {
 
     @Override
     public void setMinLines(final int minLines) {
-        if (!multiline && minLines > 1) {
-            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "minLines > 1 is illegal if multiline is set to false")));
+        if (constructed && !multiline && minLines > 1) {
+            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "minLines > 1 is illegal if multiline is set to false")));
             return;
         }
         super.setMinLines(minLines);
@@ -275,13 +277,19 @@ public class TypefacedEditText extends AppCompatEditText {
 
     @Override
     public final void setIncludeFontPadding(final boolean includeFontPadding) {
-        Lc.cutAssertion(new IllegalStateException(
+        if (!constructed) {
+            return;
+        }
+        Lc.assertion(new IllegalStateException(
                 AttributesCheckUtils.viewError(this, "Do not specify font padding as it is hard to make pixel-perfect design with such option")));
     }
 
     @Override
     public void setEllipsize(final TextUtils.TruncateAt ellipsis) {
-        Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify ellipsize for EditText")));
+        if (!constructed) {
+            return;
+        }
+        Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify ellipsize for EditText")));
     }
 
     /**

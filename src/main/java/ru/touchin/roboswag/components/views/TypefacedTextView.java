@@ -59,7 +59,8 @@ public class TypefacedTextView extends AppCompatTextView {
         inDebugMode = true;
     }
 
-    //could be null on construction
+    private boolean constructed;
+    @NonNull
     private LineStrategy lineStrategy = LineStrategy.SINGLE_LINE_ELLIPSIZE;
 
     public TypefacedTextView(@NonNull final Context context) {
@@ -78,6 +79,7 @@ public class TypefacedTextView extends AppCompatTextView {
     }
 
     private void initialize(@NonNull final Context context, @Nullable final AttributeSet attrs) {
+        constructed = true;
         super.setIncludeFontPadding(false);
         if (attrs != null) {
             final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TypefacedTextView);
@@ -199,18 +201,24 @@ public class TypefacedTextView extends AppCompatTextView {
 
     @Override
     public void setSingleLine() {
-        Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
+        if (!constructed) {
+            return;
+        }
+        Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
     }
 
     @Override
     public void setSingleLine(final boolean singleLine) {
-        Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
+        if (!constructed) {
+            return;
+        }
+        Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
     }
 
     @Override
     public void setLines(final int lines) {
-        if (lineStrategy != null && lineStrategy.multiline && lines == 1) {
-            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "lines = 1 is illegal if lineStrategy is multiline")));
+        if (constructed && lineStrategy.multiline && lines == 1) {
+            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "lines = 1 is illegal if lineStrategy is multiline")));
             return;
         }
         super.setLines(lines);
@@ -218,8 +226,8 @@ public class TypefacedTextView extends AppCompatTextView {
 
     @Override
     public void setMaxLines(final int maxLines) {
-        if (lineStrategy != null && !lineStrategy.multiline && maxLines > 1) {
-            Lc.cutAssertion(new IllegalStateException(
+        if (constructed && !lineStrategy.multiline && maxLines > 1) {
+            Lc.assertion(new IllegalStateException(
                     AttributesCheckUtils.viewError(this, "maxLines > 1 is illegal if lineStrategy is single line")));
             return;
         }
@@ -228,8 +236,8 @@ public class TypefacedTextView extends AppCompatTextView {
 
     @Override
     public void setMinLines(final int minLines) {
-        if (lineStrategy != null && !lineStrategy.multiline && minLines > 1) {
-            Lc.cutAssertion(new IllegalStateException(
+        if (constructed && !lineStrategy.multiline && minLines > 1) {
+            Lc.assertion(new IllegalStateException(
                     AttributesCheckUtils.viewError(this, "minLines > 1 is illegal if lineStrategy is single line")));
             return;
         }
@@ -238,13 +246,19 @@ public class TypefacedTextView extends AppCompatTextView {
 
     @Override
     public final void setIncludeFontPadding(final boolean includeFontPadding) {
-        Lc.cutAssertion(new IllegalStateException(
+        if (!constructed) {
+            return;
+        }
+        Lc.assertion(new IllegalStateException(
                 AttributesCheckUtils.viewError(this, "Do not specify font padding as it is hard to make pixel-perfect design with such option")));
     }
 
     @Override
     public void setEllipsize(final TextUtils.TruncateAt ellipsize) {
-        Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify ellipsize use setLineStrategy instead")));
+        if (!constructed) {
+            return;
+        }
+        Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify ellipsize use setLineStrategy instead")));
     }
 
     /**
@@ -259,15 +273,15 @@ public class TypefacedTextView extends AppCompatTextView {
     @Override
     public void setText(final CharSequence text, final BufferType type) {
         super.setText(text, type);
-        if (lineStrategy != null && lineStrategy.scalable) {
+        if (constructed && lineStrategy.scalable) {
             requestLayout();
         }
     }
 
     @Override
     public void setTextSize(final float size) {
-        if (lineStrategy != null && lineStrategy.scalable) {
-            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this,"textSize call is illegal if lineStrategy is scalable")));
+        if (constructed && lineStrategy.scalable) {
+            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "textSize call is illegal if lineStrategy is scalable")));
             return;
         }
         super.setTextSize(size);
@@ -275,8 +289,8 @@ public class TypefacedTextView extends AppCompatTextView {
 
     @Override
     public void setTextSize(final int unit, final float size) {
-        if (lineStrategy != null && lineStrategy.scalable) {
-            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this,"textSize call is illegal if lineStrategy is scalable")));
+        if (constructed && lineStrategy.scalable) {
+            Lc.assertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "textSize call is illegal if lineStrategy is scalable")));
             return;
         }
         super.setTextSize(unit, size);
@@ -344,7 +358,7 @@ public class TypefacedTextView extends AppCompatTextView {
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
         final int maxWidth = MeasureSpec.getSize(widthMeasureSpec);
         final int maxHeight = MeasureSpec.getSize(heightMeasureSpec);
-        if (lineStrategy == null || !lineStrategy.scalable || maxWidth <= 0 || maxHeight <= 0 || TextUtils.isEmpty(getText())) {
+        if (!constructed || !lineStrategy.scalable || maxWidth <= 0 || maxHeight <= 0 || TextUtils.isEmpty(getText())) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
