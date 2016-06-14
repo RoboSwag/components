@@ -25,7 +25,9 @@ import ru.touchin.roboswag.core.log.Lc;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Actions;
 import rx.subjects.BehaviorSubject;
 
 /**
@@ -83,18 +85,60 @@ public class BaseUiBindable implements UiBindable {
 
     @NonNull
     @Override
-    public <T> Observable<T> untilStop(@NonNull final Observable<T> observable) {
-        return isCreatedSubject.first()
-                .switchMap(isCreated -> isCreated ? observable.observeOn(AndroidSchedulers.mainThread()) : Observable.empty())
-                .takeUntil(isStartedSubject.filter(started -> !started));
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable) {
+        return untilStop(observable, Actions.empty(), Lc::assertion, Actions.empty());
     }
 
     @NonNull
     @Override
-    public <T> Observable<T> untilDestroy(@NonNull final Observable<T> observable) {
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return untilStop(observable, onNextAction, Lc::assertion, Actions.empty());
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable,
+                                      @NonNull final Action1<T> onNextAction, @NonNull final Action1<Throwable> onErrorAction) {
+        return untilStop(observable, onNextAction, onErrorAction, Actions.empty());
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable,
+                                      @NonNull final Action1<T> onNextAction, @NonNull final Action1<Throwable> onErrorAction, @NonNull final Action0 onCompletedAction) {
         return isCreatedSubject.first()
                 .switchMap(isCreated -> isCreated ? observable.observeOn(AndroidSchedulers.mainThread()) : Observable.empty())
-                .takeUntil(isCreatedSubject.filter(created -> !created));
+                .takeUntil(isStartedSubject.filter(started -> !started))
+                .subscribe(onNextAction, onErrorAction, onCompletedAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable) {
+        return untilDestroy(observable, Actions.empty(), Lc::assertion, Actions.empty());
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return untilDestroy(observable, onNextAction, Lc::assertion, Actions.empty());
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
+                                         @NonNull final Action1<T> onNextAction, @NonNull final Action1<Throwable> onErrorAction) {
+        return untilDestroy(observable, onNextAction, onErrorAction, Actions.empty());
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
+                                         @NonNull final Action1<T> onNextAction, @NonNull final Action1<Throwable> onErrorAction, @NonNull final Action0 onCompletedAction) {
+        return isCreatedSubject.first()
+                .switchMap(isCreated -> isCreated ? observable.observeOn(AndroidSchedulers.mainThread()) : Observable.empty())
+                .takeUntil(isCreatedSubject.filter(created -> !created))
+                .subscribe(onNextAction, onErrorAction, onCompletedAction);
     }
 
 }

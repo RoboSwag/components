@@ -33,6 +33,7 @@ import ru.touchin.roboswag.components.observables.ui.BaseUiBindable;
 import ru.touchin.roboswag.components.observables.ui.UiBindable;
 import rx.Observable;
 import rx.Subscription;
+import rx.functions.Action0;
 import rx.functions.Action1;
 
 /**
@@ -79,14 +80,60 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @NonNull
     @Override
-    public <T> Observable<T> untilDestroy(@NonNull final Observable<T> observable) {
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable) {
+        return baseUiBindable.untilStop(observable);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return baseUiBindable.untilStop(observable, onNextAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable,
+                                      @NonNull final Action1<T> onNextAction,
+                                      @NonNull final Action1<Throwable> onErrorAction) {
+        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilStop(@NonNull final Observable<T> observable,
+                                      @NonNull final Action1<T> onNextAction,
+                                      @NonNull final Action1<Throwable> onErrorAction,
+                                      @NonNull final Action0 onCompletedAction) {
+        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable) {
         return baseUiBindable.untilDestroy(observable);
     }
 
     @NonNull
     @Override
-    public <T> Observable<T> untilStop(@NonNull final Observable<T> observable) {
-        return baseUiBindable.untilStop(observable);
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return baseUiBindable.untilDestroy(observable, onNextAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
+                                         @NonNull final Action1<T> onNextAction,
+                                         @NonNull final Action1<Throwable> onErrorAction) {
+        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction);
+    }
+
+    @NonNull
+    @Override
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
+                                         @NonNull final Action1<T> onNextAction,
+                                         @NonNull final Action1<Throwable> onErrorAction,
+                                         @NonNull final Action0 onCompletedAction) {
+        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     /**

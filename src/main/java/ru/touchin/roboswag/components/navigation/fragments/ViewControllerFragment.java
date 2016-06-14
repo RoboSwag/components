@@ -21,11 +21,11 @@ package ru.touchin.roboswag.components.navigation.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Pair;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,6 +36,7 @@ import android.widget.FrameLayout;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import ru.touchin.roboswag.components.navigation.AbstractState;
 import ru.touchin.roboswag.components.navigation.ViewController;
@@ -147,7 +148,9 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
                             }
                             return newViewController;
                         })
-                .subscribe(this::onViewControllerChanged, Lc::assertion);
+                .subscribe(this::onViewControllerChanged,
+                        throwable -> Lc.cutAssertion(throwable,
+                                OnErrorThrowable.class, InvocationTargetException.class, InflateException.class));
     }
 
     @Nullable
