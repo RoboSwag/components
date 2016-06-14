@@ -85,7 +85,13 @@ public class TypefacedEditText extends AppCompatEditText {
         initializeTextChangedListener();
         if (attrs != null) {
             final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TypefacedEditText);
-            setMultiline(typedArray.getBoolean(R.styleable.TypefacedEditText_isMultiline, false));
+            boolean multiline = typedArray.getBoolean(R.styleable.TypefacedEditText_isMultiline, false);
+            if (multiline) {
+                setMultiline(getMaxLinesFromAttrs(context, attrs));
+            } else {
+                setLines(1);
+            }
+
             if (!isInEditMode()) {
                 setTypeface(Typefaces.getFromAttributes(context, attrs, R.styleable.TypefacedEditText, R.styleable.TypefacedEditText_customTypeface));
             }
@@ -93,6 +99,18 @@ public class TypefacedEditText extends AppCompatEditText {
             if (inDebugMode) {
                 checkAttributes(context, attrs);
             }
+        }
+    }
+
+    private int getMaxLinesFromAttrs(@NonNull final Context context, @NonNull final AttributeSet attrs) {
+        try {
+            final Class androidRes = Class.forName("com.android.internal.R$styleable");
+            final TypedArray typedArray = context.obtainStyledAttributes(attrs, AttributesCheckUtils.getField(androidRes, "TextView"));
+            final int result = typedArray.getInt(AttributesCheckUtils.getField(androidRes, "TextView_fontFamily"), Integer.MAX_VALUE);
+            typedArray.recycle();
+            return result;
+        } catch (Exception e) {
+            return Integer.MAX_VALUE;
         }
     }
 
@@ -119,7 +137,7 @@ public class TypefacedEditText extends AppCompatEditText {
                 checkMultilineAttributes(typedArray, androidRes, errors, multiline);
             }
         } catch (final Exception exception) {
-            Lc.assertion(exception);
+            Lc.cutAssertion(exception);
         }
         AttributesCheckUtils.handleErrors(this, errors);
         typedArray.recycle();
@@ -206,31 +224,33 @@ public class TypefacedEditText extends AppCompatEditText {
     /**
      * Sets if view supports multiline text alignment.
      *
-     * @param multiline True if multiline supported.
+     * @param maxLines Maximum lines to be set.
      */
-    public void setMultiline(final boolean multiline) {
-        this.multiline = multiline;
-        if (multiline) {
-            super.setSingleLine(false);
-        } else {
-            super.setSingleLine(true);
-        }
+    public void setMultiline(final int maxLines) {
+        super.setMaxLines(maxLines);
+        multiline = true;
     }
 
     @Override
     public void setSingleLine(final boolean singleLine) {
-        setMultiline(!singleLine);
+        if (singleLine) {
+            setSingleLine();
+        } else {
+            setMultiline(Integer.MAX_VALUE);
+        }
     }
 
     @Override
     public void setSingleLine() {
-        setMultiline(false);
+        setLines(1);
+        multiline = false;
     }
 
     @Override
     public void setLines(final int lines) {
         if (multiline && lines == 1) {
-            throw new IllegalStateException("lines = 1 is illegal if multiline is set to true");
+            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "lines = 1 is illegal if multiline is set to true")));
+            return;
         }
         super.setLines(lines);
     }
@@ -238,7 +258,8 @@ public class TypefacedEditText extends AppCompatEditText {
     @Override
     public void setMaxLines(final int maxLines) {
         if (!multiline && maxLines > 1) {
-            throw new IllegalStateException("maxLines > 1 is illegal if multiline is set to false");
+            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "maxLines > 1 is illegal if multiline is set to false")));
+            return;
         }
         super.setMaxLines(maxLines);
     }
@@ -246,19 +267,21 @@ public class TypefacedEditText extends AppCompatEditText {
     @Override
     public void setMinLines(final int minLines) {
         if (!multiline && minLines > 1) {
-            throw new IllegalStateException("minLines > 1 is illegal if multiline is set to false");
+            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "minLines > 1 is illegal if multiline is set to false")));
+            return;
         }
         super.setMinLines(minLines);
     }
 
     @Override
     public final void setIncludeFontPadding(final boolean includeFontPadding) {
-        throw new IllegalStateException("Do not specify font padding as it is hard to make pixel-perfect design with such option");
+        Lc.cutAssertion(new IllegalStateException(
+                AttributesCheckUtils.viewError(this, "Do not specify font padding as it is hard to make pixel-perfect design with such option")));
     }
 
     @Override
     public void setEllipsize(final TextUtils.TruncateAt ellipsis) {
-        throw new IllegalStateException("Do not specify ellipsize for EditText");
+        Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify ellipsize for EditText")));
     }
 
     /**

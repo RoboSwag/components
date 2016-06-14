@@ -30,6 +30,7 @@ import java.util.Collection;
 
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
+import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 
 /**
  * Created by Gavriil Sitnikov on 13/06/2016.
@@ -108,8 +109,21 @@ public final class AttributesCheckUtils {
      */
     public static void handleErrors(@NonNull final View view, @NonNull final Collection<String> errors) {
         if (!errors.isEmpty()) {
-            Lc.assertion("Errors for view [" + UiUtils.OfViews.getViewIdString(view) + "]:\n" + TextUtils.join("\n", errors));
+            final String exceptionText = viewError(view, TextUtils.join("\n", errors));
+            Lc.cutAssertion(new ShouldNotHappenException(exceptionText));
         }
+    }
+
+    /**
+     * Creates readable view error.
+     *
+     * @param view      View of error;
+     * @param errorText Text of error;
+     * @return Readable error string.
+     */
+    @NonNull
+    public static String viewError(@NonNull final View view, @NonNull final String errorText) {
+        return "Errors for view id=" + UiUtils.OfViews.getViewIdString(view) + ":\n" + errorText;
     }
 
     private AttributesCheckUtils() {

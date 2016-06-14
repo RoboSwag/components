@@ -117,7 +117,7 @@ public class TypefacedTextView extends AppCompatTextView {
                 checkLineStrategyAttributes(typedArray, androidRes, errors, lineStrategy);
             }
         } catch (final Exception exception) {
-            Lc.assertion(exception);
+            Lc.cutAssertion(exception);
         }
         AttributesCheckUtils.handleErrors(this, errors);
         typedArray.recycle();
@@ -199,18 +199,19 @@ public class TypefacedTextView extends AppCompatTextView {
 
     @Override
     public void setSingleLine() {
-        throw new IllegalStateException("Do not specify setSingleLine use setLineStrategy instead");
+        Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
     }
 
     @Override
     public void setSingleLine(final boolean singleLine) {
-        throw new IllegalStateException("Do not specify setSingleLine use setLineStrategy instead");
+        Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify setSingleLine use setLineStrategy instead")));
     }
 
     @Override
     public void setLines(final int lines) {
         if (lineStrategy != null && lineStrategy.multiline && lines == 1) {
-            throw new IllegalStateException("lines = 1 is illegal if lineStrategy is multiline");
+            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "lines = 1 is illegal if lineStrategy is multiline")));
+            return;
         }
         super.setLines(lines);
     }
@@ -218,7 +219,9 @@ public class TypefacedTextView extends AppCompatTextView {
     @Override
     public void setMaxLines(final int maxLines) {
         if (lineStrategy != null && !lineStrategy.multiline && maxLines > 1) {
-            throw new IllegalStateException("maxLines > 1 is illegal if lineStrategy is single line");
+            Lc.cutAssertion(new IllegalStateException(
+                    AttributesCheckUtils.viewError(this, "maxLines > 1 is illegal if lineStrategy is single line")));
+            return;
         }
         super.setMaxLines(maxLines);
     }
@@ -226,19 +229,22 @@ public class TypefacedTextView extends AppCompatTextView {
     @Override
     public void setMinLines(final int minLines) {
         if (lineStrategy != null && !lineStrategy.multiline && minLines > 1) {
-            throw new IllegalStateException("minLines > 1 is illegal if lineStrategy is single line");
+            Lc.cutAssertion(new IllegalStateException(
+                    AttributesCheckUtils.viewError(this, "minLines > 1 is illegal if lineStrategy is single line")));
+            return;
         }
         super.setMinLines(minLines);
     }
 
     @Override
     public final void setIncludeFontPadding(final boolean includeFontPadding) {
-        throw new IllegalStateException("Do not specify font padding as it is hard to make pixel-perfect design with such option");
+        Lc.cutAssertion(new IllegalStateException(
+                AttributesCheckUtils.viewError(this, "Do not specify font padding as it is hard to make pixel-perfect design with such option")));
     }
 
     @Override
     public void setEllipsize(final TextUtils.TruncateAt ellipsize) {
-        throw new IllegalStateException("Do not specify ellipsize use setLineStrategy instead");
+        Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this, "Do not specify ellipsize use setLineStrategy instead")));
     }
 
     /**
@@ -261,7 +267,8 @@ public class TypefacedTextView extends AppCompatTextView {
     @Override
     public void setTextSize(final float size) {
         if (lineStrategy != null && lineStrategy.scalable) {
-            throw new IllegalStateException("textSize call is illegal if lineStrategy is scalable");
+            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this,"textSize call is illegal if lineStrategy is scalable")));
+            return;
         }
         super.setTextSize(size);
     }
@@ -269,7 +276,8 @@ public class TypefacedTextView extends AppCompatTextView {
     @Override
     public void setTextSize(final int unit, final float size) {
         if (lineStrategy != null && lineStrategy.scalable) {
-            throw new IllegalStateException("textSize call is illegal if lineStrategy is scalable");
+            Lc.cutAssertion(new IllegalStateException(AttributesCheckUtils.viewError(this,"textSize call is illegal if lineStrategy is scalable")));
+            return;
         }
         super.setTextSize(unit, size);
     }
