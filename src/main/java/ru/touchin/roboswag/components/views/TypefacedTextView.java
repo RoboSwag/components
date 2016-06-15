@@ -198,9 +198,8 @@ public class TypefacedTextView extends AppCompatTextView {
      */
     public void setLineStrategy(@NonNull final LineStrategy lineStrategy, final int maxLines) {
         this.lineStrategy = lineStrategy;
-        if (!lineStrategy.multiline) {
-            super.setLines(1);
-        } else {
+        super.setSingleLine(!lineStrategy.multiline);
+        if (lineStrategy.multiline) {
             super.setMaxLines(maxLines);
         }
         switch (lineStrategy) {
