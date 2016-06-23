@@ -47,6 +47,16 @@ public abstract class BaseActivity extends AppCompatActivity
     private final ArrayList<OnBackPressedListener> onBackPressedListeners = new ArrayList<>();
     @NonNull
     private final BaseUiBindable baseUiBindable = new BaseUiBindable();
+    private boolean resumed;
+
+    /**
+     * Returns if activity resumed.
+     *
+     * @return True if resumed.
+     */
+    public boolean isResumed() {
+        return resumed;
+    }
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -58,6 +68,18 @@ public abstract class BaseActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         baseUiBindable.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        resumed = true;
+    }
+
+    @Override
+    protected void onPause() {
+        resumed = false;
+        super.onPause();
     }
 
     @Override
