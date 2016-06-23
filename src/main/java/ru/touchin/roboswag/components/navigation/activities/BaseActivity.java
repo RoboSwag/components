@@ -54,7 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity
      *
      * @return True if resumed.
      */
-    public boolean isResumed() {
+    public boolean isActuallyResumed() {
         return resumed;
     }
 
