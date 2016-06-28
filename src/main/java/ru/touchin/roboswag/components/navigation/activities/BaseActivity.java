@@ -40,6 +40,7 @@ import rx.functions.Action1;
  * Created by Gavriil Sitnikov on 08/03/2016.
  * Base activity to use in components repository.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class BaseActivity extends AppCompatActivity
         implements UiBindable {
 
