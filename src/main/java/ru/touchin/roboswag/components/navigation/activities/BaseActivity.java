@@ -29,8 +29,8 @@ import android.view.inputmethod.InputMethodManager;
 
 import java.util.ArrayList;
 
-import ru.touchin.roboswag.components.observables.ui.BaseUiBindable;
-import ru.touchin.roboswag.components.observables.ui.UiBindable;
+import ru.touchin.roboswag.components.utils.BaseLifecycleBindable;
+import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action0;
@@ -42,12 +42,12 @@ import rx.functions.Action1;
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public abstract class BaseActivity extends AppCompatActivity
-        implements UiBindable {
+        implements LifecycleBindable {
 
     @NonNull
     private final ArrayList<OnBackPressedListener> onBackPressedListeners = new ArrayList<>();
     @NonNull
-    private final BaseUiBindable baseUiBindable = new BaseUiBindable();
+    private final BaseLifecycleBindable baseLifecycleBindable = new BaseLifecycleBindable();
     private boolean resumed;
 
     /**
@@ -62,13 +62,13 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        baseUiBindable.onCreate();
+        baseLifecycleBindable.onCreate();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        baseUiBindable.onStart();
+        baseLifecycleBindable.onStart();
     }
 
     @Override
@@ -85,13 +85,13 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        baseUiBindable.onStop();
+        baseLifecycleBindable.onStop();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        baseUiBindable.onDestroy();
+        baseLifecycleBindable.onDestroy();
         super.onDestroy();
     }
 
@@ -146,11 +146,11 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     @SuppressWarnings("CPD-START")
-    //CPD: it is same as in other implementation based on BaseUiBindable
+    //CPD: it is same as in other implementation based on BaseLifecycleBindable
     @NonNull
     @Override
     public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return baseUiBindable.bind(observable, onNextAction);
+        return baseLifecycleBindable.bind(observable, onNextAction);
     }
 
     @NonNull
@@ -158,7 +158,7 @@ public abstract class BaseActivity extends AppCompatActivity
     public <T> Subscription untilStop(@NonNull final Observable<T> observable,
                                       @NonNull final Action1<T> onNextAction,
                                       @NonNull final Action1<Throwable> onErrorAction) {
-        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction);
+        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -167,31 +167,31 @@ public abstract class BaseActivity extends AppCompatActivity
                                       @NonNull final Action1<T> onNextAction,
                                       @NonNull final Action1<Throwable> onErrorAction,
                                       @NonNull final Action0 onCompletedAction) {
-        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
+        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable) {
-        return baseUiBindable.untilStop(observable);
+        return baseLifecycleBindable.untilStop(observable);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return baseUiBindable.untilStop(observable, onNextAction);
+        return baseLifecycleBindable.untilStop(observable, onNextAction);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable) {
-        return baseUiBindable.untilDestroy(observable);
+        return baseLifecycleBindable.untilDestroy(observable);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return baseUiBindable.untilDestroy(observable, onNextAction);
+        return baseLifecycleBindable.untilDestroy(observable, onNextAction);
     }
 
     @NonNull
@@ -199,7 +199,7 @@ public abstract class BaseActivity extends AppCompatActivity
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
                                          @NonNull final Action1<T> onNextAction,
                                          @NonNull final Action1<Throwable> onErrorAction) {
-        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction);
+        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -208,11 +208,11 @@ public abstract class BaseActivity extends AppCompatActivity
                                          @NonNull final Action1<T> onNextAction,
                                          @NonNull final Action1<Throwable> onErrorAction,
                                          @NonNull final Action0 onCompletedAction) {
-        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
+        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     @SuppressWarnings("CPD-END")
-    //CPD: it is same as in other implementation based on BaseUiBindable
+    //CPD: it is same as in other implementation based on BaseLifecycleBindable
     /**
      * Interface to be implemented for someone who want to intercept device back button pressing event.
      */

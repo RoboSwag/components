@@ -33,8 +33,8 @@ import android.view.ViewGroup;
 
 import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivity;
 import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment;
-import ru.touchin.roboswag.components.observables.ui.BaseUiBindable;
-import ru.touchin.roboswag.components.observables.ui.UiBindable;
+import ru.touchin.roboswag.components.utils.BaseLifecycleBindable;
+import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action0;
@@ -49,7 +49,7 @@ import rx.functions.Action1;
  */
 public class ViewController<TActivity extends ViewControllerActivity<?>,
         TFragment extends ViewControllerFragment<?, TActivity>>
-        implements UiBindable {
+        implements LifecycleBindable {
 
     @NonNull
     private final TActivity activity;
@@ -58,13 +58,12 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @NonNull
     private final ViewGroup container;
     @NonNull
-    private final BaseUiBindable baseUiBindable = new BaseUiBindable();
+    private final BaseLifecycleBindable baseLifecycleBindable = new BaseLifecycleBindable();
     private boolean destroyed;
 
     @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
     //UnusedFormalParameter: savedInstanceState could be used by children
-    public ViewController(@NonNull final CreationContext creationContext,
-                          @Nullable final Bundle savedInstanceState) {
+    public ViewController(@NonNull final CreationContext creationContext, @Nullable final Bundle savedInstanceState) {
         this.activity = (TActivity) creationContext.activity;
         this.fragment = (TFragment) creationContext.fragment;
         this.container = creationContext.container;
@@ -147,7 +146,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      */
     @CallSuper
     public void onCreate() {
-        baseUiBindable.onCreate();
+        baseLifecycleBindable.onCreate();
     }
 
     /**
@@ -156,7 +155,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      */
     @CallSuper
     public void onStart() {
-        baseUiBindable.onStart();
+        baseLifecycleBindable.onStart();
     }
 
     /**
@@ -175,7 +174,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      */
     @CallSuper
     public void onStop() {
-        baseUiBindable.onStop();
+        baseLifecycleBindable.onStop();
     }
 
     /**
@@ -184,7 +183,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      */
     @CallSuper
     public void onDestroy() {
-        baseUiBindable.onDestroy();
+        baseLifecycleBindable.onDestroy();
         destroyed = true;
     }
 
@@ -199,23 +198,23 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     }
 
     @SuppressWarnings("CPD-START")
-    //CPD: it is same as in other implementation based on BaseUiBindable
+    //CPD: it is same as in other implementation based on BaseLifecycleBindable
     @NonNull
     @Override
     public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return baseUiBindable.bind(observable, onNextAction);
+        return baseLifecycleBindable.bind(observable, onNextAction);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable) {
-        return baseUiBindable.untilStop(observable);
+        return baseLifecycleBindable.untilStop(observable);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return baseUiBindable.untilStop(observable, onNextAction);
+        return baseLifecycleBindable.untilStop(observable, onNextAction);
     }
 
     @NonNull
@@ -223,7 +222,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public <T> Subscription untilStop(@NonNull final Observable<T> observable,
                                       @NonNull final Action1<T> onNextAction,
                                       @NonNull final Action1<Throwable> onErrorAction) {
-        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction);
+        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -232,19 +231,19 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
                                       @NonNull final Action1<T> onNextAction,
                                       @NonNull final Action1<Throwable> onErrorAction,
                                       @NonNull final Action0 onCompletedAction) {
-        return baseUiBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
+        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable) {
-        return baseUiBindable.untilDestroy(observable);
+        return baseLifecycleBindable.untilDestroy(observable);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return baseUiBindable.untilDestroy(observable, onNextAction);
+        return baseLifecycleBindable.untilDestroy(observable, onNextAction);
     }
 
     @NonNull
@@ -252,7 +251,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
                                          @NonNull final Action1<T> onNextAction,
                                          @NonNull final Action1<Throwable> onErrorAction) {
-        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction);
+        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -261,11 +260,11 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
                                          @NonNull final Action1<T> onNextAction,
                                          @NonNull final Action1<Throwable> onErrorAction,
                                          @NonNull final Action0 onCompletedAction) {
-        return baseUiBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
+        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     @SuppressWarnings("CPD-END")
-    //CPD: it is same as in other implementation based on BaseUiBindable
+    //CPD: it is same as in other implementation based on BaseLifecycleBindable
     /**
      * Helper class to simplify constructor override.
      */

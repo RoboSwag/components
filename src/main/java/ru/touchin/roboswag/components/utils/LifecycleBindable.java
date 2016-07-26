@@ -17,7 +17,7 @@
  *
  */
 
-package ru.touchin.roboswag.components.observables.ui;
+package ru.touchin.roboswag.components.utils;
 
 import android.support.annotation.NonNull;
 
@@ -36,7 +36,7 @@ import rx.functions.Func1;
  * Use {@link #untilStop(Observable)} method to subscribe to observable where you want and unsubscribe onStop.
  * Use {@link #untilDestroy(Observable)} method to subscribe to observable where you want and unsubscribe onDestroy.
  */
-public interface UiBindable {
+public interface LifecycleBindable {
 
     /**
      * Method should be used to subscribe to observable while this element is in started state.

@@ -17,58 +17,67 @@
  *
  */
 
-package ru.touchin.roboswag.components.observables.ui;
+package ru.touchin.roboswag.components.adapters;
 
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
+import java.util.concurrent.TimeUnit;
+
+import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.core.log.Lc;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.functions.Action1;
-import rx.functions.Actions;
 import rx.subjects.BehaviorSubject;
 
 /**
- * Created by Gavriil Sitnikov on 18/04/16.
- * Simple implementation of {@link UiBindable}. Could be used to not implement interface but use such object inside.
+ * Created by Gavriil Sitnikov on 12/8/2016.
+ * TODO: fill description
  */
-public class BaseUiBindable implements UiBindable {
+public class BindableViewHolder extends RecyclerView.ViewHolder implements LifecycleBindable {
+
+    // it is needed to delay detach to avoid re-subscriptions on fast scroll
+    private static final long DETACH_DELAY = TimeUnit.SECONDS.toMillis(1);
 
     @NonNull
-    private final BehaviorSubject<Boolean> isCreatedSubject = BehaviorSubject.create();
+    private final LifecycleBindable baseLifecycleBindable;
     @NonNull
-    private final BehaviorSubject<Boolean> isStartedSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> attachedToWindowSubject = BehaviorSubject.create();
+    private final Observable<Boolean> attachedObservable;
 
-    /**
-     * Call it on parent's onCreate method.
-     */
-    public void onCreate() {
-        isCreatedSubject.onNext(true);
+    public BindableViewHolder(@NonNull final LifecycleBindable baseLifecycleBindable, @NonNull final View itemView) {
+        super(itemView);
+        this.baseLifecycleBindable = baseLifecycleBindable;
+        attachedObservable = attachedToWindowSubject
+                .switchMap(attached -> attached
+                        ? Observable.just(true)
+                        : Observable.timer(DETACH_DELAY, TimeUnit.MILLISECONDS).map(ignored -> false))
+                .distinctUntilChanged()
+                .replay(1)
+                .refCount();
     }
 
-    /**
-     * Call it on parent's onStart method.
-     */
-    public void onStart() {
-        isStartedSubject.onNext(true);
+    @CallSuper
+    public void onAttachedToWindow() {
+        attachedToWindowSubject.onNext(true);
     }
 
-    /**
-     * Call it on parent's onStop method.
-     */
-    public void onStop() {
-        isStartedSubject.onNext(false);
+    public boolean isAttachedToWindow() {
+        return attachedToWindowSubject.hasValue() && attachedToWindowSubject.getValue();
     }
 
-    /**
-     * Call it on parent's onDestroy method.
-     */
-    public void onDestroy() {
-        isCreatedSubject.onNext(false);
+    @CallSuper
+    public void onDetachedFromWindow() {
+        attachedToWindowSubject.onNext(false);
     }
 
+    @SuppressWarnings("CPD-START")
+    //CPD: it is same as in other implementation based on BaseLifecycleBindable
     @NonNull
     @Override
     public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
@@ -78,21 +87,20 @@ public class BaseUiBindable implements UiBindable {
                     return Observable.never();
                 })
                 .observeOn(AndroidSchedulers.mainThread());
-        return isStartedSubject.switchMap(isStarted -> isStarted ? safeObservable : Observable.never())
-                .takeUntil(isCreatedSubject.filter(created -> !created))
+        return attachedObservable.switchMap(attached -> attached ? safeObservable : Observable.never())
                 .subscribe(onNextAction);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable) {
-        return untilStop(observable, Actions.empty(), Lc::assertion, Actions.empty());
+        return baseLifecycleBindable.untilStop(observable);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return untilStop(observable, onNextAction, Lc::assertion, Actions.empty());
+        return baseLifecycleBindable.untilStop(observable, onNextAction);
     }
 
     @NonNull
@@ -100,7 +108,7 @@ public class BaseUiBindable implements UiBindable {
     public <T> Subscription untilStop(@NonNull final Observable<T> observable,
                                       @NonNull final Action1<T> onNextAction,
                                       @NonNull final Action1<Throwable> onErrorAction) {
-        return untilStop(observable, onNextAction, onErrorAction, Actions.empty());
+        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -109,20 +117,19 @@ public class BaseUiBindable implements UiBindable {
                                       @NonNull final Action1<T> onNextAction,
                                       @NonNull final Action1<Throwable> onErrorAction,
                                       @NonNull final Action0 onCompletedAction) {
-        return until(observable, isStartedSubject.map(started -> !started), onNextAction, onErrorAction, onCompletedAction);
+        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     @NonNull
     @Override
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable) {
-        return untilDestroy(observable, Actions.empty(), Lc::assertion, Actions.empty());
+        return baseLifecycleBindable.untilDestroy(observable);
     }
 
     @NonNull
     @Override
-    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
-                                         @NonNull final Action1<T> onNextAction) {
-        return untilDestroy(observable, onNextAction, Lc::assertion, Actions.empty());
+    public <T> Subscription untilDestroy(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        return baseLifecycleBindable.untilDestroy(observable, onNextAction);
     }
 
     @NonNull
@@ -130,7 +137,7 @@ public class BaseUiBindable implements UiBindable {
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
                                          @NonNull final Action1<T> onNextAction,
                                          @NonNull final Action1<Throwable> onErrorAction) {
-        return untilDestroy(observable, onNextAction, onErrorAction, Actions.empty());
+        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -139,18 +146,7 @@ public class BaseUiBindable implements UiBindable {
                                          @NonNull final Action1<T> onNextAction,
                                          @NonNull final Action1<Throwable> onErrorAction,
                                          @NonNull final Action0 onCompletedAction) {
-        return until(observable, isCreatedSubject.map(created -> !created), onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    private <T> Subscription until(@NonNull final Observable<T> observable,
-                                   @NonNull final Observable<Boolean> conditionSubject,
-                                   @NonNull final Action1<T> onNextAction,
-                                   @NonNull final Action1<Throwable> onErrorAction,
-                                   @NonNull final Action0 onCompletedAction) {
-        return isCreatedSubject.first()
-                .switchMap(isCreated -> isCreated ? observable.observeOn(AndroidSchedulers.mainThread()) : Observable.empty())
-                .takeUntil(conditionSubject.filter(condition -> condition))
-                .subscribe(onNextAction, onErrorAction, onCompletedAction);
+        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
 }
