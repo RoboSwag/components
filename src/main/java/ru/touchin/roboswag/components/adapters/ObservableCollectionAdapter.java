@@ -77,7 +77,7 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
         innerCollection.observeChanges().subscribe(this::onItemsChanged);
         lifecycleBindable.untilDestroy(observableCollectionSubject
                         .doOnNext(collection -> innerCollection.set(collection != null ? collection.getItems() : new ArrayList<>()))
-                        .switchMap(observableCollection -> observableCollection != null
+                        .<ObservableCollection.CollectionChange<TItem>>switchMap(observableCollection -> observableCollection != null
                                 ? observableCollection.observeChanges().observeOn(AndroidSchedulers.mainThread())
                                 : Observable.empty()),
                 changes -> {
@@ -252,7 +252,7 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
     @Nullable
     public TItem getItem(final int position) {
         final int positionInList = position - getHeadersCount();
-        return positionInList >= innerCollection.size() ? null : innerCollection.get(positionInList);
+        return positionInList < 0 || positionInList >= innerCollection.size() ? null : innerCollection.get(positionInList);
     }
 
     @Override
