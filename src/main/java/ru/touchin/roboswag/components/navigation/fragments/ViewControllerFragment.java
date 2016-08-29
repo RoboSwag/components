@@ -214,6 +214,22 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         }
     }
 
+    @Override
+    protected void onResume(@NonNull final View view, @NonNull final TActivity activity) {
+        super.onResume(view, activity);
+        if (viewController != null) {
+            viewController.onResume();
+        }
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (viewController != null) {
+            viewController.onLowMemory();
+        }
+    }
+
     /**
      * Calls when activity configuring ActionBar, Toolbar, Sidebar etc.
      * If it will be called or not depends on {@link #hasOptionsMenu()} and {@link #isMenuVisible()}.
@@ -258,6 +274,14 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
             viewController.onSaveInstanceState(savedInstanceState);
         }
         savedInstanceState.putSerializable(VIEW_CONTROLLER_STATE_EXTRA, state);
+    }
+
+    @Override
+    protected void onPause(@NonNull final View view, @NonNull final TActivity activity) {
+        super.onPause(view, activity);
+        if (viewController != null) {
+            viewController.onPause();
+        }
     }
 
     @Override

@@ -159,6 +159,33 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     }
 
     /**
+     * Calls when {@link ViewController} have resumed.
+     * Happens at {@link ViewControllerFragment#onResume(View, ViewControllerActivity)}.
+     */
+    @CallSuper
+    public void onResume() {
+        //do nothing
+    }
+
+    /**
+     * Calls when {@link ViewController} have goes near out of memory state.
+     * Happens at {@link ViewControllerFragment#onLowMemory()}.
+     */
+    @CallSuper
+    public void onLowMemory() {
+        //do nothing
+    }
+
+    /**
+     * Calls when {@link ViewController} have paused.
+     * Happens at {@link ViewControllerFragment#onPause(View, ViewControllerActivity)}.
+     */
+    @CallSuper
+    public void onPause() {
+        //do nothing
+    }
+
+    /**
      * Calls when {@link ViewController} should save it's state.
      * Happens at {@link ViewControllerFragment#onSaveInstanceState(Bundle)}.
      * Try not to use such method for saving state but use {@link ViewControllerFragment#getState()} from {@link #getFragment()}.
