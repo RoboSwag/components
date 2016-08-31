@@ -128,7 +128,7 @@ public final class AttributesUtils {
         try {
             final Class androidRes = Class.forName("com.android.internal.R$styleable");
             final TypedArray typedArray = context.obtainStyledAttributes(attrs, AttributesUtils.getField(androidRes, "TextView"));
-            final int result = typedArray.getInt(AttributesUtils.getField(androidRes, "TextView_fontFamily"), Integer.MAX_VALUE);
+            final int result = typedArray.getInt(AttributesUtils.getField(androidRes, "TextView_maxLines"), Integer.MAX_VALUE);
             typedArray.recycle();
             return result;
         } catch (Exception e) {
