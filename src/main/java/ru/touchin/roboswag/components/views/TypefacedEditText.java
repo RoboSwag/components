@@ -27,6 +27,8 @@ import android.support.v7.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.SingleLineTransformationMethod;
+import android.text.method.TransformationMethod;
 import android.util.AttributeSet;
 
 import java.util.ArrayList;
@@ -217,8 +219,17 @@ public class TypefacedEditText extends AppCompatEditText {
      * @param maxLines Maximum lines to be set.
      */
     public void setMultiline(final int maxLines) {
-        super.setMaxLines(maxLines);
+        if (maxLines <= 1) {
+            Lc.assertion("Wrong maxLines: " + maxLines);
+            return;
+        }
         multiline = true;
+        final TransformationMethod transformationMethod = getTransformationMethod();
+        super.setSingleLine(false);
+        super.setMaxLines(maxLines);
+        if (!(transformationMethod instanceof SingleLineTransformationMethod)) {
+            setTransformationMethod(transformationMethod);
+        }
     }
 
     @Override
@@ -232,6 +243,14 @@ public class TypefacedEditText extends AppCompatEditText {
 
     @Override
     public void setSingleLine() {
+        final TransformationMethod transformationMethod = getTransformationMethod();
+        super.setSingleLine(true);
+        if (transformationMethod != null) {
+            if (!(transformationMethod instanceof SingleLineTransformationMethod)) {
+                Lc.w("SingleLineTransformationMethod method ignored because of previous transformation method: " + transformationMethod);
+            }
+            setTransformationMethod(transformationMethod);
+        }
         setLines(1);
         multiline = false;
     }
