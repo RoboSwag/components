@@ -37,11 +37,14 @@ import rx.subjects.BehaviorSubject;
 
 /**
  * Created by Gavriil Sitnikov on 12/8/2016.
- * TODO: fill description
+ * ViewHolder that implements {@link LifecycleBindable} and uses parent bindable object as bridge (Activity, ViewController etc.).
+ * It is important to use such ViewHolder to avoid endless bindings when parent bindable have started but ViewHolder already detached from window.
+ * So inside method {@link RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder, int)}
+ * use only inner {@link #bind(Observable, Action1)} method but not parent's bind method.
  */
 public class BindableViewHolder extends RecyclerView.ViewHolder implements LifecycleBindable {
 
-    // it is needed to delay detach to avoid re-subscriptions on fast scroll
+    //HACK: it is needed to delay detach to avoid re-subscriptions on fast scroll
     private static final long DETACH_DELAY = TimeUnit.SECONDS.toMillis(1);
 
     @NonNull
@@ -62,15 +65,26 @@ public class BindableViewHolder extends RecyclerView.ViewHolder implements Lifec
                 .refCount();
     }
 
+    /**
+     * Calls when {@link RecyclerView.ViewHolder} have attached to window.
+     */
     @CallSuper
     public void onAttachedToWindow() {
         attachedToWindowSubject.onNext(true);
     }
 
+    /**
+     * Returns if {@link RecyclerView.ViewHolder} attached to window or not.
+     *
+     * @return True if {@link RecyclerView.ViewHolder} attached to window.
+     */
     public boolean isAttachedToWindow() {
         return attachedToWindowSubject.hasValue() && attachedToWindowSubject.getValue();
     }
 
+    /**
+     * Calls when {@link RecyclerView.ViewHolder} have detached from window.
+     */
     @CallSuper
     public void onDetachedFromWindow() {
         attachedToWindowSubject.onNext(false);

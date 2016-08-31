@@ -53,7 +53,7 @@ import rx.functions.Action0;
 public final class UiUtils {
 
     /**
-     * Delay to let user view rippleeffect before screen changed.
+     * Delay to let user view ripple effect before screen changed.
      */
     public static final long RIPPLE_EFFECT_DELAY = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 150 : 0;
 

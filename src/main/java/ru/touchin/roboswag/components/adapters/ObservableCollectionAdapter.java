@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import ru.touchin.roboswag.components.R;
 import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
@@ -45,14 +46,19 @@ import rx.subjects.BehaviorSubject;
 
 /**
  * Created by Gavriil Sitnikov on 20/11/2015.
- * TODO: fill description
+ * Adapter based on {@link ObservableCollection} and providing some useful features like:
+ * - item-based binding by {@link #onCreateItemViewHolder(ViewGroup, int)} and {@link #onBindItemToViewHolder(ViewHolder, int, Object)}} methods;
+ * - item click listener setup by {@link #setOnItemClickListener(OnItemClickListener)};
+ * - allows to inform about footers/headers by overriding base create/bind methods and {@link #getHeadersCount()} plus {@link #getFootersCount()};
+ * - by default it is pre-loading items for collections like {@link ru.touchin.roboswag.core.observables.collections.loadable.LoadingMoreList}.
+ *
+ * @param <TItem>       Type of items to bind to ViewHolders;
+ * @param <TViewHolder> Type of ViewHolders to show items.
  */
 public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends ObservableCollectionAdapter.ViewHolder>
         extends RecyclerView.Adapter<BindableViewHolder> {
 
     private static final int PRE_LOADING_COUNT = 10;
-
-    private static final int LIST_ITEM_TYPE = 12313212;
 
     @NonNull
     private final BehaviorSubject<ObservableCollection<TItem>> observableCollectionSubject
@@ -112,53 +118,6 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
         attachedRecyclerViews.add(recyclerView);
     }
 
-    @Override
-    public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView);
-        attachedRecyclerViews.remove(recyclerView);
-    }
-
-    @NonNull
-    public LifecycleBindable getLifecycleBindable() {
-        return lifecycleBindable;
-    }
-
-    protected long getItemClickDelay() {
-        return UiUtils.RIPPLE_EFFECT_DELAY;
-    }
-
-    public void setItems(@NonNull final List<TItem> items) {
-        setObservableCollection(new ObservableList<>(items));
-    }
-
-    @Nullable
-    public ObservableCollection<TItem> getObservableCollection() {
-        return observableCollectionSubject.getValue();
-    }
-
-    @NonNull
-    public Observable<ObservableCollection<TItem>> observeObservableCollection() {
-        return observableCollectionSubject.distinctUntilChanged();
-    }
-
-    protected int getHeadersCount() {
-        return 0;
-    }
-
-    protected int getFootersCount() {
-        return 0;
-    }
-
-    private void refreshUpdate() {
-        notifyDataSetChanged();
-        lastUpdatedChangeNumber = innerCollection.getChangesCount();
-    }
-
-    public void setObservableCollection(@Nullable final ObservableCollection<TItem> observableCollection) {
-        this.observableCollectionSubject.onNext(observableCollection);
-        refreshUpdate();
-    }
-
     private boolean anyRecyclerViewShown() {
         for (final RecyclerView recyclerView : attachedRecyclerViews) {
             if (recyclerView.isShown()) {
@@ -168,6 +127,66 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
         return false;
     }
 
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        attachedRecyclerViews.remove(recyclerView);
+    }
+
+    /**
+     * Returns parent {@link LifecycleBindable} (Activity/ViewController etc.).
+     *
+     * @return Parent {@link LifecycleBindable}.
+     */
+    @NonNull
+    public LifecycleBindable getLifecycleBindable() {
+        return lifecycleBindable;
+    }
+
+    /**
+     * Returns {@link ObservableCollection} which provides items and it's changes.
+     *
+     * @return Inner {@link ObservableCollection}.
+     */
+    @Nullable
+    public ObservableCollection<TItem> getObservableCollection() {
+        return observableCollectionSubject.getValue();
+    }
+
+    /**
+     * Method to observe {@link ObservableCollection} which provides items and it's changes.
+     *
+     * @return Observable of inner {@link ObservableCollection}.
+     */
+    @NonNull
+    public Observable<ObservableCollection<TItem>> observeObservableCollection() {
+        return observableCollectionSubject.distinctUntilChanged();
+    }
+
+    /**
+     * Sets {@link ObservableCollection} which will provide items and it's changes.
+     *
+     * @param observableCollection Inner {@link ObservableCollection}.
+     */
+    public void setObservableCollection(@Nullable final ObservableCollection<TItem> observableCollection) {
+        this.observableCollectionSubject.onNext(observableCollection);
+        refreshUpdate();
+    }
+
+    /**
+     * Simply sets items.
+     *
+     * @param items Items to set.
+     */
+    public void setItems(@NonNull final Collection<TItem> items) {
+        setObservableCollection(new ObservableList<>(items));
+    }
+
+    /**
+     * Calls when collection changes.
+     *
+     * @param collectionChange Changes of collection.
+     */
     protected void onItemsChanged(@NonNull final ObservableCollection.CollectionChange<TItem> collectionChange) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             Lc.assertion("Items changes called on not main thread");
@@ -186,6 +205,11 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
             return;
         }
         notifyAboutChanges(collectionChange.getChanges());
+        lastUpdatedChangeNumber = innerCollection.getChangesCount();
+    }
+
+    private void refreshUpdate() {
+        notifyDataSetChanged();
         lastUpdatedChangeNumber = innerCollection.getChangesCount();
     }
 
@@ -213,14 +237,32 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
         }
     }
 
-    public void setOnItemClickListener(@Nullable final OnItemClickListener<TItem> onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-        refreshUpdate();
+    /**
+     * Returns headers count goes before items.
+     *
+     * @return Headers count.
+     */
+    protected int getHeadersCount() {
+        return 0;
+    }
+
+    /**
+     * Returns footers count goes after items and headers.
+     *
+     * @return Footers count.
+     */
+    protected int getFootersCount() {
+        return 0;
+    }
+
+    @Override
+    public int getItemCount() {
+        return getHeadersCount() + innerCollection.size() + getFootersCount();
     }
 
     @Override
     public int getItemViewType(final int position) {
-        return LIST_ITEM_TYPE;
+        return R.id.OBSERVABLE_COLLECTION_ITEM_VIEW_TYPE;
     }
 
     @Override
@@ -228,18 +270,25 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
         return onCreateItemViewHolder(parent, viewType);
     }
 
+    /**
+     * Method to create ViewHolder for item (from {@link #getObservableCollection()}).
+     *
+     * @param parent   Parent to inflate ViewHolder into;
+     * @param viewType Type of ViewHolder;
+     * @return Item-specific ViewHolder.
+     */
     public abstract TViewHolder onCreateItemViewHolder(@NonNull ViewGroup parent, int viewType);
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(final BindableViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final BindableViewHolder holder, final int position) {
         lastUpdatedChangeNumber = innerCollection.getChangesCount();
 
         if (position - getHeadersCount() >= innerCollection.size()) {
             return;
         }
-        final TItem item = innerCollection.get(position - getHeadersCount());
 
+        final TItem item = innerCollection.get(position - getHeadersCount());
         onBindItemToViewHolder((TViewHolder) holder, position, item);
         ((TViewHolder) holder).bindPosition(position);
         if (onItemClickListener != null && !isOnClickListenerDisabled(item)) {
@@ -247,17 +296,20 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
         }
     }
 
+    /**
+     * Method to bind item (from {@link #getObservableCollection()}) to item-specific ViewHolder.
+     * It is not calling for headers and footer which counts are returned by {@link #getHeadersCount()} and @link #getFootersCount()}.
+     *
+     * @param holder   ViewHolder to bind item to;
+     * @param position Position of ViewHolder (NOT item!);
+     * @param item     Item returned by position (WITH HEADER OFFSET!).
+     */
     protected abstract void onBindItemToViewHolder(@NonNull TViewHolder holder, int position, @NonNull TItem item);
 
     @Nullable
     public TItem getItem(final int position) {
         final int positionInList = position - getHeadersCount();
         return positionInList < 0 || positionInList >= innerCollection.size() ? null : innerCollection.get(positionInList);
-    }
-
-    @Override
-    public int getItemCount() {
-        return getHeadersCount() + innerCollection.size() + getFootersCount();
     }
 
     @Override
@@ -272,16 +324,55 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
         super.onViewDetachedFromWindow(holder);
     }
 
+    /**
+     * Sets item click listener.
+     *
+     * @param onItemClickListener Item click listener.
+     */
+    public void setOnItemClickListener(@Nullable final OnItemClickListener<TItem> onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+        refreshUpdate();
+    }
+
+    /**
+     * Returns delay of item click. By default returns delay of ripple effect duration.
+     *
+     * @return Milliseconds delay of click.
+     */
+    protected long getItemClickDelay() {
+        return UiUtils.RIPPLE_EFFECT_DELAY;
+    }
+
+    /**
+     * Returns if click listening disabled or not for specific item.
+     *
+     * @param item Item to check click availability;
+     * @return True if click listener enabled for such item.
+     */
     public boolean isOnClickListenerDisabled(@NonNull final TItem item) {
         return false;
     }
 
+    /**
+     * Interface to simply add item click listener.
+     *
+     * @param <TItem> Type of item
+     */
     public interface OnItemClickListener<TItem> {
 
+        /**
+         * Calls when item have clicked.
+         *
+         * @param item     Clicked item;
+         * @param position Position of clicked item.
+         */
         void onItemClicked(@NonNull TItem item, int position);
 
     }
 
+    /**
+     * Base item ViewHolder that have included pre-loading logic.
+     */
     public class ViewHolder extends BindableViewHolder {
 
         @Nullable
@@ -291,7 +382,11 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
             super(baseBindable, itemView);
         }
 
-        @SuppressWarnings("unchecked")
+        /**
+         * Bind position to enable pre-loading for connected {@link ObservableCollection}.
+         *
+         * @param position Position of ViewHolder.
+         */
         public void bindPosition(final int position) {
             if (historyPreLoadingSubscription != null) {
                 historyPreLoadingSubscription.unsubscribe();

@@ -19,4 +19,6 @@
         <attr name="isMultiline" format="boolean"/>
     </declare-styleable>
 
+    <item name="OBSERVABLE_COLLECTION_ITEM_VIEW_TYPE" type="id"/>
+
 </resources>
