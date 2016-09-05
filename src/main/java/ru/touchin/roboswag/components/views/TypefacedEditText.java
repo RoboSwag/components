@@ -93,7 +93,7 @@ public class TypefacedEditText extends AppCompatEditText {
             if (multiline) {
                 setMultiline(AttributesUtils.getMaxLinesFromAttrs(context, attrs));
             } else {
-                setLines(1);
+                setSingleLine();
             }
 
             if (!isInEditMode()) {
