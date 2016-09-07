@@ -136,6 +136,10 @@ public class FragmentNavigation {
 
         final Fragment fragment = Fragment.instantiate(context, fragmentClass.getName(), args);
         if (targetFragment != null) {
+            if (fragmentManager != targetFragment.getFragmentManager()) {
+                Lc.assertion("FragmentManager of target is differ then of creating fragment. Target will be lost after restoring activity. "
+                        + targetFragment.getFragmentManager() + " != " + fragmentManager);
+            }
             fragment.setTargetFragment(targetFragment, 0);
         }
 
