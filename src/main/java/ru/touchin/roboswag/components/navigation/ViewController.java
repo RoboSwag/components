@@ -47,6 +47,7 @@ import rx.functions.Action1;
  * @param <TActivity> Type of activity where such {@link ViewController} could be;
  * @param <TFragment> Type of fragment where such {@link ViewController} could be;
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class ViewController<TActivity extends ViewControllerActivity<?>,
         TFragment extends ViewControllerFragment<?, TActivity>>
         implements LifecycleBindable {
