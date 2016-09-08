@@ -47,15 +47,15 @@ import rx.subjects.BehaviorSubject;
 /**
  * Created by Gavriil Sitnikov on 20/11/2015.
  * Adapter based on {@link ObservableCollection} and providing some useful features like:
- * - item-based binding by {@link #onCreateItemViewHolder(ViewGroup, int)} and {@link #onBindItemToViewHolder(ViewHolder, int, Object)}} methods;
+ * - item-based binding by {@link #onBindItemToViewHolder(ViewHolder, int, Object)}} method;
  * - item click listener setup by {@link #setOnItemClickListener(OnItemClickListener)};
  * - allows to inform about footers/headers by overriding base create/bind methods and {@link #getHeadersCount()} plus {@link #getFootersCount()};
  * - by default it is pre-loading items for collections like {@link ru.touchin.roboswag.core.observables.collections.loadable.LoadingMoreList}.
  *
- * @param <TItem>       Type of items to bind to ViewHolders;
- * @param <TViewHolder> Type of ViewHolders to show items.
+ * @param <TItem>           Type of items to bind to ViewHolders;
+ * @param <TItemViewHolder> Type of ViewHolders to show items.
  */
-public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends ObservableCollectionAdapter.ViewHolder>
+public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends ObservableCollectionAdapter.ViewHolder>
         extends RecyclerView.Adapter<BindableViewHolder> {
 
     private static final int PRE_LOADING_COUNT = 10;
@@ -266,18 +266,9 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
     }
 
     @Override
-    public BindableViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
-        return onCreateItemViewHolder(parent, viewType);
+    public BindableViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
+        return null;
     }
-
-    /**
-     * Method to create ViewHolder for item (from {@link #getObservableCollection()}).
-     *
-     * @param parent   Parent to inflate ViewHolder into;
-     * @param viewType Type of ViewHolder;
-     * @return Item-specific ViewHolder.
-     */
-    public abstract TViewHolder onCreateItemViewHolder(@NonNull ViewGroup parent, int viewType);
 
     @SuppressWarnings("unchecked")
     @Override
@@ -289,8 +280,15 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
         }
 
         final TItem item = innerCollection.get(position - getHeadersCount());
-        onBindItemToViewHolder((TViewHolder) holder, position, item);
-        ((TViewHolder) holder).bindPosition(position);
+        final TItemViewHolder itemViewHolder;
+        try {
+            itemViewHolder = (TItemViewHolder) holder;
+        } catch (final ClassCastException exception) {
+            Lc.assertion(exception);
+            return;
+        }
+        onBindItemToViewHolder(itemViewHolder, position, item);
+        (itemViewHolder).bindPosition(position);
         if (onItemClickListener != null && !isOnClickListenerDisabled(item)) {
             UiUtils.setOnRippleClickListener(holder.itemView, () -> onItemClickListener.onItemClicked(item, position), getItemClickDelay());
         }
@@ -304,7 +302,7 @@ public abstract class ObservableCollectionAdapter<TItem, TViewHolder extends Obs
      * @param position Position of ViewHolder (NOT item!);
      * @param item     Item returned by position (WITH HEADER OFFSET!).
      */
-    protected abstract void onBindItemToViewHolder(@NonNull TViewHolder holder, int position, @NonNull TItem item);
+    protected abstract void onBindItemToViewHolder(@NonNull TItemViewHolder holder, int position, @NonNull TItem item);
 
     @Nullable
     public TItem getItem(final int position) {
