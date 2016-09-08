@@ -278,7 +278,6 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
             return;
         }
 
-        final TItem item = innerCollection.get(position - getHeadersCount());
         final TItemViewHolder itemViewHolder;
         try {
             itemViewHolder = (TItemViewHolder) holder;
@@ -286,6 +285,7 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
             Lc.assertion(exception);
             return;
         }
+        final TItem item = innerCollection.get(position - getHeadersCount());
         onBindItemToViewHolder(itemViewHolder, position, item);
         (itemViewHolder).bindPosition(position);
         if (onItemClickListener != null && !isOnClickListenerDisabled(item)) {

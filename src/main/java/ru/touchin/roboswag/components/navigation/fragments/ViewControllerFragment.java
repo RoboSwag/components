@@ -55,6 +55,7 @@ import rx.subjects.BehaviorSubject;
  * @param <TState>    Type of object which is representing it's fragment state;
  * @param <TActivity> Type of {@link ViewControllerActivity} where fragment could be attached to.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public abstract class ViewControllerFragment<TState extends AbstractState, TActivity extends ViewControllerActivity<?>>
         extends ViewFragment<TActivity> {
 
