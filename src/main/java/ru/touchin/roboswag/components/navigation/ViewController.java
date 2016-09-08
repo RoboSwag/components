@@ -159,6 +159,14 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     }
 
     /**
+     * Called when fragment is moved in started state and it's {@link #getFragment().isMenuVisible()} sets to true.
+     * Usually it is indicating that user can't see fragment on screen and useful to track analytics events.
+     */
+    public void onAppear() {
+        //do nothing
+    }
+
+    /**
      * Calls when {@link ViewController} have resumed.
      * Happens at {@link ViewControllerFragment#onResume(View, ViewControllerActivity)}.
      */
@@ -193,6 +201,14 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @CallSuper
     public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
         // do nothing
+    }
+
+    /**
+     * Called when fragment is moved in stopped state or it's {@link #getFragment().isMenuVisible()} sets to false.
+     * Usually it is indicating that user can't see fragment on screen and useful to track analytics events.
+     */
+    public void onDisappear() {
+        //do nothing
     }
 
     /**

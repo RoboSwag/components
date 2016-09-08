@@ -215,6 +215,14 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
+    protected void onAppear(@NonNull final View view, @NonNull final TActivity activity) {
+        super.onAppear(view, activity);
+        if (viewController != null) {
+            viewController.onAppear();
+        }
+    }
+
+    @Override
     protected void onResume(@NonNull final View view, @NonNull final TActivity activity) {
         super.onResume(view, activity);
         if (viewController != null) {
@@ -268,6 +276,14 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
+    protected void onPause(@NonNull final View view, @NonNull final TActivity activity) {
+        super.onPause(view, activity);
+        if (viewController != null) {
+            viewController.onPause();
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         if (viewController != null) {
@@ -277,10 +293,10 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
-    protected void onPause(@NonNull final View view, @NonNull final TActivity activity) {
-        super.onPause(view, activity);
+    protected void onDisappear(@NonNull final View view, @NonNull final TActivity activity) {
+        super.onDisappear(view, activity);
         if (viewController != null) {
-            viewController.onPause();
+            viewController.onDisappear();
         }
     }
 

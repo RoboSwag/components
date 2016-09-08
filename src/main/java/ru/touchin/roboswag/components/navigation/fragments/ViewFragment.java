@@ -42,6 +42,9 @@ import rx.functions.Action2;
 public abstract class ViewFragment<TActivity extends AppCompatActivity> extends Fragment
         implements OnFragmentStartedListener {
 
+    private boolean appeared;
+    private boolean started;
+
     /**
      * Returns if fragment have parent fragment.
      *
@@ -120,6 +123,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
     @Override
     public void onStart() {
         super.onStart();
+        started = true;
         callMethodAfterInstantiation(this::onStart);
     }
 
@@ -136,6 +140,21 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
         } else if (activity instanceof OnFragmentStartedListener) {
             ((OnFragmentStartedListener) activity).onFragmentStarted(this);
         }
+        if (!appeared && isMenuVisible()) {
+            onAppear(view, activity);
+            appeared = true;
+        }
+    }
+
+    /**
+     * Called when fragment is moved in started state and it's {@link #isMenuVisible()} sets to true.
+     * Usually it is indicating that user can't see fragment on screen and useful to track analytics events.
+     *
+     * @param view     Instantiated view.
+     * @param activity Activity which fragment attached to.
+     */
+    protected void onAppear(@NonNull final View view, @NonNull final TActivity activity) {
+        //do nothing
     }
 
     @Deprecated
@@ -156,6 +175,19 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
         //do nothing
     }
 
+    @Override
+    public void setMenuVisibility(final boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+        if (getBaseActivity() != null && getView() != null) {
+            if (!appeared && menuVisible && started) {
+                onAppear(getView(), getBaseActivity());
+            }
+            if (appeared && (!menuVisible || !started)) {
+                onDisappear(getView(), getBaseActivity());
+            }
+        }
+    }
+
     @Deprecated
     @Override
     public void onPause() {
@@ -171,12 +203,24 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      */
     @CallSuper
     protected void onPause(@NonNull final View view, @NonNull final TActivity activity) {
+        // do nothing
+    }
+
+    /**
+     * Called when fragment is moved in stopped state or it's {@link #isMenuVisible()} sets to false.
+     * Usually it is indicating that user can't see fragment on screen and useful to track analytics events.
+     *
+     * @param view     Instantiated view.
+     * @param activity Activity which fragment attached to.
+     */
+    protected void onDisappear(@NonNull final View view, @NonNull final TActivity activity) {
         //do nothing
     }
 
     @Deprecated
     @Override
     public void onStop() {
+        started = false;
         callMethodAfterInstantiation(this::onStop);
         super.onStop();
     }
@@ -189,7 +233,10 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      */
     @CallSuper
     protected void onStop(@NonNull final View view, @NonNull final TActivity activity) {
-        //do nothing
+        if (appeared) {
+            onDisappear(view, activity);
+            appeared = false;
+        }
     }
 
     @Deprecated
