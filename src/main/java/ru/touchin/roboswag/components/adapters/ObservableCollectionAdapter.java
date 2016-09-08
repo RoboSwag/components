@@ -265,10 +265,9 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
         return R.id.OBSERVABLE_COLLECTION_ITEM_VIEW_TYPE;
     }
 
+    @NonNull
     @Override
-    public BindableViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-        return null;
-    }
+    public abstract BindableViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType);
 
     @SuppressWarnings("unchecked")
     @Override
