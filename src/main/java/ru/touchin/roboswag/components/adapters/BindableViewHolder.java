@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.core.log.Lc;
+import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -95,9 +96,10 @@ public class BindableViewHolder extends RecyclerView.ViewHolder implements Lifec
     @NonNull
     @Override
     public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        final String codePoint = Lc.getCodePoint(this, 1);
         final Observable<T> safeObservable = observable
                 .onErrorResumeNext(throwable -> {
-                    Lc.assertion(throwable);
+                    Lc.assertion(new ShouldNotHappenException("Unexpected error on bind at " + codePoint, throwable));
                     return Observable.never();
                 })
                 .observeOn(AndroidSchedulers.mainThread());

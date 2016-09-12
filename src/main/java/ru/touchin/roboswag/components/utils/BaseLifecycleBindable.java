@@ -22,6 +22,7 @@ package ru.touchin.roboswag.components.utils;
 import android.support.annotation.NonNull;
 
 import ru.touchin.roboswag.core.log.Lc;
+import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -72,9 +73,10 @@ public class BaseLifecycleBindable implements LifecycleBindable {
     @NonNull
     @Override
     public <T> Subscription bind(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
+        final String codePoint = Lc.getCodePoint(this, 2);
         final Observable<T> safeObservable = observable
                 .onErrorResumeNext(throwable -> {
-                    Lc.assertion(throwable);
+                    Lc.assertion(new ShouldNotHappenException("Unexpected error on bind at " + codePoint, throwable));
                     return Observable.never();
                 })
                 .observeOn(AndroidSchedulers.mainThread());
@@ -86,13 +88,19 @@ public class BaseLifecycleBindable implements LifecycleBindable {
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable) {
-        return untilStop(observable, Actions.empty(), Lc::assertion, Actions.empty());
+        final String codePoint = Lc.getCodePoint(this, 2);
+        return untilStop(observable, Actions.empty(),
+                throwable -> Lc.assertion(new ShouldNotHappenException("Unexpected error on untilStop at " + codePoint, throwable)),
+                Actions.empty());
     }
 
     @NonNull
     @Override
     public <T> Subscription untilStop(@NonNull final Observable<T> observable, @NonNull final Action1<T> onNextAction) {
-        return untilStop(observable, onNextAction, Lc::assertion, Actions.empty());
+        final String codePoint = Lc.getCodePoint(this, 2);
+        return untilStop(observable, onNextAction,
+                throwable -> Lc.assertion(new ShouldNotHappenException("Unexpected error on untilStop at " + codePoint, throwable)),
+                Actions.empty());
     }
 
     @NonNull
@@ -115,14 +123,20 @@ public class BaseLifecycleBindable implements LifecycleBindable {
     @NonNull
     @Override
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable) {
-        return untilDestroy(observable, Actions.empty(), Lc::assertion, Actions.empty());
+        final String codePoint = Lc.getCodePoint(this, 2);
+        return untilDestroy(observable, Actions.empty(),
+                throwable -> Lc.assertion(new ShouldNotHappenException("Unexpected error on untilDestroy at " + codePoint, throwable)),
+                Actions.empty());
     }
 
     @NonNull
     @Override
     public <T> Subscription untilDestroy(@NonNull final Observable<T> observable,
                                          @NonNull final Action1<T> onNextAction) {
-        return untilDestroy(observable, onNextAction, Lc::assertion, Actions.empty());
+        final String codePoint = Lc.getCodePoint(this, 2);
+        return untilDestroy(observable, onNextAction,
+                throwable -> Lc.assertion(new ShouldNotHappenException("Unexpected error on untilDestroy at " + codePoint, throwable)),
+                Actions.empty());
     }
 
     @NonNull

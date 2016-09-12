@@ -390,7 +390,7 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
                 historyPreLoadingSubscription = null;
             }
             if (position - getHeadersCount() > innerCollection.size() - PRE_LOADING_COUNT) {
-                historyPreLoadingSubscription = bind(historyPreLoadingObservable, Actions.empty());
+                historyPreLoadingSubscription = bind(historyPreLoadingObservable.onErrorReturn(ignored -> null), Actions.empty());
             }
         }
 
