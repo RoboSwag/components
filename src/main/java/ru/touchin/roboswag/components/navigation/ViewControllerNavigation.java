@@ -220,7 +220,7 @@ public class ViewControllerNavigation<TActivity extends ViewControllerActivity<?
      * @param <TTargetFragment>   Type of target fragment.
      */
     public <TTargetState extends AbstractState,
-            TTargetFragment extends ViewControllerFragment<TTargetState, TActivity>> void pushViewControllerForResult(
+            TTargetFragment extends ViewControllerFragment<? extends TTargetState, TActivity>> void pushViewControllerForResult(
             @NonNull final Class<? extends ViewController<TActivity,
                     StatelessTargetedViewControllerFragment<TTargetState, TActivity>>> viewControllerClass,
             @NonNull final TTargetFragment targetFragment) {
@@ -238,7 +238,7 @@ public class ViewControllerNavigation<TActivity extends ViewControllerActivity<?
      * @param <TTargetFragment>   Type of target fragment.
      */
     public <TTargetState extends AbstractState,
-            TTargetFragment extends ViewControllerFragment<TTargetState, TActivity>> void pushViewControllerForResult(
+            TTargetFragment extends ViewControllerFragment<? extends TTargetState, TActivity>> void pushViewControllerForResult(
             @NonNull final Class<? extends ViewController<TActivity,
                     StatelessTargetedViewControllerFragment<TTargetState, TActivity>>> viewControllerClass,
             @NonNull final TTargetFragment targetFragment,
@@ -260,7 +260,7 @@ public class ViewControllerNavigation<TActivity extends ViewControllerActivity<?
      */
     @SuppressWarnings("CPD-START")
     public <TState extends AbstractState, TTargetState extends AbstractState,
-            TTargetFragment extends ViewControllerFragment<TTargetState, TActivity>> void pushViewControllerForResult(
+            TTargetFragment extends ViewControllerFragment<? extends TTargetState, TActivity>> void pushViewControllerForResult(
             @NonNull final Class<? extends ViewController<TActivity,
                     TargetedViewControllerFragment<TState, TTargetState, TActivity>>> viewControllerClass,
             @NonNull final TTargetFragment targetFragment,
@@ -283,7 +283,7 @@ public class ViewControllerNavigation<TActivity extends ViewControllerActivity<?
      */
     @SuppressWarnings("CPD-END")
     public <TState extends AbstractState, TTargetState extends AbstractState,
-            TTargetFragment extends ViewControllerFragment<TTargetState, TActivity>> void pushViewControllerForResult(
+            TTargetFragment extends ViewControllerFragment<? extends TTargetState, TActivity>> void pushViewControllerForResult(
             @NonNull final Class<? extends ViewController<TActivity,
                     TargetedViewControllerFragment<TState, TTargetState, TActivity>>> viewControllerClass,
             @NonNull final TTargetFragment targetFragment,
