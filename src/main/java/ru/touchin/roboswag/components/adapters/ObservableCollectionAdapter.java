@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import ru.touchin.roboswag.components.R;
 import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
@@ -258,11 +257,6 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     @Override
     public int getItemCount() {
         return getHeadersCount() + innerCollection.size() + getFootersCount();
-    }
-
-    @Override
-    public int getItemViewType(final int position) {
-        return R.id.OBSERVABLE_COLLECTION_ITEM_VIEW_TYPE;
     }
 
     @NonNull
