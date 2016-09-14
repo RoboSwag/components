@@ -11,6 +11,8 @@
             <enum name="singleLineAutoScale" value="2"/>
             <enum name="multilineEllipsize" value="3"/>
             <enum name="multilineMarquee" value="4"/>
+            <enum name="singleLineEllipsizeMiddle" value="5"/>
+            <enum name="multilineLineEllipsizeMiddle" value="6"/>
         </attr>
     </declare-styleable>
 

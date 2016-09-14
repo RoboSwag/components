@@ -223,6 +223,10 @@ public class TypefacedTextView extends AppCompatTextView {
             case SINGLE_LINE_AUTO_SCALE:
                 super.setEllipsize(null);
                 break;
+            case SINGLE_LINE_ELLIPSIZE_MIDDLE:
+            case MULTILINE_ELLIPSIZE_MIDDLE:
+                super.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+                break;
             default:
                 Lc.assertion("Unknown line strategy: " + lineStrategy);
                 break;
@@ -423,11 +427,11 @@ public class TypefacedTextView extends AppCompatTextView {
     public enum LineStrategy {
 
         /**
-         * Not more than one line and ellipsize text with dots at end.
+         * Not more than one line and ellipsize text with dots at the end.
          */
         SINGLE_LINE_ELLIPSIZE(false, false),
         /**
-         * Not more than one line and ellipsize text with marquee at end.
+         * Not more than one line and ellipsize text with marquee at the end.
          */
         SINGLE_LINE_MARQUEE(false, false),
         /**
@@ -435,13 +439,21 @@ public class TypefacedTextView extends AppCompatTextView {
          */
         SINGLE_LINE_AUTO_SCALE(false, true),
         /**
-         * More than one line and ellipsize text with dots at end.
+         * More than one line and ellipsize text with dots at the end.
          */
         MULTILINE_ELLIPSIZE(true, false),
         /**
-         * More than one line and ellipsize text with marquee at end.
+         * More than one line and ellipsize text with marquee at the end.
          */
-        MULTILINE_MARQUEE(true, false);
+        MULTILINE_MARQUEE(true, false),
+        /**
+         * Not more than one line and ellipsize text with dots in the middle.
+         */
+        SINGLE_LINE_ELLIPSIZE_MIDDLE(false, false),
+        /**
+         * More than one line and ellipsize text with dots in the middle.
+         */
+        MULTILINE_ELLIPSIZE_MIDDLE(true, false);
 
         @NonNull
         public static LineStrategy byResIndex(final int resIndex) {
