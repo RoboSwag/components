@@ -26,7 +26,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
-import android.text.method.SingleLineTransformationMethod;
 import android.text.method.TransformationMethod;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -203,9 +202,9 @@ public class TypefacedTextView extends AppCompatTextView {
         final TransformationMethod transformationMethod = getTransformationMethod();
         super.setSingleLine(!lineStrategy.multiline);
         if (transformationMethod != null) {
-            if (!(transformationMethod instanceof SingleLineTransformationMethod)) {
+            /*DEBUG if (!(transformationMethod instanceof SingleLineTransformationMethod)) {
                 Lc.w("SingleLineTransformationMethod method ignored because of previous transformation method: " + transformationMethod);
-            }
+            }*/
             setTransformationMethod(transformationMethod);
         }
         if (lineStrategy.multiline) {

@@ -246,9 +246,9 @@ public class TypefacedEditText extends AppCompatEditText {
         final TransformationMethod transformationMethod = getTransformationMethod();
         super.setSingleLine(true);
         if (transformationMethod != null) {
-            if (!(transformationMethod instanceof SingleLineTransformationMethod)) {
+            /*DEBUG if (!(transformationMethod instanceof SingleLineTransformationMethod)) {
                 Lc.w("SingleLineTransformationMethod method ignored because of previous transformation method: " + transformationMethod);
-            }
+            }*/
             setTransformationMethod(transformationMethod);
         }
         setLines(1);

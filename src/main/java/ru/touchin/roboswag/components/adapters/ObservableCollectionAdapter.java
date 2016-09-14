@@ -274,7 +274,8 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     public void onBindViewHolder(@NonNull final BindableViewHolder holder, final int position) {
         lastUpdatedChangeNumber = innerCollection.getChangesCount();
 
-        if (position - getHeadersCount() >= innerCollection.size()) {
+        final int itemPosition = position - getHeadersCount();
+        if (itemPosition < 0 || itemPosition >= innerCollection.size()) {
             return;
         }
 
@@ -285,7 +286,7 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
             Lc.assertion(exception);
             return;
         }
-        final TItem item = innerCollection.get(position - getHeadersCount());
+        final TItem item = innerCollection.get(itemPosition);
         onBindItemToViewHolder(itemViewHolder, position, item);
         (itemViewHolder).bindPosition(position);
         if (onItemClickListener != null && !isOnClickListenerDisabled(item)) {
