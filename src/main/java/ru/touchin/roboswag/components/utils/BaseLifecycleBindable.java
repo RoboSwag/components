@@ -162,9 +162,11 @@ public class BaseLifecycleBindable implements LifecycleBindable {
                                    @NonNull final Action1<Throwable> onErrorAction,
                                    @NonNull final Action0 onCompletedAction) {
         return isCreatedSubject.first()
-                .switchMap(created -> created ? observable.observeOn(AndroidSchedulers.mainThread()) : Observable.empty())
+                .switchMap(created -> created
+                        ? observable.observeOn(AndroidSchedulers.mainThread()).doOnCompleted(onCompletedAction)
+                        : Observable.empty())
                 .takeUntil(conditionSubject.filter(condition -> condition))
-                .subscribe(onNextAction, onErrorAction, onCompletedAction);
+                .subscribe(onNextAction, onErrorAction);
     }
 
 }
