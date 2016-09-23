@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
@@ -68,7 +69,7 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     private OnItemClickListener<TItem> onItemClickListener;
     private int lastUpdatedChangeNumber = -1;
     @NonNull
-    private final Observable<?> historyPreLoadingObservable;
+    private final Observable historyPreLoadingObservable;
 
     @NonNull
     private final ObservableList<TItem> innerCollection = new ObservableList<>();
@@ -281,8 +282,9 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
             return;
         }
         final TItem item = innerCollection.get(itemPosition);
+        itemViewHolder.adapter = this;
         onBindItemToViewHolder(itemViewHolder, position, item);
-        (itemViewHolder).bindPosition(position);
+        itemViewHolder.bindPosition(position);
         if (onItemClickListener != null && !isOnClickListenerDisabled(item)) {
             UiUtils.setOnRippleClickListener(holder.itemView, () -> onItemClickListener.onItemClicked(item, position), getItemClickDelay());
         }
@@ -365,10 +367,15 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     /**
      * Base item ViewHolder that have included pre-loading logic.
      */
-    public class ViewHolder extends BindableViewHolder {
+    public static class ViewHolder extends BindableViewHolder {
+
+        //it is needed to avoid massive requests on initial view holders attaching (like if we will add 10 items they all will try to load history)
+        private static final long DELAY_BEFORE_LOADING_HISTORY = TimeUnit.SECONDS.toMillis(1);
 
         @Nullable
         private Subscription historyPreLoadingSubscription;
+        @Nullable
+        public ObservableCollectionAdapter adapter;
 
         public ViewHolder(@NonNull final LifecycleBindable baseBindable, @NonNull final View itemView) {
             super(baseBindable, itemView);
@@ -379,13 +386,17 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
          *
          * @param position Position of ViewHolder.
          */
+        @SuppressWarnings("unchecked")
+        //unchecked: it's ok, we just need to load something more
         public void bindPosition(final int position) {
             if (historyPreLoadingSubscription != null) {
                 historyPreLoadingSubscription.unsubscribe();
                 historyPreLoadingSubscription = null;
             }
-            if (position - getHeadersCount() > innerCollection.size() - PRE_LOADING_COUNT) {
-                historyPreLoadingSubscription = bind(historyPreLoadingObservable.onErrorReturn(ignored -> null), Actions.empty());
+            if (adapter != null && position - adapter.getHeadersCount() > adapter.innerCollection.size() - PRE_LOADING_COUNT) {
+                historyPreLoadingSubscription = bind(adapter.historyPreLoadingObservable
+                        .delaySubscription(DELAY_BEFORE_LOADING_HISTORY, TimeUnit.MILLISECONDS)
+                        .onErrorResumeNext(Observable.empty()), Actions.empty());
             }
         }
 
