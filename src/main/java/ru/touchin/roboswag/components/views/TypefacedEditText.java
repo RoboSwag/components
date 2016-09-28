@@ -129,7 +129,7 @@ public class TypefacedEditText extends AppCompatEditText {
                 checkMultilineAttributes(typedArray, androidRes, errors, multiline);
             }
         } catch (final Exception exception) {
-            Lc.cutAssertion(exception);
+            Lc.e(exception, "Error during checking attributes");
         }
         AttributesUtils.handleErrors(this, errors);
         typedArray.recycle();
