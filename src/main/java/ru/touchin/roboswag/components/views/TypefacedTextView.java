@@ -48,6 +48,8 @@ import ru.touchin.roboswag.core.log.Lc;
 //ConstructorCallsOverridableMethod: it's ok as we need to setTypeface
 public class TypefacedTextView extends AppCompatTextView {
 
+    private static final int SIZE_THRESHOLD = 10000;
+
     private static final int UNSPECIFIED_MEASURE_SPEC = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
     private static final int START_SCALABLE_DIFFERENCE = 4;
 
@@ -405,12 +407,13 @@ public class TypefacedTextView extends AppCompatTextView {
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
         final int maxWidth = MeasureSpec.getSize(widthMeasureSpec);
         final int maxHeight = MeasureSpec.getSize(heightMeasureSpec);
-        if (!constructed || !lineStrategy.scalable || maxWidth <= 0 || maxHeight <= 0 || TextUtils.isEmpty(getText())) {
+        if (!constructed || !lineStrategy.scalable || (maxWidth <= 0 && maxHeight <= 0) || TextUtils.isEmpty(getText())) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
 
-        computeScalableTextSize(maxWidth, maxHeight);
+        computeScalableTextSize(MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.UNSPECIFIED ? maxWidth : SIZE_THRESHOLD,
+                MeasureSpec.getMode(heightMeasureSpec) != MeasureSpec.UNSPECIFIED ? maxHeight : SIZE_THRESHOLD);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
