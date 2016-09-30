@@ -380,7 +380,8 @@ public class TypefacedTextView extends AppCompatTextView {
             super.onMeasure(UNSPECIFIED_MEASURE_SPEC, UNSPECIFIED_MEASURE_SPEC);
             previousScaleAction = scaleAction;
             scaleAction = computeScaleAction(maxWidth, maxHeight);
-        } while (scaleAction != ScaleAction.DO_NOTHING);
+        }
+        while (scaleAction != ScaleAction.DO_NOTHING);
     }
 
     @NonNull
