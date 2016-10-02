@@ -112,6 +112,16 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
                 });
     }
 
+    /**
+     * Returns if any change of source collection applied to adapter.
+     * It's important to not show some footers or header before first change have applied.
+     *
+     * @return True id any change applied.
+     */
+    public boolean isAnyChangeApplied() {
+        return anyChangeApplied;
+    }
+
     @Override
     public void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
