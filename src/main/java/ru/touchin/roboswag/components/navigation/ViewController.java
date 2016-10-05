@@ -19,6 +19,7 @@
 
 package ru.touchin.roboswag.components.navigation;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -306,6 +307,11 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
                                          @NonNull final Action0 onCompletedAction) {
         return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
     }
+
+    public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
+        // onActivityResult() is fired
+    }
+
 
     @SuppressWarnings("CPD-END")
     //CPD: it is same as in other implementation based on BaseLifecycleBindable

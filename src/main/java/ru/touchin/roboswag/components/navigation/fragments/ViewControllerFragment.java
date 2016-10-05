@@ -20,6 +20,7 @@
 package ru.touchin.roboswag.components.navigation.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
@@ -249,6 +250,14 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     protected void onConfigureNavigation(@NonNull final Menu menu, @NonNull final MenuInflater inflater) {
         if (viewController != null) {
             viewController.onConfigureNavigation(menu, inflater);
+        }
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (viewController != null) {
+            viewController.onActivityResult(requestCode, resultCode, data);
         }
     }
 
