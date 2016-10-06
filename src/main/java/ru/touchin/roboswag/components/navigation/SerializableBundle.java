@@ -2,7 +2,6 @@ package ru.touchin.roboswag.components.navigation;
 
 import android.os.Bundle;
 import android.os.Parcel;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.IOException;
@@ -37,7 +36,7 @@ public class SerializableBundle implements Serializable {
      *
      * @param bundle Bundle to serialize.
      */
-    public void setBundle(@NonNull final Bundle bundle) {
+    public void setBundle(@Nullable final Bundle bundle) {
         this.bundle = bundle;
     }
 
