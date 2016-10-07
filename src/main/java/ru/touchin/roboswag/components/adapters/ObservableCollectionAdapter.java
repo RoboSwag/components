@@ -56,7 +56,7 @@ import rx.subjects.BehaviorSubject;
  * @param <TItemViewHolder> Type of ViewHolders to show items.
  */
 public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends ObservableCollectionAdapter.ViewHolder>
-        extends RecyclerView.Adapter<BindableViewHolder> {
+        extends RecyclerView.Adapter<TItemViewHolder> {
 
     private static final int PRE_LOADING_COUNT = 10;
 
@@ -272,11 +272,11 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
 
     @NonNull
     @Override
-    public abstract BindableViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType);
+    public abstract TItemViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType);
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(@NonNull final BindableViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final TItemViewHolder holder, final int position) {
         lastUpdatedChangeNumber = innerCollection.getChangesCount();
 
         final int itemPosition = position - getHeadersCount();
@@ -284,17 +284,10 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
             return;
         }
 
-        final TItemViewHolder itemViewHolder;
-        try {
-            itemViewHolder = (TItemViewHolder) holder;
-        } catch (final ClassCastException exception) {
-            Lc.assertion(exception);
-            return;
-        }
         final TItem item = innerCollection.get(itemPosition);
-        itemViewHolder.adapter = this;
-        onBindItemToViewHolder(itemViewHolder, position, item);
-        itemViewHolder.bindPosition(position);
+        holder.adapter = this;
+        onBindItemToViewHolder(holder, position, item);
+        holder.bindPosition(position);
         if (onItemClickListener != null && !isOnClickListenerDisabled(item)) {
             UiUtils.setOnRippleClickListener(holder.itemView, () -> onItemClickListener.onItemClicked(item, position), getItemClickDelay());
         }
@@ -317,13 +310,13 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     }
 
     @Override
-    public void onViewAttachedToWindow(@NonNull final BindableViewHolder holder) {
+    public void onViewAttachedToWindow(@NonNull final TItemViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         holder.onAttachedToWindow();
     }
 
     @Override
-    public void onViewDetachedFromWindow(@NonNull final BindableViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull final TItemViewHolder holder) {
         holder.onDetachedFromWindow();
         super.onViewDetachedFromWindow(holder);
     }
