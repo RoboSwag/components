@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 RoboSwag (Gavriil Sitnikov, Vsevolod Ivanov)
+ *  Copyright (c) 2016 RoboSwag (Gavriil Sitnikov, Vsevolod Ivanov)
  *
  *  This file is part of RoboSwag library.
  *
@@ -35,7 +35,7 @@ import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 
 /**
- * Created by Ilia Kurtov on 17.03.2016.
+ * Created by Ilia Kurtov on 17/03/2016.
  * Adapter for Calendar view. Use with {@link CalendarRecyclerView}.
  *
  * @param <TDayViewHolder>    Type of ViewHolders of a day with a date;
@@ -68,7 +68,7 @@ public abstract class CalendarAdapter<TDayViewHolder extends RecyclerView.ViewHo
      * @param endDate     Last date (not inclusive) in the calendar range;
      * @param monthsNames String array of months names where #0 is January and #11 is December.
      */
-    protected CalendarAdapter(@NonNull final DateTime startDate, @NonNull final DateTime endDate, @Nullable final String... monthsNames) {
+    public CalendarAdapter(@NonNull final DateTime startDate, @NonNull final DateTime endDate, @Nullable final String... monthsNames) {
         super();
         if (monthsNames != null && monthsNames.length == MONTHS_IN_YEAR) {
             this.monthsNames = monthsNames;
@@ -78,11 +78,6 @@ public abstract class CalendarAdapter<TDayViewHolder extends RecyclerView.ViewHo
             throw new ShouldNotHappenException("There is no items in calendar with startDate: " + DateTimeFormat.fullDate().print(startDate)
                     + ", and endDate: " + DateTimeFormat.fullDate().print(endDate));
         }
-    }
-
-    public CalendarAdapter() {
-        super();
-        Lc.assertion("Use CalendarAdapter(startDate, endDate, mothsNames) instead");
     }
 
     /**
@@ -233,6 +228,7 @@ public abstract class CalendarAdapter<TDayViewHolder extends RecyclerView.ViewHo
         }
     }
 
+    //TODO fix suppress
     @SuppressWarnings("PMD.CyclomaticComplexity")
     private void bindDay(final TDayViewHolder holder, final int position, final CalendarItem calendarItem) {
         final String currentDay = String.valueOf(((CalendarDayItem) calendarItem).getPositionOfFirstDay()

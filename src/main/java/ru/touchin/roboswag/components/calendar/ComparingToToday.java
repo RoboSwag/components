@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 RoboSwag (Gavriil Sitnikov, Vsevolod Ivanov)
+ *  Copyright (c) 2016 RoboSwag (Gavriil Sitnikov, Vsevolod Ivanov)
  *
  *  This file is part of RoboSwag library.
  *
@@ -20,7 +20,7 @@
 package ru.touchin.roboswag.components.calendar;
 
 /**
- * Created by Ilia Kurtov on 18.03.2016.
+ * Created by Ilia Kurtov on 18/03/2016.
  * Show the comparison between a date and today.
  */
 public enum ComparingToToday {

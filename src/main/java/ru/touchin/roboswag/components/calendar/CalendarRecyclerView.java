@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 RoboSwag (Gavriil Sitnikov, Vsevolod Ivanov)
+ *  Copyright (c) 2016 RoboSwag (Gavriil Sitnikov, Vsevolod Ivanov)
  *
  *  This file is part of RoboSwag library.
  *
@@ -28,8 +28,8 @@ import android.util.AttributeSet;
 import ru.touchin.roboswag.core.log.Lc;
 
 /**
- * Created by Ilia Kurtov on 17.03.2016.
- * * //TODO: fill description
+ * Created by Ilia Kurtov on 17/03/2016.
+ * Specific {@link RecyclerView} that works with {@link CalendarAdapter}. It optimizes speed of the calendar.
  */
 public class CalendarRecyclerView extends RecyclerView {
 
@@ -58,6 +58,7 @@ public class CalendarRecyclerView extends RecyclerView {
      *
      * @param calendarAdapter Adapter that extends from {@link CalendarAdapter}.
      */
+    // This suppress needed for using only specific CalendarAdapter}
     @SuppressWarnings("PMD.UselessOverridingMethod")
     public void setAdapter(@NonNull final CalendarAdapter calendarAdapter) {
         super.setAdapter(calendarAdapter);
@@ -66,7 +67,6 @@ public class CalendarRecyclerView extends RecyclerView {
     @Override
     @Deprecated
     public void setAdapter(final Adapter adapter) {
-        super.setAdapter(adapter);
         Lc.assertion("Unsupported adapter class. Use CalendarAdapter instead.");
     }
 

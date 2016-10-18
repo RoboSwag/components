@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 RoboSwag (Gavriil Sitnikov, Vsevolod Ivanov)
+ *  Copyright (c) 2016 RoboSwag (Gavriil Sitnikov, Vsevolod Ivanov)
  *
  *  This file is part of RoboSwag library.
  *
@@ -33,8 +33,8 @@ import java.util.concurrent.TimeUnit;
 import ru.touchin.roboswag.core.log.Lc;
 
 /**
- * Created by Ilia Kurtov on 17.03.2016.
-     * Utility class to simplify working with {@link CalendarAdapter}.
+ * Created by Ilia Kurtov on 17/03/2016.
+ * Utility class to simplify working with {@link CalendarAdapter}.
  */
 public final class CalendarUtils {
 
