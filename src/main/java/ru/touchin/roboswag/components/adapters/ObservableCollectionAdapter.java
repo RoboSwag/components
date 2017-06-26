@@ -31,6 +31,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.functions.BiConsumer;
+import io.reactivex.functions.Consumer;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.subjects.BehaviorSubject;
 import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
@@ -40,12 +46,6 @@ import ru.touchin.roboswag.core.observables.collections.ObservableList;
 import ru.touchin.roboswag.core.observables.collections.loadable.LoadingMoreList;
 import ru.touchin.roboswag.core.utils.Optional;
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Action2;
-import rx.functions.Action3;
-import rx.subjects.BehaviorSubject;
 
 /**
  * Created by Gavriil Sitnikov on 20/11/2015.
@@ -77,7 +77,7 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
 
     @NonNull
     private final BehaviorSubject<Optional<ObservableCollection<TItem>>> observableCollectionSubject
-            = BehaviorSubject.create(new Optional<>(null));
+            = BehaviorSubject.createDefault(new Optional<>(null));
     @NonNull
     private final BehaviorSubject<Boolean> moreAutoLoadingRequested = BehaviorSubject.create();
     @NonNull
@@ -129,8 +129,9 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
                                 final int size = collection.size();
                                 return ((LoadingMoreList<?, ?, ?>) collection)
                                         .loadRange(size, size + PRE_LOADING_COUNT)
-                                        .onErrorResumeNext(Observable.empty())
-                                        .doOnCompleted(() -> moreAutoLoadingRequested.onNext(false));
+                                        .onErrorReturnItem(new ArrayList<>())
+                                        .toObservable()
+                                        .doOnComplete(() -> moreAutoLoadingRequested.onNext(false));
                             });
                 });
     }
@@ -406,36 +407,49 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     public long getItemId(final int positionInAdapter) {
         final LongContainer result = new LongContainer();
         tryDelegateAction(positionInAdapter,
-                (itemAdapterDelegate, item, positionInCollection) ->
-                        result.value = itemAdapterDelegate.getItemId(item, positionInAdapter, positionInCollection),
+                (itemAdapterDelegate, positionInCollection) ->
+                        result.value = itemAdapterDelegate.getItemId(innerCollection.get(positionInCollection),
+                                positionInAdapter, positionInCollection),
                 positionAdapterDelegate -> result.value = positionAdapterDelegate.getItemId(positionInAdapter),
-                (item, positionInCollection) -> result.value = super.getItemId(positionInAdapter));
+                (positionInCollection) -> result.value = super.getItemId(positionInAdapter));
         return result.value;
     }
 
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     private void tryDelegateAction(final int positionInAdapter,
-                                   @NonNull final Action3<ItemAdapterDelegate, TItem, Integer> itemAdapterDelegateAction,
-                                   @NonNull final Action1<PositionAdapterDelegate> positionAdapterDelegateAction,
-                                   @NonNull final Action2<TItem, Integer> defaultAction) {
+                                   @NonNull final BiConsumer<ItemAdapterDelegate, Integer> itemAdapterDelegateAction,
+                                   @NonNull final Consumer<PositionAdapterDelegate> positionAdapterDelegateAction,
+                                   @NonNull final Consumer<Integer> defaultAction) {
         final int viewType = getItemViewType(positionInAdapter);
         final int positionInCollection = getItemPositionInCollection(positionInAdapter);
-        final TItem item = positionInCollection >= 0 ? innerCollection.get(positionInCollection) : null;
         for (final AdapterDelegate<?> delegate : delegates) {
             if (delegate instanceof ItemAdapterDelegate) {
-                if (item != null && viewType == delegate.getItemViewType()) {
-                    itemAdapterDelegateAction.call((ItemAdapterDelegate) delegate, item, positionInCollection);
+                if (positionInCollection >= 0 && viewType == delegate.getItemViewType()) {
+                    try {
+                        itemAdapterDelegateAction.accept((ItemAdapterDelegate) delegate, positionInCollection);
+                    } catch (final Exception exception) {
+                        Lc.assertion(exception);
+                    }
                     return;
                 }
             } else if (delegate instanceof PositionAdapterDelegate) {
                 if (viewType == delegate.getItemViewType()) {
-                    positionAdapterDelegateAction.call((PositionAdapterDelegate) delegate);
+                    try {
+                        positionAdapterDelegateAction.accept((PositionAdapterDelegate) delegate);
+                    } catch (final Exception exception) {
+                        Lc.assertion(exception);
+                    }
                     return;
                 }
             } else {
                 Lc.assertion("Delegate of type " + delegate.getClass());
             }
         }
-        defaultAction.call(item, positionInCollection);
+        try {
+            defaultAction.accept(positionInCollection);
+        } catch (final Exception exception) {
+            Lc.assertion(exception);
+        }
     }
 
     @Override
@@ -459,14 +473,15 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
         lastUpdatedChangeNumber = innerCollection.getChangesCount();
 
         tryDelegateAction(positionInAdapter,
-                (itemAdapterDelegate, item, positionInCollection) -> {
-                    bindItemViewHolder(itemAdapterDelegate, holder, item, null, positionInAdapter, positionInCollection);
+                (itemAdapterDelegate, positionInCollection) -> {
+                    bindItemViewHolder(itemAdapterDelegate, holder, innerCollection.get(positionInCollection),
+                            null, positionInAdapter, positionInCollection);
                     updateMoreAutoLoadingRequest(positionInCollection);
                 },
                 positionAdapterDelegate -> positionAdapterDelegate.onBindViewHolder(holder, positionInAdapter),
-                (item, positionInCollection) -> {
-                    if (item != null) {
-                        bindItemViewHolder(null, holder, item, null, positionInAdapter, positionInCollection);
+                (positionInCollection) -> {
+                    if (positionInCollection >= 0) {
+                        bindItemViewHolder(null, holder, innerCollection.get(positionInCollection), null, positionInAdapter, positionInCollection);
                     }
                 });
     }
@@ -475,14 +490,16 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     public void onBindViewHolder(@NonNull final BindableViewHolder holder, final int positionInAdapter, @NonNull final List<Object> payloads) {
         super.onBindViewHolder(holder, positionInAdapter, payloads);
         tryDelegateAction(positionInAdapter,
-                (itemAdapterDelegate, item, positionInCollection) -> {
-                    bindItemViewHolder(itemAdapterDelegate, holder, item, payloads, positionInAdapter, positionInCollection);
+                (itemAdapterDelegate, positionInCollection) -> {
+                    bindItemViewHolder(itemAdapterDelegate, holder, innerCollection.get(positionInCollection),
+                            payloads, positionInAdapter, positionInCollection);
                     updateMoreAutoLoadingRequest(positionInCollection);
                 },
                 positionAdapterDelegate -> positionAdapterDelegate.onBindViewHolder(holder, positionInAdapter),
-                (item, positionInCollection) -> {
-                    if (item != null) {
-                        bindItemViewHolder(null, holder, item, payloads, positionInAdapter, positionInCollection);
+                (positionInCollection) -> {
+                    if (positionInCollection >= 0) {
+                        bindItemViewHolder(null, holder, innerCollection.get(positionInCollection),
+                                payloads, positionInAdapter, positionInCollection);
                     }
                 });
     }
