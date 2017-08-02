@@ -567,6 +567,16 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
         return positionInCollection >= 0 ? innerCollection.get(positionInCollection) : null;
     }
 
+    @NonNull
+    public TItem getItemOrThrow(final int positionInAdapter) {
+        final int positionInCollection = getItemPositionInCollection(positionInAdapter);
+        if (positionInCollection >= 0) {
+            return innerCollection.get(positionInCollection);
+        } else {
+            throw new ShouldNotHappenException("Item cannot be null");
+        }
+    }
+
     /**
      * Sets item click listener.
      *
