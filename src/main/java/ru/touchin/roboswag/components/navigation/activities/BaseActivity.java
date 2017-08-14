@@ -114,7 +114,7 @@ public abstract class BaseActivity extends AppCompatActivity
     @NonNull
     public Observable<Intent> observeActivityResult(final int requestCode) {
         return lastActivityResult
-                .flatMap(optional -> {
+                .concatMap(optional -> {
                     final HalfNullablePair<Integer, Intent> activityResult = optional.get();
                     if (activityResult == null || activityResult.getFirst() != requestCode) {
                         return Observable.empty();
