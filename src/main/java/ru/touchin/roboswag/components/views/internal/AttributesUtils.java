@@ -94,9 +94,7 @@ public final class AttributesUtils {
     public static void checkRegularTextViewAttributes(@NonNull final TypedArray typedArray, @NonNull final Class androidRes,
                                                       @NonNull final Collection<String> errors, @NonNull final String lineStrategyParameterName)
             throws NoSuchFieldException, IllegalAccessException {
-        checkAttribute(typedArray, errors, getField(androidRes, "TextView_typeface"), false, "remove typeface and use customTypeface");
-        checkAttribute(typedArray, errors, getField(androidRes, "TextView_textStyle"), false, "remove textStyle and use customTypeface");
-        checkAttribute(typedArray, errors, getField(androidRes, "TextView_fontFamily"), false, "remove fontFamily and use customTypeface");
+        checkAttribute(typedArray, errors, getField(androidRes, "TextView_fontFamily"), true, "fontFamily required parameter");
         checkAttribute(typedArray, errors, getField(androidRes, "TextView_includeFontPadding"), false, "includeFontPadding forbid parameter");
         checkAttribute(typedArray, errors, getField(androidRes, "TextView_singleLine"), false,
                 "remove singleLine and use " + lineStrategyParameterName);
