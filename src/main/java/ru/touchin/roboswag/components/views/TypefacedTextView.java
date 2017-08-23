@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.touchin.roboswag.components.R;
-import ru.touchin.roboswag.components.utils.Typefaces;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.components.views.internal.AttributesUtils;
 import ru.touchin.roboswag.core.log.Lc;
@@ -93,9 +92,6 @@ public class TypefacedTextView extends AppCompatTextView {
             } else {
                 setLineStrategy(lineStrategy);
             }
-            if (!isInEditMode()) {
-                setTypeface(Typefaces.getFromAttributes(context, attrs, R.styleable.TypefacedTextView, R.styleable.TypefacedTextView_customTypeface));
-            }
             typedArray.recycle();
             if (inDebugMode) {
                 checkAttributes(context, attrs);
@@ -107,8 +103,6 @@ public class TypefacedTextView extends AppCompatTextView {
         final List<String> errors = new ArrayList<>();
         LineStrategy lineStrategy = null;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TypefacedTextView);
-        AttributesUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedTextView_customTypeface, true,
-                "customTypeface required parameter");
         AttributesUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedTextView_lineStrategy, true,
                 "lineStrategy required parameter");
         if (typedArray.hasValue(R.styleable.TypefacedTextView_lineStrategy)) {
@@ -309,15 +303,6 @@ public class TypefacedTextView extends AppCompatTextView {
             return;
         }
         Lc.assertion(new IllegalStateException(AttributesUtils.viewError(this, "Do not specify ellipsize use setLineStrategy instead")));
-    }
-
-    /**
-     * Sets typeface from 'assets/fonts' folder by name.
-     *
-     * @param name Full name of typeface (without extension, e.g. 'Roboto-Regular').
-     */
-    public void setTypeface(@NonNull final String name) {
-        setTypeface(Typefaces.getByName(getContext(), name));
     }
 
     @Override
