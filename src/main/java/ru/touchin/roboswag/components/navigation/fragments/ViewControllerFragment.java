@@ -20,6 +20,7 @@
 package ru.touchin.roboswag.components.navigation.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -379,6 +380,14 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
             viewController = null;
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
+        if (viewController != null) {
+            viewController.onActivityResult(requestCode, resultCode, data);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private static class PlaceholderView extends FrameLayout {
