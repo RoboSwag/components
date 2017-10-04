@@ -3,7 +3,7 @@ apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    buildToolsVersion buildTools
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -18,10 +18,10 @@ android {
 dependencies {
     compile project(':libraries:core')
 
-    provided 'com.android.support:appcompat-v7:26.0.1'
-    provided 'com.android.support:design:26.0.1'
-    provided 'com.android.support:recyclerview-v7:26.0.1'
+    provided "com.android.support:appcompat-v7:$supportLibraryVersion"
+    provided "com.android.support:design:$supportLibraryVersion"
+    provided "com.android.support:recyclerview-v7:$supportLibraryVersion"
 
-    provided 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    provided 'io.reactivex.rxjava2:rxjava:2.1.4'
+    provided "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
+    provided "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
 }
