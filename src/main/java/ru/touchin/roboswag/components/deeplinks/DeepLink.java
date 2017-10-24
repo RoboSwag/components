@@ -36,7 +36,7 @@ public interface DeepLink<TActivity extends BaseActivity> {
      * Called by deep link to provide unique name.
      */
     @NonNull
-    String getName();
+    String getDeepLinkName();
 
     /**
      * Called by deep link to decide - whenever deep link should process uri or if we are already on that screen that deep link links to.
