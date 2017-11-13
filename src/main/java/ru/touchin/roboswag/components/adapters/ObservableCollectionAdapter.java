@@ -31,10 +31,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.functions.BiConsumer;
 import io.reactivex.functions.Consumer;
-
-import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
@@ -104,6 +103,11 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
         lifecycleBindable.untilDestroy(observableCollectionSubject
                 .switchMap(optional -> {
                     final ObservableCollection<TItem> collection = optional.get();
+                    if (collection instanceof ObservableList) {
+                        innerCollection.setDiffUtilsSource((ObservableList<TItem>) collection);
+                    } else {
+                        innerCollection.setDiffUtilsSource(null);
+                    }
                     return collection != null ? collection.observeItems() : Observable.just(Collections.emptyList());
                 }), innerCollection::set);
         lifecycleBindable.untilDestroy(createMoreAutoLoadingObservable());
