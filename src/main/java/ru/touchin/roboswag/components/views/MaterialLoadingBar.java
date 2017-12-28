@@ -22,6 +22,8 @@ package ru.touchin.roboswag.components.views;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageView;
@@ -89,7 +91,7 @@ public class MaterialLoadingBar extends AppCompatImageView {
         typedArray.recycle();
 
         progressDrawable = new MaterialProgressDrawable(context, size);
-        progressDrawable.setColor(color);
+        setColor(color);
         progressDrawable.setStrokeWidth(strokeWidth);
         setScaleType(ScaleType.CENTER);
         setImageDrawable(progressDrawable);
@@ -105,6 +107,15 @@ public class MaterialLoadingBar extends AppCompatImageView {
     protected void onDetachedFromWindow() {
         progressDrawable.stop();
         super.onDetachedFromWindow();
+    }
+
+    /**
+     * Set color for loader
+     *
+     * @param colorInt Color of loaderto be set
+     */
+    public void setColor(@ColorInt final int colorInt) {
+        progressDrawable.setColor(colorInt);
     }
 
 }
