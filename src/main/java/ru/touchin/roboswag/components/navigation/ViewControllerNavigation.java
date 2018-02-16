@@ -212,6 +212,25 @@ public class ViewControllerNavigation<TActivity extends ViewControllerActivity<?
     }
 
     /**
+     * Pushes {@link ViewController} on top of stack with specific {@link StatelessTargetedViewControllerFragment#getState()}
+     * and with specific {@link TargetedViewControllerFragment#getTarget()}.
+     *
+     * @param viewControllerClass Class of {@link ViewController} to be pushed;
+     * @param targetFragment      {@link ViewControllerFragment} to be set as target;
+     * @param <TTargetState>      Type of state of target fragment. State is using to affect on that fragment;
+     * @param <TTargetFragment>   Type of target fragment.
+     */
+    public <TTargetState extends AbstractState,
+            TTargetFragment extends ViewControllerFragment<? extends TTargetState, TActivity>> void pushStatelessTargetedViewControllerForResult(
+            @NonNull final Class<? extends ViewController<TActivity,
+                    TargetedViewControllerFragment<AbstractState, TTargetState, TActivity>>> viewControllerClass,
+            @NonNull final TTargetFragment targetFragment) {
+        addToStack(StatelessTargetedViewControllerFragment.class, targetFragment,
+                StatelessTargetedViewControllerFragment.createState(viewControllerClass),
+                viewControllerClass.getName() + ';' + WITH_TARGET_FRAGMENT_TAG_MARK, null);
+    }
+
+    /**
      * Pushes {@link ViewController} on top of stack with specific {@link StatelessTargetedViewControllerFragment#getTarget()}.
      *
      * @param viewControllerClass Class of {@link ViewController} to be pushed;
