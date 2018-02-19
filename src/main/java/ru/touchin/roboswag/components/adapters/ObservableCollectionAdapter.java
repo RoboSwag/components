@@ -258,8 +258,8 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
                     notifyDataSetChanged();
                 } else {
                     final Change.Removed castedChange = (Change.Removed) change;
-                    notifyItemRemoved(castedChange.getPosition() + getHeadersCount());
-                    notifyItemRangeChanged(castedChange.getPosition() + getHeadersCount(), castedChange.getCount());
+                    notifyItemRangeRemoved(castedChange.getPosition() + getHeadersCount(), castedChange.getCount());
+                    notifyItemRangeChanged(castedChange.getPosition() + getHeadersCount(), getItemCount());
                 }
             } else if (change instanceof Change.Moved) {
                 final Change.Moved castedChange = (Change.Moved) change;
