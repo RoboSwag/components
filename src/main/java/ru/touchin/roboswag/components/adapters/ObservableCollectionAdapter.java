@@ -259,6 +259,7 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
                 } else {
                     final Change.Removed castedChange = (Change.Removed) change;
                     notifyItemRangeRemoved(castedChange.getPosition() + getHeadersCount(), castedChange.getCount());
+                    notifyItemRangeChanged(castedChange.getPosition() + getHeadersCount(), getItemCount());
                 }
             } else if (change instanceof Change.Moved) {
                 final Change.Moved castedChange = (Change.Moved) change;
