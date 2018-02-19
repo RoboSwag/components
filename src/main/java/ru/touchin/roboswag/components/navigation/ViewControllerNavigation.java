@@ -220,6 +220,7 @@ public class ViewControllerNavigation<TActivity extends ViewControllerActivity<?
      * @param <TTargetState>      Type of state of target fragment. State is using to affect on that fragment;
      * @param <TTargetFragment>   Type of target fragment.
      */
+    @SuppressWarnings("CPD-START")
     public <TTargetState extends AbstractState,
             TTargetFragment extends ViewControllerFragment<? extends TTargetState, TActivity>> void pushStatelessTargetedViewControllerForResult(
             @NonNull final Class<? extends ViewController<TActivity,
@@ -238,6 +239,7 @@ public class ViewControllerNavigation<TActivity extends ViewControllerActivity<?
      * @param <TTargetState>      Type of state of target fragment. State is using to affect on that fragment;
      * @param <TTargetFragment>   Type of target fragment.
      */
+    @SuppressWarnings("CPD-END")
     public <TTargetState extends AbstractState,
             TTargetFragment extends ViewControllerFragment<? extends TTargetState, TActivity>> void pushViewControllerForResult(
             @NonNull final Class<? extends ViewController<TActivity,
