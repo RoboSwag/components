@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.touchin.roboswag.components.R;
-import ru.touchin.roboswag.components.utils.Typefaces;
 import ru.touchin.roboswag.components.views.internal.AttributesUtils;
 import ru.touchin.roboswag.core.log.Lc;
 
@@ -101,10 +100,6 @@ public class TypefacedEditText extends AppCompatEditText {
             } else {
                 setSingleLine();
             }
-
-            if (!isInEditMode()) {
-                setTypeface(Typefaces.getFromAttributes(context, attrs, R.styleable.TypefacedEditText, R.styleable.TypefacedEditText_customTypeface));
-            }
             typedArray.recycle();
             if (inDebugMode) {
                 checkAttributes(context, attrs);
@@ -131,8 +126,6 @@ public class TypefacedEditText extends AppCompatEditText {
         final List<String> errors = new ArrayList<>();
         Boolean multiline = null;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.TypefacedEditText);
-        AttributesUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedEditText_customTypeface, true,
-                "customTypeface required parameter");
         AttributesUtils.checkAttribute(typedArray, errors, R.styleable.TypefacedEditText_isMultiline, true,
                 "isMultiline required parameter");
         if (typedArray.hasValue(R.styleable.TypefacedEditText_isMultiline)) {
@@ -159,12 +152,6 @@ public class TypefacedEditText extends AppCompatEditText {
     private void checkEditTextSpecificAttributes(@NonNull final TypedArray typedArray, @NonNull final Class androidRes,
                                                  @NonNull final List<String> errors)
             throws NoSuchFieldException, IllegalAccessException {
-        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_typeface"), false,
-                "remove typeface and use customTypeface");
-        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_textStyle"), false,
-                "remove textStyle and use customTypeface");
-        AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_fontFamily"), false,
-                "remove fontFamily and use customTypeface");
         AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_singleLine"), false,
                 "remove singleLine and use isMultiline");
         AttributesUtils.checkAttribute(typedArray, errors, AttributesUtils.getField(androidRes, "TextView_includeFontPadding"), false,
@@ -335,15 +322,6 @@ public class TypefacedEditText extends AppCompatEditText {
             return;
         }
         super.setInputType(type);
-    }
-
-    /**
-     * Sets typeface from 'assets/fonts' folder by name.
-     *
-     * @param name Full name of typeface (without extension, e.g. 'Roboto-Regular').
-     */
-    public void setTypeface(@NonNull final String name) {
-        setTypeface(Typefaces.getByName(getContext(), name));
     }
 
     public void setOnTextChangedListener(@Nullable final OnTextChangedListener onTextChangedListener) {

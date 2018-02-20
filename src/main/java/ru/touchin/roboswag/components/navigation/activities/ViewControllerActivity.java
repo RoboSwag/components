@@ -103,8 +103,8 @@ public abstract class ViewControllerActivity<TLogic extends Logic> extends BaseA
 
     @NonNull
     @Override
-    public View findViewById(@IdRes final int id) {
-        final View viewById = super.findViewById(id);
+    public <T extends View> T findViewById(@IdRes final int id) {
+        final T viewById = super.findViewById(id);
         if (viewById == null) {
             throw new ShouldNotHappenException("No view for id=" + getResources().getResourceName(id));
         }
