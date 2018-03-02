@@ -96,28 +96,29 @@ public class PreferenceStore<T> implements Store<String, T> {
 
     @NonNull
     @Override
+    public Single<Optional<T>> loadObject(@NonNull final Type storeObjectType, @NonNull final String key) {
+        return Single.fromCallable(() -> new Optional<>(!preferences.contains(key) ? null : getObject(storeObjectType, key)));
+    }
+
+    @Nullable
+    @Override
     @SuppressWarnings("unchecked")
     //unchecked: it is checking class in if-else statements
-    public Single<Optional<T>> loadObject(@NonNull final Type storeObjectType, @NonNull final String key) {
-        return Single.fromCallable(() -> {
-            if (!preferences.contains(key)) {
-                return new Optional<>(null);
-            }
-
-            if (isTypeBoolean(storeObjectType)) {
-                return new Optional<>((T) ((Boolean) preferences.getBoolean(key, false)));
-            } else if (storeObjectType.equals(String.class)) {
-                return new Optional<>((T) (preferences.getString(key, null)));
-            } else if (isTypeInteger(storeObjectType)) {
-                return new Optional<>((T) ((Integer) preferences.getInt(key, 0)));
-            } else if (isTypeLong(storeObjectType)) {
-                return new Optional<>((T) ((Long) preferences.getLong(key, 0L)));
-            } else if (isTypeFloat(storeObjectType)) {
-                return new Optional<>((T) ((Float) preferences.getFloat(key, 0f)));
-            }
+    public T getObject(@NonNull final Type storeObjectType, @NonNull final String key) {
+        if (isTypeBoolean(storeObjectType)) {
+            return (T) ((Boolean) preferences.getBoolean(key, false));
+        } else if (storeObjectType.equals(String.class)) {
+            return (T) (preferences.getString(key, null));
+        } else if (isTypeInteger(storeObjectType)) {
+            return (T) ((Integer) preferences.getInt(key, 0));
+        } else if (isTypeLong(storeObjectType)) {
+            return (T) ((Long) preferences.getLong(key, 0L));
+        } else if (isTypeFloat(storeObjectType)) {
+            return (T) ((Float) preferences.getFloat(key, 0f));
+        } else {
             Lc.assertion("Unsupported type of object " + storeObjectType);
-            return new Optional<>(null);
-        });
+            return null;
+        }
     }
 
 }
