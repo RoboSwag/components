@@ -24,6 +24,8 @@ dependencies {
     compileOnly "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
     compileOnly "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    implementation "android.arch.lifecycle:extensions:1.1.0"
 }
 repositories {
     mavenCentral()

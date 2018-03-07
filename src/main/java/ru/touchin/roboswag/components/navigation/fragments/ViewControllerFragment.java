@@ -19,6 +19,9 @@
 
 package ru.touchin.roboswag.components.navigation.fragments;
 
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -27,6 +30,7 @@ import android.os.Parcel;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,6 +43,7 @@ import android.widget.FrameLayout;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
@@ -47,6 +52,7 @@ import ru.touchin.roboswag.components.navigation.AbstractState;
 import ru.touchin.roboswag.components.navigation.ViewController;
 import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivity;
 import ru.touchin.roboswag.components.utils.UiUtils;
+import ru.touchin.roboswag.components.viewmodel.StateViewModel;
 import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.utils.Optional;
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
@@ -60,13 +66,31 @@ import ru.touchin.roboswag.core.utils.pairs.NullablePair;
  * @param <TActivity> Type of {@link ViewControllerActivity} where fragment could be attached to.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class ViewControllerFragment<TState extends AbstractState, TActivity extends ViewControllerActivity<?>>
-        extends ViewFragment<TActivity> {
+public class ViewControllerFragment<TState extends AbstractState, TActivity extends ViewControllerActivity>
+        extends ViewFragment {
 
     private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
+    private static final String VIEW_CONTROLLER_CLASS_EXTRA = "VIEW_CONTROLLER_CLASS_EXTRA";
+    private static final String VIEW_MODEL_CLASS_EXTRA = "VIEW_MODEL_CLASS_EXTRA";
 
     private static boolean inDebugMode;
     private static long acceptableUiCalculationTime = 100;
+
+    private Class<? extends ViewController<TActivity, ? extends ViewControllerFragment<TState, TActivity>>> viewControllerClass;
+    private Class<? extends StateViewModel> viewModelClass;
+
+    @NonNull
+    private final BehaviorSubject<Optional<ViewControllerActivity>> activitySubject = BehaviorSubject.create();
+    @NonNull
+    private final BehaviorSubject<NullablePair<PlaceholderView, Bundle>> viewSubject = BehaviorSubject.create();
+    @Nullable
+
+    private ViewController viewController;
+    private StateViewModel<TState> viewModel;
+    private Disposable viewControllerSubscription;
+    private TState state;
+    private boolean started;
+    private boolean stateCreated;
 
     /**
      * Enables debugging features like serialization of {@link #getState()} every creation.
@@ -82,6 +106,50 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
      */
     public static void setAcceptableUiCalculationTime(final long acceptableUiCalculationTime) {
         ViewControllerFragment.acceptableUiCalculationTime = acceptableUiCalculationTime;
+    }
+
+    /**
+     * Creates {@link Bundle} which will store state and {@link ViewController}'s class.
+     *
+     * @param viewControllerClass Class of {@link ViewController} which will be instantiated inside this fragment;
+     * @param state               State to use into {@link ViewController};
+     * @return Returns {@link Bundle} with state inside.
+     */
+    @NonNull
+    public static Bundle createState(@NonNull final Class<? extends ViewController> viewControllerClass,
+                                     @NonNull final Class<? extends ViewModel> viewModelClass,
+                                     @NonNull final AbstractState state) {
+        final Bundle result = createState(state);
+        result.putSerializable(VIEW_CONTROLLER_CLASS_EXTRA, viewControllerClass);
+        result.putSerializable(VIEW_MODEL_CLASS_EXTRA, viewModelClass);
+        return result;
+    }
+
+    public StateViewModel getViewModel() {
+        return viewModel;
+    }
+
+    public ViewModelProvider getViewModelProvider() {
+        return ViewModelProviders.of(this, ((ViewControllerActivity) getActivity()).getViewModelFactory());
+    }
+
+    /**
+     * It should return specific {@link ViewController} class to control instantiated view by logic after activity creation.
+     *
+     * @return Returns class of specific {@link ViewController}.
+     */
+    @NonNull
+    public Class<? extends ViewController<TActivity, ? extends ViewControllerFragment<TState, TActivity>>> getViewControllerClass() {
+        return viewControllerClass;
+    }
+
+    /**
+     * Returns if ViewControllerFragment requires state or not.
+     *
+     * @return true if state is required
+     */
+    protected boolean isStateRequired() {
+        return true;
     }
 
     @SuppressWarnings("unchecked")
@@ -112,17 +180,6 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         return result;
     }
 
-    @NonNull
-    private final BehaviorSubject<Optional<TActivity>> activitySubject = BehaviorSubject.create();
-    @NonNull
-    private final BehaviorSubject<NullablePair<PlaceholderView, Bundle>> viewSubject = BehaviorSubject.create();
-    @Nullable
-    private ViewController viewController;
-    private Disposable viewControllerSubscription;
-    private TState state;
-    private boolean started;
-    private boolean stateCreated;
-
     private void tryCreateState(@Nullable final Context context) {
         if (!stateCreated && state != null && context != null) {
             state.onCreate();
@@ -130,42 +187,36 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         }
     }
 
-    /**
-     * Returns specific {@link AbstractState} which contains state of fragment and it's {@link ViewController}.
-     *
-     * @return Object represents state.
-     */
-    @NonNull
-    public TState getState() {
-        return state;
-    }
-
-    /**
-     * It should return specific {@link ViewController} class to control instantiated view by logic after activity creation.
-     *
-     * @return Returns class of specific {@link ViewController}.
-     */
-    @NonNull
-    public abstract Class<? extends ViewController<TActivity,
-            ? extends ViewControllerFragment<TState, TActivity>>> getViewControllerClass();
-
-    /**
-     * Returns if ViewControllerFragment requires state or not.
-     *
-     * @return true if state is required
-     */
-    protected abstract boolean isStateRequired();
-
     @SuppressWarnings("unchecked")
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        viewControllerClass = (Class<? extends ViewController<TActivity, ? extends ViewControllerFragment<TState, TActivity>>>) getArguments().getSerializable(VIEW_CONTROLLER_CLASS_EXTRA);
+        viewModelClass = (Class<? extends StateViewModel>) getArguments().getSerializable(VIEW_MODEL_CLASS_EXTRA);
+        viewModel = ViewModelProviders.of(this, ((ViewControllerActivity) getActivity()).getViewModelFactory()).get(viewModelClass);
+
         setHasOptionsMenu(!isChildFragment());
 
+        TState stateFromViewModel = null;
+        try {
+            stateFromViewModel = viewModel.getState();
+        } catch (ShouldNotHappenException ignored) {
+            // ignored, it`s ok to get null state there
+        }
         state = savedInstanceState != null
-                ? (TState) savedInstanceState.getSerializable(VIEW_CONTROLLER_STATE_EXTRA)
+                ? stateFromViewModel != null ? stateFromViewModel : (TState) savedInstanceState.getSerializable(VIEW_CONTROLLER_STATE_EXTRA)
                 : (getArguments() != null ? (TState) getArguments().getSerializable(VIEW_CONTROLLER_STATE_EXTRA) : null);
+        if (stateFromViewModel == null) {
+            try {
+                Method stateSetter = viewModelClass.getSuperclass().getDeclaredMethod("setState", state.getClass().getSuperclass());
+                stateSetter.setAccessible(true);
+                stateSetter.invoke(viewModel, state);
+            } catch (IllegalAccessException ignored) {
+            } catch (NoSuchMethodException ignored) {
+            } catch (InvocationTargetException ignored) {
+            }
+        }
         if (state != null) {
             if (inDebugMode) {
                 state = reserialize(state);
@@ -174,10 +225,11 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         } else if (isStateRequired()) {
             Lc.assertion("State is required and null");
         }
+
         viewControllerSubscription = Observable
                 .combineLatest(activitySubject.distinctUntilChanged(), viewSubject.distinctUntilChanged(),
                         (activityOptional, viewInfo) -> {
-                            final TActivity activity = activityOptional.get();
+                            final ViewControllerActivity activity = activityOptional.get();
                             final PlaceholderView container = viewInfo.getFirst();
                             if (activity == null || container == null) {
                                 return new Optional<ViewController>(null);
@@ -191,7 +243,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @NonNull
-    private ViewController createViewController(@NonNull final TActivity activity, @NonNull final PlaceholderView view,
+    private ViewController createViewController(@NonNull final ViewControllerActivity activity, @NonNull final PlaceholderView view,
                                                 @Nullable final Bundle savedInstanceState) {
 
         if (getViewControllerClass().getConstructors().length != 1) {
@@ -251,13 +303,13 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
-    public void onActivityCreated(@NonNull final View view, @NonNull final TActivity activity, @Nullable final Bundle savedInstanceState) {
+    public void onActivityCreated(@NonNull final View view, @NonNull final AppCompatActivity activity, @Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(view, activity, savedInstanceState);
-        activitySubject.onNext(new Optional<>(activity));
+        activitySubject.onNext(new Optional<>((ViewControllerActivity) activity));
     }
 
     @Override
-    protected void onStart(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onStart(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         super.onStart(view, activity);
         started = true;
         if (viewController != null) {
@@ -266,7 +318,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
-    protected void onAppear(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onAppear(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         super.onAppear(view, activity);
         if (viewController != null) {
             viewController.onAppear();
@@ -274,7 +326,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
-    protected void onResume(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onResume(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         super.onResume(view, activity);
         if (viewController != null) {
             viewController.onResume();
@@ -327,7 +379,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
-    protected void onPause(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onPause(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         super.onPause(view, activity);
         if (viewController != null) {
             viewController.onPause();
@@ -344,7 +396,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
-    protected void onDisappear(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onDisappear(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         super.onDisappear(view, activity);
         if (viewController != null) {
             viewController.onDisappear();
@@ -352,7 +404,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
-    protected void onStop(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onStop(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         started = false;
         if (viewController != null) {
             viewController.onStop();
@@ -421,6 +473,10 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
             }
         }
 
+    }
+
+    public static class DefaultState extends AbstractState {
+        // just default implementation
     }
 
 }

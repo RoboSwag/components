@@ -61,7 +61,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  * @param <TFragment> Type of fragment where such {@link ViewController} could be;
  */
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessivePublicCount"})
-public class ViewController<TActivity extends ViewControllerActivity<?>,
+public class ViewController<TActivity extends ViewControllerActivity,
         TFragment extends ViewControllerFragment<?, TActivity>>
         implements Stopable {
 
