@@ -36,11 +36,8 @@ import ru.touchin.roboswag.core.log.Lc;
 /**
  * Created by Gavriil Sitnikov on 21/10/2015.
  * Non-background fragment that have specific activity as a parent.
- *
- * @param <TActivity> Type of activity which to such fragment could be attached.
  */
-public abstract class ViewFragment<TActivity extends AppCompatActivity> extends Fragment
-        implements OnFragmentStartedListener {
+public abstract class ViewFragment extends Fragment implements OnFragmentStartedListener {
 
     private boolean appeared;
     private boolean started;
@@ -61,13 +58,13 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      */
     @SuppressWarnings("unchecked")
     @Nullable
-    protected final TActivity getBaseActivity() {
+    protected final AppCompatActivity getBaseActivity() {
         if (getActivity() == null) {
             return null;
         }
 
         try {
-            return (TActivity) getActivity();
+            return (AppCompatActivity) getActivity();
         } catch (final ClassCastException exception) {
             Lc.assertion(exception);
             return null;
@@ -107,11 +104,11 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param savedInstanceState If the fragment is being re-created from a previous saved state, this is the state.
      */
     @CallSuper
-    public void onActivityCreated(@NonNull final View view, @NonNull final TActivity activity, @Nullable final Bundle savedInstanceState) {
+    public void onActivityCreated(@NonNull final View view, @NonNull final AppCompatActivity activity, @Nullable final Bundle savedInstanceState) {
         //do nothing
     }
 
-    private void callMethodAfterInstantiation(@NonNull final BiConsumer<View, TActivity> action) {
+    private void callMethodAfterInstantiation(@NonNull final BiConsumer<View, AppCompatActivity> action) {
         if (getView() == null || getBaseActivity() == null) {
             Lc.assertion("View and activity shouldn't be null");
             return;
@@ -140,7 +137,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
     @CallSuper
     @SuppressWarnings("RestrictedApi")
     //RestrictedApi: we need isMenuVisible() to check analytics rightly!
-    protected void onStart(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onStart(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         if (getParentFragment() instanceof OnFragmentStartedListener) {
             ((OnFragmentStartedListener) getParentFragment()).onFragmentStarted(this);
         } else if (activity instanceof OnFragmentStartedListener) {
@@ -158,7 +155,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param view     Instantiated view.
      * @param activity Activity which fragment attached to.
      */
-    protected void onAppear(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onAppear(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         appeared = true;
     }
 
@@ -176,7 +173,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param activity Activity which fragment attached to.
      */
     @CallSuper
-    protected void onResume(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onResume(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         //do nothing
     }
 
@@ -207,7 +204,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param activity Activity which fragment attached to.
      */
     @CallSuper
-    protected void onPause(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onPause(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         // do nothing
     }
 
@@ -218,7 +215,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param view     Instantiated view.
      * @param activity Activity which fragment attached to.
      */
-    protected void onDisappear(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onDisappear(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         appeared = false;
     }
 
@@ -237,7 +234,7 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
      * @param activity Activity which fragment attached to.
      */
     @CallSuper
-    protected void onStop(@NonNull final View view, @NonNull final TActivity activity) {
+    protected void onStop(@NonNull final View view, @NonNull final AppCompatActivity activity) {
         if (appeared) {
             onDisappear(view, activity);
         }

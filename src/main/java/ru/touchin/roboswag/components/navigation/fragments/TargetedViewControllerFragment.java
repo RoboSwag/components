@@ -35,8 +35,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  */
 public class TargetedViewControllerFragment<TState extends AbstractState,
         TTargetState extends AbstractState,
-        TActivity extends ViewControllerActivity>
-        extends ViewControllerFragment<TState, TActivity> {
+        TActivity extends ViewControllerActivity> extends ViewControllerFragment<TState, TActivity> {
 
     /**
      * Returns specific {@link ViewControllerFragment} which is attached to this fragment as {@link #getTargetFragment()}.
