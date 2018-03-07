@@ -19,6 +19,7 @@
 
 package ru.touchin.roboswag.components.navigation.activities;
 
+import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.view.Menu;
@@ -32,6 +33,8 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  *
  */
 public abstract class ViewControllerActivity extends BaseActivity {
+
+    public abstract ViewModelProvider.Factory getViewModelFactory();
 
     @Override
     @Deprecated

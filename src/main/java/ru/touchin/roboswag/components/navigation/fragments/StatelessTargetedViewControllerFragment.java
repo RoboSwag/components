@@ -37,7 +37,7 @@ import ru.touchin.roboswag.core.log.Lc;
 @SuppressWarnings("PMD.UseUtilityClass")
 //UseUtilityClass: PMD bug
 public class StatelessTargetedViewControllerFragment<TTargetState extends AbstractState,
-        TActivity extends ViewControllerActivity<?>>
+        TActivity extends ViewControllerActivity>
         extends TargetedViewControllerFragment<AbstractState, TTargetState, TActivity> {
 
     /**
