@@ -19,48 +19,22 @@
 
 package ru.touchin.roboswag.components.navigation.activities;
 
+import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.View;
 
-import ru.touchin.roboswag.components.utils.Logic;
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 
 /**
  * Created by Gavriil Sitnikov on 07/03/2016.
- * Activity which is containing specific {@link Logic}
  * to support navigation based on {@link ru.touchin.roboswag.components.navigation.ViewController}s.
  *
- * @param <TLogic> Type of application's {@link Logic}.
  */
-public abstract class ViewControllerActivity<TLogic extends Logic> extends BaseActivity {
+public abstract class ViewControllerActivity extends BaseActivity {
 
-    //it is needed to hold strong reference to logic
-    private TLogic reference;
-
-    /**
-     * It should return specific class where all logic will be.
-     *
-     * @return Returns class of specific {@link Logic}.
-     */
-    @NonNull
-    protected abstract Class<TLogic> getLogicClass();
-
-    /**
-     * Returns (and creates if needed) application's logic.
-     *
-     * @return Object which represents application's logic.
-     */
-    @NonNull
-    public TLogic getLogic() {
-        synchronized (ViewControllerActivity.class) {
-            if (reference == null) {
-                reference = Logic.getInstance(this, getLogicClass());
-            }
-        }
-        return reference;
-    }
+    public abstract ViewModelProvider.Factory getViewModelFactory();
 
     @Override
     @Deprecated

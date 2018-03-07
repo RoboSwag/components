@@ -35,7 +35,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  */
 public class TargetedViewControllerFragment<TState extends AbstractState,
         TTargetState extends AbstractState,
-        TActivity extends ViewControllerActivity<?>>
+        TActivity extends ViewControllerActivity>
         extends SimpleViewControllerFragment<TState, TActivity> {
 
     /**

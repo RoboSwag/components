@@ -60,7 +60,7 @@ import ru.touchin.roboswag.core.utils.pairs.NullablePair;
  * @param <TActivity> Type of {@link ViewControllerActivity} where fragment could be attached to.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public abstract class ViewControllerFragment<TState extends AbstractState, TActivity extends ViewControllerActivity<?>>
+public abstract class ViewControllerFragment<TState extends AbstractState, TActivity extends ViewControllerActivity>
         extends ViewFragment<TActivity> {
 
     private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
@@ -421,6 +421,10 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
             }
         }
 
+    }
+
+    public static class DefaultState extends AbstractState {
+        // just default implementation
     }
 
 }

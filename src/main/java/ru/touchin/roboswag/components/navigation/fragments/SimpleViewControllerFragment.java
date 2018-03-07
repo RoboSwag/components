@@ -34,7 +34,7 @@ import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivi
  * @param <TState>    Type of object which is representing it's fragment state;
  * @param <TActivity> Type of {@link ViewControllerActivity} where fragment could be attached to.
  */
-public class SimpleViewControllerFragment<TState extends AbstractState, TActivity extends ViewControllerActivity<?>>
+public class SimpleViewControllerFragment<TState extends AbstractState, TActivity extends ViewControllerActivity>
         extends ViewControllerFragment<TState, TActivity> {
 
     private static final String VIEW_CONTROLLER_CLASS_EXTRA = "VIEW_CONTROLLER_CLASS_EXTRA";

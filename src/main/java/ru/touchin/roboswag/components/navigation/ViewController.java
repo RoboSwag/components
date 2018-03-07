@@ -47,9 +47,9 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivity;
 import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment;
-import ru.touchin.roboswag.components.utils.BaseLifecycleBindable;
-import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
+import ru.touchin.roboswag.components.utils.lifecycle.BaseStopable;
+import ru.touchin.roboswag.components.utils.lifecycle.Stopable;
 import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 
@@ -63,7 +63,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 @SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessivePublicCount"})
 public class ViewController<TActivity extends ViewControllerActivity<?>,
         TFragment extends ViewControllerFragment<?, TActivity>>
-        implements LifecycleBindable {
+        implements Stopable {
 
     @NonNull
     private final TActivity activity;
@@ -72,7 +72,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @NonNull
     private final ViewGroup container;
     @NonNull
-    private final BaseLifecycleBindable baseLifecycleBindable = new BaseLifecycleBindable();
+    private final BaseStopable baseStopable = new BaseStopable();
     private boolean destroyed;
 
     @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
@@ -242,7 +242,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @CallSuper
     public void onCreate() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onCreate();
+        baseStopable.onCreate();
     }
 
     /**
@@ -252,7 +252,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @CallSuper
     public void onStart() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onStart();
+        baseStopable.onStart();
     }
 
     /**
@@ -270,7 +270,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @CallSuper
     public void onResume() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onResume();
+        baseStopable.onResume();
     }
 
     /**
@@ -298,7 +298,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      */
     @CallSuper
     public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
-        baseLifecycleBindable.onSaveInstanceState();
+        baseStopable.onSaveInstanceState();
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
     }
 
@@ -317,7 +317,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @CallSuper
     public void onStop() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onStop();
+        baseStopable.onStop();
     }
 
     /**
@@ -327,7 +327,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @CallSuper
     public void onDestroy() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onDestroy();
+        baseStopable.onDestroy();
         destroyed = true;
     }
 
@@ -351,13 +351,13 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Observable<T> observable) {
-        return baseLifecycleBindable.untilStop(observable);
+        return baseStopable.untilStop(observable);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return baseLifecycleBindable.untilStop(observable, onNextAction);
+        return baseStopable.untilStop(observable, onNextAction);
     }
 
     @NonNull
@@ -365,7 +365,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public <T> Disposable untilStop(@NonNull final Observable<T> observable,
                                     @NonNull final Consumer<T> onNextAction,
                                     @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction);
+        return baseStopable.untilStop(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -374,19 +374,19 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
                                     @NonNull final Consumer<T> onNextAction,
                                     @NonNull final Consumer<Throwable> onErrorAction,
                                     @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
+        return baseStopable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Single<T> single) {
-        return baseLifecycleBindable.untilStop(single);
+        return baseStopable.untilStop(single);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return baseLifecycleBindable.untilStop(single, onSuccessAction);
+        return baseStopable.untilStop(single, onSuccessAction);
     }
 
     @NonNull
@@ -394,19 +394,19 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public <T> Disposable untilStop(@NonNull final Single<T> single,
                                     @NonNull final Consumer<T> onSuccessAction,
                                     @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(single, onSuccessAction, onErrorAction);
+        return baseStopable.untilStop(single, onSuccessAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public Disposable untilStop(@NonNull final Completable completable) {
-        return baseLifecycleBindable.untilStop(completable);
+        return baseStopable.untilStop(completable);
     }
 
     @NonNull
     @Override
     public Disposable untilStop(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilStop(completable, onCompletedAction);
+        return baseStopable.untilStop(completable, onCompletedAction);
     }
 
     @NonNull
@@ -414,19 +414,19 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public Disposable untilStop(@NonNull final Completable completable,
                                 @NonNull final Action onCompletedAction,
                                 @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(completable, onCompletedAction, onErrorAction);
+        return baseStopable.untilStop(completable, onCompletedAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Maybe<T> maybe) {
-        return baseLifecycleBindable.untilStop(maybe);
+        return baseStopable.untilStop(maybe);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onSuccessAction) {
-        return baseLifecycleBindable.untilStop(maybe, onSuccessAction);
+        return baseStopable.untilStop(maybe, onSuccessAction);
     }
 
     @NonNull
@@ -434,19 +434,19 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public <T> Disposable untilStop(@NonNull final Maybe<T> maybe,
                                     @NonNull final Consumer<T> onSuccessAction,
                                     @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(maybe, onSuccessAction, onErrorAction);
+        return baseStopable.untilStop(maybe, onSuccessAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Observable<T> observable) {
-        return baseLifecycleBindable.untilDestroy(observable);
+        return baseStopable.untilDestroy(observable);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return baseLifecycleBindable.untilDestroy(observable, onNextAction);
+        return baseStopable.untilDestroy(observable, onNextAction);
     }
 
     @NonNull
@@ -454,7 +454,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
                                        @NonNull final Consumer<T> onNextAction,
                                        @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction);
+        return baseStopable.untilDestroy(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -463,19 +463,19 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
                                        @NonNull final Consumer<T> onNextAction,
                                        @NonNull final Consumer<Throwable> onErrorAction,
                                        @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
+        return baseStopable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Single<T> single) {
-        return baseLifecycleBindable.untilDestroy(single);
+        return baseStopable.untilDestroy(single);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return baseLifecycleBindable.untilDestroy(single, onSuccessAction);
+        return baseStopable.untilDestroy(single, onSuccessAction);
     }
 
     @NonNull
@@ -483,19 +483,19 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public <T> Disposable untilDestroy(@NonNull final Single<T> single,
                                        @NonNull final Consumer<T> onSuccessAction,
                                        @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(single, onSuccessAction, onErrorAction);
+        return baseStopable.untilDestroy(single, onSuccessAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public Disposable untilDestroy(@NonNull final Completable completable) {
-        return baseLifecycleBindable.untilDestroy(completable);
+        return baseStopable.untilDestroy(completable);
     }
 
     @NonNull
     @Override
     public Disposable untilDestroy(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilDestroy(completable, onCompletedAction);
+        return baseStopable.untilDestroy(completable, onCompletedAction);
     }
 
     @NonNull
@@ -503,19 +503,19 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public Disposable untilDestroy(@NonNull final Completable completable,
                                    @NonNull final Action onCompletedAction,
                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(completable, onCompletedAction, onErrorAction);
+        return baseStopable.untilDestroy(completable, onCompletedAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe) {
-        return baseLifecycleBindable.untilDestroy(maybe);
+        return baseStopable.untilDestroy(maybe);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onCompletedAction) {
-        return baseLifecycleBindable.untilDestroy(maybe, onCompletedAction);
+        return baseStopable.untilDestroy(maybe, onCompletedAction);
     }
 
     @NonNull
@@ -523,7 +523,7 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe,
                                        @NonNull final Consumer<T> onCompletedAction,
                                        @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(maybe, onCompletedAction, onErrorAction);
+        return baseStopable.untilDestroy(maybe, onCompletedAction, onErrorAction);
     }
 
     @SuppressWarnings("CPD-END")

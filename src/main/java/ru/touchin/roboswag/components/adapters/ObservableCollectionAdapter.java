@@ -35,8 +35,8 @@ import io.reactivex.Observable;
 import io.reactivex.functions.BiConsumer;
 import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
-import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
+import ru.touchin.roboswag.components.utils.lifecycle.Stopable;
 import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.observables.collections.ObservableCollection;
 import ru.touchin.roboswag.core.observables.collections.ObservableList;
@@ -82,7 +82,7 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     @NonNull
     private final BehaviorSubject<Boolean> moreAutoLoadingRequested = BehaviorSubject.create();
     @NonNull
-    private final LifecycleBindable lifecycleBindable;
+    private final Stopable stopable;
     @Nullable
     private Object onItemClickListener;
     private int lastUpdatedChangeNumber = -1;
@@ -96,11 +96,11 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     @NonNull
     private final List<AdapterDelegate<? extends BindableViewHolder>> delegates = new ArrayList<>();
 
-    public ObservableCollectionAdapter(@NonNull final LifecycleBindable lifecycleBindable) {
+    public ObservableCollectionAdapter(@NonNull final Stopable stopable) {
         super();
-        this.lifecycleBindable = lifecycleBindable;
-        lifecycleBindable.untilDestroy(innerCollection.observeChanges(), this::onItemsChanged);
-        lifecycleBindable.untilDestroy(observableCollectionSubject
+        this.stopable = stopable;
+        stopable.untilDestroy(innerCollection.observeChanges(), this::onItemsChanged);
+        stopable.untilDestroy(observableCollectionSubject
                 .switchMap(optional -> {
                     final ObservableCollection<TItem> collection = optional.get();
                     if (collection instanceof ObservableList) {
@@ -110,7 +110,7 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
                     }
                     return collection != null ? collection.observeItems() : Observable.just(Collections.emptyList());
                 }), innerCollection::set);
-        lifecycleBindable.untilDestroy(createMoreAutoLoadingObservable());
+        stopable.untilDestroy(createMoreAutoLoadingObservable());
     }
 
     @NonNull
@@ -169,13 +169,13 @@ public abstract class ObservableCollectionAdapter<TItem, TItemViewHolder extends
     }
 
     /**
-     * Returns parent {@link LifecycleBindable} (Activity/ViewController etc.).
+     * Returns parent {@link Stopable} (Activity/ViewController etc.).
      *
-     * @return Parent {@link LifecycleBindable}.
+     * @return Parent {@link Stopable}.
      */
     @NonNull
-    public LifecycleBindable getLifecycleBindable() {
-        return lifecycleBindable;
+    public Stopable getStopable() {
+        return stopable;
     }
 
     /**
