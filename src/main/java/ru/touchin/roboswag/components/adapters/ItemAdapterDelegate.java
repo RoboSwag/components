@@ -5,7 +5,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import ru.touchin.roboswag.components.utils.LifecycleBindable;
+import ru.touchin.roboswag.components.utils.lifecycle.Stopable;
 
 /**
  * Objects of such class controls creation and binding of specific type of RecyclerView's ViewHolders.
@@ -17,8 +17,8 @@ import ru.touchin.roboswag.components.utils.LifecycleBindable;
  */
 public abstract class ItemAdapterDelegate<TViewHolder extends BindableViewHolder, TItem> extends AdapterDelegate<TViewHolder> {
 
-    public ItemAdapterDelegate(@NonNull final LifecycleBindable parentLifecycleBindable) {
-        super(parentLifecycleBindable);
+    public ItemAdapterDelegate(@NonNull final Stopable parentStopable) {
+        super(parentStopable);
     }
 
     /**

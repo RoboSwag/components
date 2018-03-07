@@ -29,8 +29,8 @@ import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
-import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
+import ru.touchin.roboswag.components.utils.lifecycle.Stopable;
 
 /**
  * Objects of such class controls creation and binding of specific type of RecyclerView's ViewHolders.
@@ -40,25 +40,25 @@ import ru.touchin.roboswag.components.utils.UiUtils;
  */
 @SuppressWarnings("PMD.TooManyMethods")
 //TooManyMethods: it's ok
-public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> implements LifecycleBindable {
+public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> implements Stopable {
 
     @NonNull
-    private final LifecycleBindable parentLifecycleBindable;
+    private final Stopable parentStopable;
     private final int defaultItemViewType;
 
-    public AdapterDelegate(@NonNull final LifecycleBindable parentLifecycleBindable) {
-        this.parentLifecycleBindable = parentLifecycleBindable;
+    public AdapterDelegate(@NonNull final Stopable parentStopable) {
+        this.parentStopable = parentStopable;
         this.defaultItemViewType = UiUtils.OfViews.generateViewId();
     }
 
     /**
-     * Returns parent {@link LifecycleBindable} that this delegate created from (e.g. Activity or ViewController).
+     * Returns parent {@link Stopable} that this delegate created from (e.g. Activity or ViewController).
      *
-     * @return Parent {@link LifecycleBindable}.
+     * @return Parent {@link Stopable}.
      */
     @NonNull
-    public LifecycleBindable getParentLifecycleBindable() {
-        return parentLifecycleBindable;
+    public Stopable getParentStopable() {
+        return parentStopable;
     }
 
     /**
@@ -84,13 +84,13 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Observable<T> observable) {
-        return parentLifecycleBindable.untilStop(observable);
+        return parentStopable.untilStop(observable);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return parentLifecycleBindable.untilStop(observable, onNextAction);
+        return parentStopable.untilStop(observable, onNextAction);
     }
 
     @NonNull
@@ -98,7 +98,7 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
     public <T> Disposable untilStop(@NonNull final Observable<T> observable,
                                     @NonNull final Consumer<T> onNextAction,
                                     @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilStop(observable, onNextAction, onErrorAction);
+        return parentStopable.untilStop(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -107,19 +107,19 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
                                     @NonNull final Consumer<T> onNextAction,
                                     @NonNull final Consumer<Throwable> onErrorAction,
                                     @NonNull final Action onCompletedAction) {
-        return parentLifecycleBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
+        return parentStopable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Single<T> single) {
-        return parentLifecycleBindable.untilStop(single);
+        return parentStopable.untilStop(single);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return parentLifecycleBindable.untilStop(single, onSuccessAction);
+        return parentStopable.untilStop(single, onSuccessAction);
     }
 
     @NonNull
@@ -127,19 +127,19 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
     public <T> Disposable untilStop(@NonNull final Single<T> single,
                                     @NonNull final Consumer<T> onSuccessAction,
                                     @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilStop(single, onSuccessAction, onErrorAction);
+        return parentStopable.untilStop(single, onSuccessAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public Disposable untilStop(@NonNull final Completable completable) {
-        return parentLifecycleBindable.untilStop(completable);
+        return parentStopable.untilStop(completable);
     }
 
     @NonNull
     @Override
     public Disposable untilStop(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return parentLifecycleBindable.untilStop(completable, onCompletedAction);
+        return parentStopable.untilStop(completable, onCompletedAction);
     }
 
     @NonNull
@@ -147,19 +147,19 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
     public Disposable untilStop(@NonNull final Completable completable,
                                 @NonNull final Action onCompletedAction,
                                 @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilStop(completable, onCompletedAction, onErrorAction);
+        return parentStopable.untilStop(completable, onCompletedAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Maybe<T> maybe) {
-        return parentLifecycleBindable.untilStop(maybe);
+        return parentStopable.untilStop(maybe);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilStop(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onSuccessAction) {
-        return parentLifecycleBindable.untilStop(maybe, onSuccessAction);
+        return parentStopable.untilStop(maybe, onSuccessAction);
     }
 
     @NonNull
@@ -167,19 +167,19 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
     public <T> Disposable untilStop(@NonNull final Maybe<T> maybe,
                                     @NonNull final Consumer<T> onSuccessAction,
                                     @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilStop(maybe, onSuccessAction, onErrorAction);
+        return parentStopable.untilStop(maybe, onSuccessAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Observable<T> observable) {
-        return parentLifecycleBindable.untilDestroy(observable);
+        return parentStopable.untilDestroy(observable);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return parentLifecycleBindable.untilDestroy(observable, onNextAction);
+        return parentStopable.untilDestroy(observable, onNextAction);
     }
 
     @NonNull
@@ -187,7 +187,7 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
     public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
                                        @NonNull final Consumer<T> onNextAction,
                                        @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction);
+        return parentStopable.untilDestroy(observable, onNextAction, onErrorAction);
     }
 
     @NonNull
@@ -196,19 +196,19 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
                                        @NonNull final Consumer<T> onNextAction,
                                        @NonNull final Consumer<Throwable> onErrorAction,
                                        @NonNull final Action onCompletedAction) {
-        return parentLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
+        return parentStopable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Single<T> single) {
-        return parentLifecycleBindable.untilDestroy(single);
+        return parentStopable.untilDestroy(single);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return parentLifecycleBindable.untilDestroy(single, onSuccessAction);
+        return parentStopable.untilDestroy(single, onSuccessAction);
     }
 
     @NonNull
@@ -216,19 +216,19 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
     public <T> Disposable untilDestroy(@NonNull final Single<T> single,
                                        @NonNull final Consumer<T> onSuccessAction,
                                        @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilDestroy(single, onSuccessAction, onErrorAction);
+        return parentStopable.untilDestroy(single, onSuccessAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public Disposable untilDestroy(@NonNull final Completable completable) {
-        return parentLifecycleBindable.untilDestroy(completable);
+        return parentStopable.untilDestroy(completable);
     }
 
     @NonNull
     @Override
     public Disposable untilDestroy(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return parentLifecycleBindable.untilDestroy(completable, onCompletedAction);
+        return parentStopable.untilDestroy(completable, onCompletedAction);
     }
 
     @NonNull
@@ -236,19 +236,19 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
     public Disposable untilDestroy(@NonNull final Completable completable,
                                    @NonNull final Action onCompletedAction,
                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilDestroy(completable, onCompletedAction, onErrorAction);
+        return parentStopable.untilDestroy(completable, onCompletedAction, onErrorAction);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe) {
-        return parentLifecycleBindable.untilDestroy(maybe);
+        return parentStopable.untilDestroy(maybe);
     }
 
     @NonNull
     @Override
     public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onSuccessAction) {
-        return parentLifecycleBindable.untilDestroy(maybe, onSuccessAction);
+        return parentStopable.untilDestroy(maybe, onSuccessAction);
     }
 
     @NonNull
@@ -256,7 +256,7 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
     public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe,
                                        @NonNull final Consumer<T> onSuccessAction,
                                        @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilDestroy(maybe, onSuccessAction, onErrorAction);
+        return parentStopable.untilDestroy(maybe, onSuccessAction, onErrorAction);
     }
 
 }
