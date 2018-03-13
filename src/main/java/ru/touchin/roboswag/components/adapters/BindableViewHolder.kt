@@ -45,10 +45,9 @@ class BindableViewHolder(private val baseStopable: Stopable, itemView: View)
      * @param id The id to search for;
      * @return The view that has the given id in the hierarchy.
      */
-    fun <T : View> findViewById(@IdRes id: Int): T? {
-        return itemView.findViewById<View>(id) as T?
+    fun <T : View> findViewById(@IdRes id: Int): T? =
+        itemView.findViewById<View>(id) as T?
                 ?: throw ShouldNotHappenException("No view for id=" + itemView.resources.getResourceName(id))
-    }
 
     /**
      * Return the string value associated with a particular resource ID.  It
@@ -57,9 +56,8 @@ class BindableViewHolder(private val baseStopable: Stopable, itemView: View)
      * @param resId The resource id to search for data;
      * @return String The string data associated with the resource.
      */
-    fun getString(@StringRes resId: Int): String {
-        return itemView.resources.getString(resId)
-    }
+    fun getString(@StringRes resId: Int): String =
+        itemView.resources.getString(resId)
 
     /**
      * Return the string value associated with a particular resource ID.  It
@@ -69,9 +67,8 @@ class BindableViewHolder(private val baseStopable: Stopable, itemView: View)
      * @param formatArgs The format arguments that will be used for substitution.
      * @return String The string data associated with the resource.
      */
-    fun getString(@StringRes resId: Int, vararg formatArgs: Any): String {
-        return itemView.resources.getString(resId, *formatArgs)
-    }
+    fun getString(@StringRes resId: Int, vararg formatArgs: Any): String =
+        itemView.resources.getString(resId, *formatArgs)
 
     /**
      * Return the color value associated with a particular resource ID.
@@ -82,9 +79,8 @@ class BindableViewHolder(private val baseStopable: Stopable, itemView: View)
      * @return int A single color value in the form 0xAARRGGBB.
      */
     @ColorInt
-    fun getColor(@ColorRes resId: Int): Int {
-        return ContextCompat.getColor(itemView.context, resId)
-    }
+    fun getColor(@ColorRes resId: Int): Int =
+        ContextCompat.getColor(itemView.context, resId)
 
     /**
      * Returns a drawable object associated with a particular resource ID.
@@ -94,7 +90,6 @@ class BindableViewHolder(private val baseStopable: Stopable, itemView: View)
      * @param resId The resource id to search for data;
      * @return Drawable An object that can be used to draw this resource.
      */
-    fun getDrawable(@DrawableRes resId: Int): Drawable? {
-        return ContextCompat.getDrawable(itemView.context, resId)
-    }
+    fun getDrawable(@DrawableRes resId: Int): Drawable? =
+        ContextCompat.getDrawable(itemView.context, resId)
 }
