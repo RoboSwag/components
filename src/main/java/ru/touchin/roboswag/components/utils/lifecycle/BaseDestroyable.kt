@@ -19,6 +19,10 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException
  */
 open class BaseDestroyable : Destroyable {
 
+    companion object {
+        private const val UNTIL_DESTROY_METHOD = "untilDestroy"
+    }
+
     protected val isCreatedSubject = BehaviorSubject.create<Boolean>()!!
 
     /**
@@ -139,9 +143,4 @@ open class BaseDestroyable : Destroyable {
     private fun getActionThrowableForAssertion(codePoint: String, method: String): Consumer<Throwable> {
         return Consumer { t -> Lc.assertion(ShouldNotHappenException("Unexpected error on $method at $codePoint", t)) }
     }
-
-    companion object {
-        private const val UNTIL_DESTROY_METHOD = "untilDestroy"
-    }
-
 }

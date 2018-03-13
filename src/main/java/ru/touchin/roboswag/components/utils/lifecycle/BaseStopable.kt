@@ -18,6 +18,10 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException
  */
 class BaseStopable : Stopable, BaseDestroyable() {
 
+    companion object {
+        private const val UNTIL_STOP_METHOD = "untilStop"
+    }
+
     private val isStartedSubject = BehaviorSubject.create<Boolean>()
     private val isInAfterSaving = BehaviorSubject.createDefault(false)
 
@@ -131,9 +135,5 @@ class BaseStopable : Stopable, BaseDestroyable() {
 
     private fun getActionThrowableForAssertion(codePoint: String, method: String): Consumer<Throwable> {
         return Consumer { t -> Lc.assertion(ShouldNotHappenException("Unexpected error on $method at $codePoint", t)) }
-    }
-
-    companion object {
-        private const val UNTIL_STOP_METHOD = "untilStop"
     }
 }

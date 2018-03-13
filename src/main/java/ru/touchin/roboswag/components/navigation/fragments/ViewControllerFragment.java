@@ -76,22 +76,6 @@ public class ViewControllerFragment<TState extends AbstractState, TActivity exte
     private static boolean inDebugMode;
     private static long acceptableUiCalculationTime = 100;
 
-    private Class<? extends ViewController<TActivity, ? extends ViewControllerFragment<TState, TActivity>>> viewControllerClass;
-    private Class<? extends StateViewModel> viewModelClass;
-
-    @NonNull
-    private final BehaviorSubject<Optional<ViewControllerActivity>> activitySubject = BehaviorSubject.create();
-    @NonNull
-    private final BehaviorSubject<NullablePair<PlaceholderView, Bundle>> viewSubject = BehaviorSubject.create();
-    @Nullable
-
-    private ViewController viewController;
-    private StateViewModel<TState> viewModel;
-    private Disposable viewControllerSubscription;
-    private TState state;
-    private boolean started;
-    private boolean stateCreated;
-
     /**
      * Enables debugging features like serialization of {@link #getState()} every creation.
      */
@@ -108,6 +92,21 @@ public class ViewControllerFragment<TState extends AbstractState, TActivity exte
         ViewControllerFragment.acceptableUiCalculationTime = acceptableUiCalculationTime;
     }
 
+    private Class<? extends ViewController<TActivity, ? extends ViewControllerFragment<TState, TActivity>>> viewControllerClass;
+    private Class<? extends StateViewModel> viewModelClass;
+
+    @NonNull
+    private final BehaviorSubject<Optional<ViewControllerActivity>> activitySubject = BehaviorSubject.create();
+    @NonNull
+    private final BehaviorSubject<NullablePair<PlaceholderView, Bundle>> viewSubject = BehaviorSubject.create();
+    @Nullable
+
+    private ViewController viewController;
+    private Disposable viewControllerSubscription;
+    private TState state;
+    private boolean started;
+    private boolean stateCreated;
+
     /**
      * Creates {@link Bundle} which will store state and {@link ViewController}'s class.
      *
@@ -123,10 +122,6 @@ public class ViewControllerFragment<TState extends AbstractState, TActivity exte
         result.putSerializable(VIEW_CONTROLLER_CLASS_EXTRA, viewControllerClass);
         result.putSerializable(VIEW_MODEL_CLASS_EXTRA, viewModelClass);
         return result;
-    }
-
-    public StateViewModel getViewModel() {
-        return viewModel;
     }
 
     public ViewModelProvider getViewModelProvider() {
@@ -194,7 +189,7 @@ public class ViewControllerFragment<TState extends AbstractState, TActivity exte
 
         viewControllerClass = (Class<? extends ViewController<TActivity, ? extends ViewControllerFragment<TState, TActivity>>>) getArguments().getSerializable(VIEW_CONTROLLER_CLASS_EXTRA);
         viewModelClass = (Class<? extends StateViewModel>) getArguments().getSerializable(VIEW_MODEL_CLASS_EXTRA);
-        viewModel = ViewModelProviders.of(this, ((ViewControllerActivity) getActivity()).getViewModelFactory()).get(viewModelClass);
+        StateViewModel<TState> viewModel = ViewModelProviders.of(this, ((ViewControllerActivity) getActivity()).getViewModelFactory()).get(viewModelClass);
 
         setHasOptionsMenu(!isChildFragment());
 

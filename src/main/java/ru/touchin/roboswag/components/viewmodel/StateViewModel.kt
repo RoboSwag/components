@@ -15,9 +15,9 @@ import ru.touchin.roboswag.components.navigation.AbstractState
 import ru.touchin.roboswag.core.log.Lc
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException
 
-open class StateViewModel<TState : AbstractState>(application: Application) : AndroidViewModel(application), Destroyable {
-
-    private val baseDestroyable = BaseDestroyable()
+open class StateViewModel<TState : AbstractState>(application: Application,
+                                                  val baseDestroyable: BaseDestroyable = BaseDestroyable())
+    : AndroidViewModel(application), Destroyable by baseDestroyable {
 
     var state: TState? = null
         get() {
@@ -40,45 +40,6 @@ open class StateViewModel<TState : AbstractState>(application: Application) : An
     protected fun onStateCreated() {
 
     }
-
-    final override fun <T> untilDestroy(observable: Observable<T>): Disposable =
-            baseDestroyable.untilDestroy(observable)
-
-    final override fun <T> untilDestroy(observable: Observable<T>, onNextAction: Consumer<T>): Disposable =
-            baseDestroyable.untilDestroy(observable, onNextAction)
-
-    final override fun <T> untilDestroy(observable: Observable<T>, onNextAction: Consumer<T>, onErrorAction: Consumer<Throwable>): Disposable =
-            baseDestroyable.untilDestroy(observable, onNextAction, onErrorAction)
-
-    final override fun <T> untilDestroy(observable: Observable<T>, onNextAction: Consumer<T>, onErrorAction: Consumer<Throwable>, onCompletedAction: Action): Disposable =
-            baseDestroyable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction)
-
-    final override fun <T> untilDestroy(single: Single<T>): Disposable =
-            baseDestroyable.untilDestroy(single)
-
-    final override fun <T> untilDestroy(single: Single<T>, onSuccessAction: Consumer<T>): Disposable =
-            baseDestroyable.untilDestroy(single, onSuccessAction)
-
-    final override fun <T> untilDestroy(single: Single<T>, onSuccessAction: Consumer<T>, onErrorAction: Consumer<Throwable>): Disposable =
-            baseDestroyable.untilDestroy(single, onSuccessAction, onErrorAction)
-
-    final override fun untilDestroy(completable: Completable): Disposable =
-            baseDestroyable.untilDestroy(completable)
-
-    final override fun untilDestroy(completable: Completable, onCompletedAction: Action): Disposable =
-            baseDestroyable.untilDestroy(completable, onCompletedAction)
-
-    final override fun untilDestroy(completable: Completable, onCompletedAction: Action, onErrorAction: Consumer<Throwable>): Disposable =
-            baseDestroyable.untilDestroy(completable, onCompletedAction, onErrorAction)
-
-    final override fun <T> untilDestroy(maybe: Maybe<T>): Disposable =
-            baseDestroyable.untilDestroy(maybe)
-
-    final override fun <T> untilDestroy(maybe: Maybe<T>, onSuccessAction: Consumer<T>): Disposable =
-            baseDestroyable.untilDestroy(maybe, onSuccessAction)
-
-    final override fun <T> untilDestroy(maybe: Maybe<T>, onSuccessAction: Consumer<T>, onErrorAction: Consumer<Throwable>): Disposable =
-            baseDestroyable.untilDestroy(maybe, onSuccessAction, onErrorAction)
 
     override fun onCleared() {
         baseDestroyable.onDestroy()

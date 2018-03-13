@@ -296,32 +296,6 @@ public final class UiUtils {
         private static final AtomicInteger NEXT_GENERATED_ID = new AtomicInteger(1);
 
         /**
-         * Generates unique ID for view. See android {@link View#generateViewId()}.
-         *
-         * @return Unique ID.
-         */
-        @IdRes
-        public static int generateViewId() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                return View.generateViewId();
-            }
-            int result = 0;
-            boolean isGenerated = false;
-            while (!isGenerated) {
-                result = NEXT_GENERATED_ID.get();
-                // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
-                int newValue = result + 1;
-                if (newValue > GENERATED_ID_THRESHOLD) {
-                    newValue = 1; // Roll over to 1, not 0.
-                }
-                if (NEXT_GENERATED_ID.compareAndSet(result, newValue)) {
-                    isGenerated = true;
-                }
-            }
-            return result;
-        }
-
-        /**
          * Returns string representation of {@link View}'s ID.
          *
          * @param view {@link View} to get ID from;

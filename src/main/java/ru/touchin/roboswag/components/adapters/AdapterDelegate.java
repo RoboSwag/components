@@ -20,16 +20,9 @@
 package ru.touchin.roboswag.components.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.view.ViewGroup;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.components.utils.lifecycle.Stopable;
 
 /**
@@ -40,7 +33,7 @@ import ru.touchin.roboswag.components.utils.lifecycle.Stopable;
  */
 @SuppressWarnings("PMD.TooManyMethods")
 //TooManyMethods: it's ok
-public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> implements Stopable {
+public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> {
 
     @NonNull
     private final Stopable parentStopable;
@@ -48,7 +41,7 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
 
     public AdapterDelegate(@NonNull final Stopable parentStopable) {
         this.parentStopable = parentStopable;
-        this.defaultItemViewType = UiUtils.OfViews.generateViewId();
+        this.defaultItemViewType = ViewCompat.generateViewId();
     }
 
     /**
@@ -78,185 +71,4 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
      */
     @NonNull
     public abstract TViewHolder onCreateViewHolder(@NonNull final ViewGroup parent);
-
-    @SuppressWarnings("CPD-START")
-    //CPD: it is same as in other implementation based on BaseLifecycleBindable
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable) {
-        return parentStopable.untilStop(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return parentStopable.untilStop(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable,
-                                    @NonNull final Consumer<T> onNextAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentStopable.untilStop(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable,
-                                    @NonNull final Consumer<T> onNextAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction,
-                                    @NonNull final Action onCompletedAction) {
-        return parentStopable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single) {
-        return parentStopable.untilStop(single);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return parentStopable.untilStop(single, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single,
-                                    @NonNull final Consumer<T> onSuccessAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentStopable.untilStop(single, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable) {
-        return parentStopable.untilStop(completable);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return parentStopable.untilStop(completable, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable,
-                                @NonNull final Action onCompletedAction,
-                                @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentStopable.untilStop(completable, onCompletedAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe) {
-        return parentStopable.untilStop(maybe);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onSuccessAction) {
-        return parentStopable.untilStop(maybe, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe,
-                                    @NonNull final Consumer<T> onSuccessAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentStopable.untilStop(maybe, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable) {
-        return parentStopable.untilDestroy(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return parentStopable.untilDestroy(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
-                                       @NonNull final Consumer<T> onNextAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentStopable.untilDestroy(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
-                                       @NonNull final Consumer<T> onNextAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction,
-                                       @NonNull final Action onCompletedAction) {
-        return parentStopable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single) {
-        return parentStopable.untilDestroy(single);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return parentStopable.untilDestroy(single, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single,
-                                       @NonNull final Consumer<T> onSuccessAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentStopable.untilDestroy(single, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable) {
-        return parentStopable.untilDestroy(completable);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return parentStopable.untilDestroy(completable, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable,
-                                   @NonNull final Action onCompletedAction,
-                                   @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentStopable.untilDestroy(completable, onCompletedAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe) {
-        return parentStopable.untilDestroy(maybe);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onSuccessAction) {
-        return parentStopable.untilDestroy(maybe, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe,
-                                       @NonNull final Consumer<T> onSuccessAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentStopable.untilDestroy(maybe, onSuccessAction, onErrorAction);
-    }
-
 }
