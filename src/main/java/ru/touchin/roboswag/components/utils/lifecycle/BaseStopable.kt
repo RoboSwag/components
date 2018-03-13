@@ -67,18 +67,16 @@ class BaseStopable : Stopable, BaseDestroyable() {
 
     override fun <T> untilStop(observable: Observable<T>,
                                onNextAction: Consumer<T>,
-                               onErrorAction: Consumer<Throwable>): Disposable {
-        return untilStop(observable, onNextAction, onErrorAction, Functions.EMPTY_ACTION)
-    }
+                               onErrorAction: Consumer<Throwable>): Disposable =
+        untilStop(observable, onNextAction, onErrorAction, Functions.EMPTY_ACTION)
 
     override fun <T> untilStop(observable: Observable<T>,
                                onNextAction: Consumer<T>,
                                onErrorAction: Consumer<Throwable>,
-                               onCompletedAction: Action): Disposable {
-        return until(observable, isStartedSubject.map { started -> !started }
+                               onCompletedAction: Action): Disposable =
+        until(observable, isStartedSubject.map { started -> !started }
                 .delay { item -> isInAfterSaving.filter { inAfterSaving -> !inAfterSaving } },
                 onNextAction, onErrorAction, onCompletedAction)
-    }
 
     override fun <T> untilStop(single: Single<T>): Disposable {
         val codePoint = Lc.getCodePoint(this, 2)
@@ -92,11 +90,10 @@ class BaseStopable : Stopable, BaseDestroyable() {
 
     override fun <T> untilStop(single: Single<T>,
                                onSuccessAction: Consumer<T>,
-                               onErrorAction: Consumer<Throwable>): Disposable {
-        return until(single.toObservable(), isStartedSubject.map { started -> !started }
+                               onErrorAction: Consumer<Throwable>): Disposable =
+        until(single.toObservable(), isStartedSubject.map { started -> !started }
                 .delay { item -> isInAfterSaving.filter { inAfterSaving -> !inAfterSaving } },
                 onSuccessAction, onErrorAction, Functions.EMPTY_ACTION)
-    }
 
     override fun untilStop(completable: Completable): Disposable {
         val codePoint = Lc.getCodePoint(this, 2)
@@ -111,11 +108,10 @@ class BaseStopable : Stopable, BaseDestroyable() {
 
     override fun untilStop(completable: Completable,
                            onCompletedAction: Action,
-                           onErrorAction: Consumer<Throwable>): Disposable {
-        return until(completable.toObservable(), isStartedSubject.map { started -> !started }
+                           onErrorAction: Consumer<Throwable>): Disposable =
+        until(completable.toObservable(), isStartedSubject.map { started -> !started }
                 .delay { item -> isInAfterSaving.filter { inAfterSaving -> !inAfterSaving } },
                 Functions.emptyConsumer<Any>(), onErrorAction, onCompletedAction)
-    }
 
     override fun <T> untilStop(maybe: Maybe<T>): Disposable {
         val codePoint = Lc.getCodePoint(this, 2)
@@ -129,11 +125,9 @@ class BaseStopable : Stopable, BaseDestroyable() {
 
     override fun <T> untilStop(maybe: Maybe<T>,
                                onSuccessAction: Consumer<T>,
-                               onErrorAction: Consumer<Throwable>): Disposable {
-        return until(maybe.toObservable(), isStartedSubject.map { started -> !started }, onSuccessAction, onErrorAction, Functions.EMPTY_ACTION)
-    }
+                               onErrorAction: Consumer<Throwable>): Disposable =
+        until(maybe.toObservable(), isStartedSubject.map { started -> !started }, onSuccessAction, onErrorAction, Functions.EMPTY_ACTION)
 
-    private fun getActionThrowableForAssertion(codePoint: String, method: String): Consumer<Throwable> {
-        return Consumer { t -> Lc.assertion(ShouldNotHappenException("Unexpected error on $method at $codePoint", t)) }
-    }
+    private fun getActionThrowableForAssertion(codePoint: String, method: String): Consumer<Throwable> =
+        Consumer { t -> Lc.assertion(ShouldNotHappenException("Unexpected error on $method at $codePoint", t)) }
 }

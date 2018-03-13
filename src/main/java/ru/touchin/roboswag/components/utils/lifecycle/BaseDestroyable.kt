@@ -53,16 +53,14 @@ open class BaseDestroyable : Destroyable {
 
     override fun <T> untilDestroy(observable: Observable<T>,
                                   onNextAction: Consumer<T>,
-                                  onErrorAction: Consumer<Throwable>): Disposable {
-        return untilDestroy(observable, onNextAction, onErrorAction, Functions.EMPTY_ACTION)
-    }
+                                  onErrorAction: Consumer<Throwable>): Disposable =
+        untilDestroy(observable, onNextAction, onErrorAction, Functions.EMPTY_ACTION)
 
     override fun <T> untilDestroy(observable: Observable<T>,
                                   onNextAction: Consumer<T>,
                                   onErrorAction: Consumer<Throwable>,
-                                  onCompletedAction: Action): Disposable {
-        return until(observable, isCreatedSubject.map { created -> !created }, onNextAction, onErrorAction, onCompletedAction)
-    }
+                                  onCompletedAction: Action): Disposable =
+        until(observable, isCreatedSubject.map { created -> !created }, onNextAction, onErrorAction, onCompletedAction)
 
     override fun <T> untilDestroy(single: Single<T>): Disposable {
         val codePoint = Lc.getCodePoint(this, 2)
@@ -76,9 +74,8 @@ open class BaseDestroyable : Destroyable {
 
     override fun <T> untilDestroy(single: Single<T>,
                                   onSuccessAction: Consumer<T>,
-                                  onErrorAction: Consumer<Throwable>): Disposable {
-        return until(single.toObservable(), isCreatedSubject.map { created -> !created }, onSuccessAction, onErrorAction, Functions.EMPTY_ACTION)
-    }
+                                  onErrorAction: Consumer<Throwable>): Disposable =
+        until(single.toObservable(), isCreatedSubject.map { created -> !created }, onSuccessAction, onErrorAction, Functions.EMPTY_ACTION)
 
     override fun untilDestroy(completable: Completable): Disposable {
         val codePoint = Lc.getCodePoint(this, 2)
@@ -92,10 +89,9 @@ open class BaseDestroyable : Destroyable {
 
     override fun untilDestroy(completable: Completable,
                               onCompletedAction: Action,
-                              onErrorAction: Consumer<Throwable>): Disposable {
-        return until(completable.toObservable(), isCreatedSubject.map { created -> !created },
+                              onErrorAction: Consumer<Throwable>): Disposable =
+        until(completable.toObservable(), isCreatedSubject.map { created -> !created },
                 Functions.emptyConsumer<Any>(), onErrorAction, onCompletedAction)
-    }
 
     override fun <T> untilDestroy(maybe: Maybe<T>): Disposable {
         val codePoint = Lc.getCodePoint(this, 2)
@@ -109,16 +105,16 @@ open class BaseDestroyable : Destroyable {
 
     override fun <T> untilDestroy(maybe: Maybe<T>,
                                   onSuccessAction: Consumer<T>,
-                                  onErrorAction: Consumer<Throwable>): Disposable {
-        return until(maybe.toObservable(), isCreatedSubject.map { created -> !created }, onSuccessAction, onErrorAction, Functions.EMPTY_ACTION)
-    }
+                                  onErrorAction: Consumer<Throwable>): Disposable =
+        until(maybe.toObservable(), isCreatedSubject.map { created -> !created }, onSuccessAction, onErrorAction, Functions.EMPTY_ACTION)
 
     protected fun <T> until(observable: Observable<T>,
                           conditionSubject: Observable<Boolean>,
                           onNextAction: Consumer<T>,
                           onErrorAction: Consumer<Throwable>,
                           onCompletedAction: Action): Disposable {
-        val actualObservable: Observable<T> = if (onNextAction === Functions.emptyConsumer<Any>() && onErrorAction === Functions.emptyConsumer<Any>() as Consumer<*>
+        val actualObservable: Observable<T> = if (onNextAction === Functions.emptyConsumer<Any>()
+                && onErrorAction === Functions.emptyConsumer<Any>() as Consumer<*>
                 && onCompletedAction === Functions.EMPTY_ACTION) {
             observable
         } else {
@@ -140,7 +136,6 @@ open class BaseDestroyable : Destroyable {
                 .subscribe()
     }
 
-    private fun getActionThrowableForAssertion(codePoint: String, method: String): Consumer<Throwable> {
-        return Consumer { t -> Lc.assertion(ShouldNotHappenException("Unexpected error on $method at $codePoint", t)) }
-    }
+    private fun getActionThrowableForAssertion(codePoint: String, method: String): Consumer<Throwable> =
+        Consumer { t -> Lc.assertion(ShouldNotHappenException("Unexpected error on $method at $codePoint", t)) }
 }

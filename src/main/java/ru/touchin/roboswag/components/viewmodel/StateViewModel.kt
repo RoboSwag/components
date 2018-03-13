@@ -2,12 +2,7 @@ package ru.touchin.roboswag.components.viewmodel
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import io.reactivex.Completable
-import io.reactivex.Maybe
 import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import ru.touchin.roboswag.components.utils.lifecycle.BaseDestroyable
 import ru.touchin.roboswag.components.utils.lifecycle.Destroyable
