@@ -87,9 +87,7 @@ class DelegateListAdapter<TItem, TItemViewHolder : BindableViewHolder>(
         attachedRecyclerViews.add(recyclerView)
     }
 
-    private fun anyRecyclerViewShown(): Boolean {
-        return attachedRecyclerViews.any { it.isShown }
-    }
+    private fun anyRecyclerViewShown(): Boolean = attachedRecyclerViews.any { it.isShown }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
@@ -101,9 +99,7 @@ class DelegateListAdapter<TItem, TItemViewHolder : BindableViewHolder>(
      *
      * @return List of [AdapterDelegate].
      */
-    fun getDelegates(): List<AdapterDelegate<out BindableViewHolder>> {
-        return Collections.unmodifiableList(delegates)
-    }
+    fun getDelegates(): List<AdapterDelegate<out BindableViewHolder>> = Collections.unmodifiableList(delegates)
 
     /**
      * Adds [ItemAdapterDelegate] to adapter.
@@ -239,9 +235,7 @@ class DelegateListAdapter<TItem, TItemViewHolder : BindableViewHolder>(
 
     }
 
-    override fun getItemCount(): Int {
-        return headersCount + items.size + footersCount
-    }
+    override fun getItemCount(): Int = headersCount + items.size + footersCount
 
     @Suppress("UNCHECKED_CAST")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TItemViewHolder {
@@ -255,7 +249,9 @@ class DelegateListAdapter<TItem, TItemViewHolder : BindableViewHolder>(
 
     override fun onBindViewHolder(holder: TItemViewHolder, positionInAdapter: Int) {
         tryDelegateAction(positionInAdapter,
-                BiConsumer { itemAdapterDelegate, positionInCollection -> bindItemViewHolder(itemAdapterDelegate, holder, items[positionInCollection!!], null, positionInAdapter, positionInCollection!!) },
+                BiConsumer { itemAdapterDelegate, positionInCollection ->
+                    bindItemViewHolder(itemAdapterDelegate, holder, items[positionInCollection], null, positionInAdapter, positionInCollection)
+                },
                 Consumer { positionAdapterDelegate -> positionAdapterDelegate.onBindViewHolder(holder, positionInAdapter) },
                 Consumer { positionInCollection ->
                     if (positionInCollection >= 0) {
@@ -268,14 +264,14 @@ class DelegateListAdapter<TItem, TItemViewHolder : BindableViewHolder>(
         super.onBindViewHolder(holder, positionInAdapter, payloads)
         tryDelegateAction(positionInAdapter,
                 BiConsumer { itemAdapterDelegate, positionInCollection ->
-                    bindItemViewHolder(itemAdapterDelegate, holder, items[positionInCollection!!],
-                            payloads, positionInAdapter, positionInCollection!!)
+                    bindItemViewHolder(itemAdapterDelegate, holder, items[positionInCollection],
+                            payloads, positionInAdapter, positionInCollection)
                 },
                 Consumer { positionAdapterDelegate -> positionAdapterDelegate.onBindViewHolder(holder, positionInAdapter) },
                 Consumer { positionInCollection ->
                     if (positionInCollection >= 0) {
-                        bindItemViewHolder(null, holder, items[positionInCollection!!],
-                                payloads, positionInAdapter, positionInCollection!!)
+                        bindItemViewHolder(null, holder, items[positionInCollection],
+                                payloads, positionInAdapter, positionInCollection)
                     }
                 })
     }
@@ -316,7 +312,8 @@ class DelegateListAdapter<TItem, TItemViewHolder : BindableViewHolder>(
                     { any ->
                         when (onItemClickListener) {
                             is OnItemClickListener<*> -> (onItemClickListener as OnItemClickListener<TItem>).onItemClicked(item)
-                            is OnItemWithPositionClickListener<*> -> (onItemClickListener as OnItemWithPositionClickListener<TItem>).onItemClicked(item, positionInAdapter, positionInCollection)
+                            is OnItemWithPositionClickListener<*> -> (onItemClickListener as OnItemWithPositionClickListener<TItem>)
+                                    .onItemClicked(item, positionInAdapter, positionInCollection)
                             else -> Lc.assertion("Unexpected onItemClickListener type " + onItemClickListener!!)
                         }
                     },
@@ -404,9 +401,7 @@ class DelegateListAdapter<TItem, TItemViewHolder : BindableViewHolder>(
      * @param positionInCollection Position of clicked item in inner collection;
      * @return True if click listener enabled for such item.
      */
-    fun isOnClickListenerDisabled(item: TItem, positionInAdapter: Int, positionInCollection: Int): Boolean {
-        return false
-    }
+    fun isOnClickListenerDisabled(item: TItem, positionInAdapter: Int, positionInCollection: Int): Boolean = false
 
     /**
      * Interface to simply add item click listener.
@@ -442,10 +437,6 @@ class DelegateListAdapter<TItem, TItemViewHolder : BindableViewHolder>(
 
     }
 
-    private inner class LongContainer {
-
-        var value: Long = 0
-
-    }
+    private data class LongContainer(var value: Long = 0)
 
 }
