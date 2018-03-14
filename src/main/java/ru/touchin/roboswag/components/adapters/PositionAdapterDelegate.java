@@ -11,9 +11,9 @@ import java.util.List;
  * Such delegates are creating and binding ViewHolders by position in adapter.
  * Default {@link #getItemViewType} is generating on construction of object.
  *
- * @param <TViewHolder> Type of {@link BindableViewHolder} of delegate.
+ * @param <TViewHolder> Type of {@link LifecycleViewHolder} of delegate.
  */
-public abstract class PositionAdapterDelegate<TViewHolder extends BindableViewHolder> extends AdapterDelegate<TViewHolder> {
+public abstract class PositionAdapterDelegate<TViewHolder extends LifecycleViewHolder> extends AdapterDelegate<TViewHolder> {
 
     public PositionAdapterDelegate(@NonNull final LifecycleOwner lifecycleOwner) {
         super(lifecycleOwner);

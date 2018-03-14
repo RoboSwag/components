@@ -11,10 +11,10 @@ import java.util.List;
  * Such delegates are creating and binding ViewHolders for specific items.
  * Default {@link #getItemViewType} is generating on construction of object.
  *
- * @param <TViewHolder> Type of {@link LifecycleOwner} of delegate;
- * @param <TItem>       Type of items to bind to {@link LifecycleOwner}s.
+ * @param <TViewHolder> Type of {@link LifecycleViewHolder} of delegate;
+ * @param <TItem>       Type of items to bind to {@link LifecycleViewHolder}s.
  */
-public abstract class ItemAdapterDelegate<TViewHolder extends BindableViewHolder, TItem> extends AdapterDelegate<TViewHolder> {
+public abstract class ItemAdapterDelegate<TViewHolder extends LifecycleViewHolder, TItem> extends AdapterDelegate<TViewHolder> {
 
     public ItemAdapterDelegate(@NonNull final LifecycleOwner lifecycleOwner) {
         super(lifecycleOwner);

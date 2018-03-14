@@ -28,9 +28,9 @@ import android.view.ViewGroup;
  * Objects of such class controls creation and binding of specific type of RecyclerView's ViewHolders.
  * Default {@link #getItemViewType} is generating on construction of object.
  *
- * @param <TViewHolder> Type of {@link BindableViewHolder} of delegate.
+ * @param <TViewHolder> Type of {@link LifecycleViewHolder} of delegate.
  */
-public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> {
+public abstract class AdapterDelegate<TViewHolder extends LifecycleViewHolder> {
 
     private final int defaultItemViewType = ViewCompat.generateViewId();
     @NonNull

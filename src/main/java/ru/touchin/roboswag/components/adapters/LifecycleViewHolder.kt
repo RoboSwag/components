@@ -28,7 +28,7 @@ import android.view.View
  * ViewHolder that implements {@link LifecycleOwner} and uses parent lifecycle
  * object as bridge ([android.app.Activity], [android.support.v4.app.Fragment] etc.).
  */
-open class BindableViewHolder(
+open class LifecycleViewHolder(
         private val lifecycleOwner: LifecycleOwner,
         itemView: View
 ) : RecyclerView.ViewHolder(itemView), LifecycleOwner by lifecycleOwner
