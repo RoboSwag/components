@@ -17,13 +17,14 @@
  *
  */
 
-package ru.touchin.roboswag.components.navigation;
+package ru.touchin.roboswag.components.navigation.viewcontrollers;
 
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LifecycleRegistry;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -48,7 +49,10 @@ import ru.touchin.roboswag.core.log.Lc;
  * @param <TActivity> Type of activity where such {@link ViewController} could be;
  * @param <TFragment> Type of fragment where such {@link ViewController} could be;
  */
-public class ViewController<TActivity extends FragmentActivity, TFragment extends ViewControllerFragment<?, TActivity>> implements LifecycleOwner {
+public class ViewController<
+        TActivity extends FragmentActivity,
+        TFragment extends ViewControllerFragment<TState, TActivity>,
+        TState extends Parcelable> implements LifecycleOwner {
 
     @NonNull
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
@@ -81,6 +85,16 @@ public class ViewController<TActivity extends FragmentActivity, TFragment extend
     @NonNull
     public final TActivity getActivity() {
         return activity;
+    }
+
+    /**
+     * Returns state from fragment.
+     *
+     * @return Returns state.
+     */
+    @NonNull
+    public final TState getState() {
+        return fragment.getState();
     }
 
     /**

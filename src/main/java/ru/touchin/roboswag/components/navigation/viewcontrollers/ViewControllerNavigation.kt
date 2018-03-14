@@ -17,7 +17,7 @@
  *
  */
 
-package ru.touchin.roboswag.components.navigation
+package ru.touchin.roboswag.components.navigation.viewcontrollers
 
 import android.content.Context
 import android.os.Parcelable
@@ -28,6 +28,7 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 
 import io.reactivex.functions.Function
+import ru.touchin.roboswag.components.navigation.FragmentNavigation
 import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment
 
 /**
@@ -52,7 +53,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TState              Type of state of fragment.
      */
     fun <TState : Parcelable> pushViewController(
-            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>>>,
+            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>>,
             state: TState,
             transactionSetup: Function<FragmentTransaction, FragmentTransaction>? = null
     ) {
@@ -67,7 +68,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TState              Type of state of fragment.
      */
     fun <TState : Parcelable> pushSingleViewController(
-            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>>>,
+            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>>,
             state: TState,
             transactionSetup: Function<FragmentTransaction, FragmentTransaction>? = null
     ) {
@@ -86,7 +87,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TTargetFragment     Type of target fragment.
      */
     fun <TState : Parcelable, TTargetFragment : Fragment> pushViewControllerForResult(
-            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>>>,
+            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>>,
             state: TState,
             targetFragment: TTargetFragment,
             transactionSetup: Function<FragmentTransaction, FragmentTransaction>? = null
@@ -96,7 +97,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
                 targetFragment,
                 true,
                 state,
-                viewControllerClass.name + ';'.toString() + FragmentNavigation.WITH_TARGET_FRAGMENT_TAG_MARK,
+                viewControllerClass.name + ';'.toString() + WITH_TARGET_FRAGMENT_TAG_MARK,
                 transactionSetup
         )
     }
@@ -111,7 +112,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TState              Type of state of fragment.
      */
     fun <TState : Parcelable> setViewControllerAsTop(
-            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>>>,
+            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>>,
             state: TState,
             transactionSetup: Function<FragmentTransaction, FragmentTransaction>? = null
     ) {
@@ -120,7 +121,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
                 null,
                 true,
                 state,
-                viewControllerClass.name + ';'.toString() + FragmentNavigation.TOP_FRAGMENT_TAG_MARK,
+                viewControllerClass.name + ';'.toString() + TOP_FRAGMENT_TAG_MARK,
                 transactionSetup
         )
     }
@@ -135,7 +136,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TState              Type of state of fragment.
      */
     fun <TState : Parcelable> setInitialViewController(
-            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>>>,
+            viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>>,
             state: TState,
             transactionSetup: Function<FragmentTransaction, FragmentTransaction>? = null
     ) {
@@ -154,7 +155,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TState              Type of state of fragment.
      */
     protected fun <TState : Parcelable> addViewControllerToStack(
-            viewControllerClass: Class<out ViewController<TActivity, out ViewControllerFragment<TState, TActivity>>>,
+            viewControllerClass: Class<out ViewController<TActivity, out ViewControllerFragment<TState, TActivity>, TState>>,
             targetFragment: Fragment?,
             addToStack: Boolean,
             state: TState,

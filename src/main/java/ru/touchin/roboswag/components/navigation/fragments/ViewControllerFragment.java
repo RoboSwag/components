@@ -39,7 +39,7 @@ import android.widget.FrameLayout;
 
 import java.lang.reflect.Constructor;
 
-import ru.touchin.roboswag.components.navigation.ViewController;
+import ru.touchin.roboswag.components.navigation.viewcontrollers.ViewController;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
@@ -51,7 +51,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  * @param <TState>    Type of object which is representing it's fragment state;
  * @param <TActivity> Type of {@link FragmentActivity} where fragment could be attached to.
  */
-public abstract class ViewControllerFragment<TState extends Parcelable, TActivity extends FragmentActivity> extends ViewFragment<TActivity> {
+public class ViewControllerFragment<TState extends Parcelable, TActivity extends FragmentActivity> extends ViewFragment<TActivity> {
 
     private static final String VIEW_CONTROLLER_CLASS_EXTRA = "VIEW_CONTROLLER_CLASS_EXTRA";
     private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
@@ -105,7 +105,7 @@ public abstract class ViewControllerFragment<TState extends Parcelable, TActivit
 
     @Nullable
     private ViewController viewController;
-    private Class<ViewController<TActivity, ViewControllerFragment<TState, TActivity>>> viewControllerClass;
+    private Class<ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>> viewControllerClass;
     private TState state;
 
     /**
@@ -125,7 +125,7 @@ public abstract class ViewControllerFragment<TState extends Parcelable, TActivit
         setHasOptionsMenu(!isChildFragment());
 
         //noinspection unchecked
-        viewControllerClass = (Class<ViewController<TActivity, ViewControllerFragment<TState, TActivity>>>)
+        viewControllerClass = (Class<ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>>)
                 getArguments().getSerializable(VIEW_CONTROLLER_CLASS_EXTRA);
         state = savedInstanceState != null
                 ? savedInstanceState.getParcelable(VIEW_CONTROLLER_STATE_EXTRA)
