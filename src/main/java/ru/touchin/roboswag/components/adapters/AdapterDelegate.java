@@ -19,18 +19,10 @@
 
 package ru.touchin.roboswag.components.adapters;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.view.ViewGroup;
-
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import ru.touchin.roboswag.components.utils.LifecycleBindable;
-import ru.touchin.roboswag.components.utils.UiUtils;
 
 /**
  * Objects of such class controls creation and binding of specific type of RecyclerView's ViewHolders.
@@ -38,27 +30,24 @@ import ru.touchin.roboswag.components.utils.UiUtils;
  *
  * @param <TViewHolder> Type of {@link BindableViewHolder} of delegate.
  */
-@SuppressWarnings("PMD.TooManyMethods")
-//TooManyMethods: it's ok
-public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> implements LifecycleBindable {
+public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> {
 
+    private final int defaultItemViewType = ViewCompat.generateViewId();
     @NonNull
-    private final LifecycleBindable parentLifecycleBindable;
-    private final int defaultItemViewType;
+    private final LifecycleOwner lifecycleOwner;
 
-    public AdapterDelegate(@NonNull final LifecycleBindable parentLifecycleBindable) {
-        this.parentLifecycleBindable = parentLifecycleBindable;
-        this.defaultItemViewType = UiUtils.OfViews.generateViewId();
+    public AdapterDelegate(@NonNull final LifecycleOwner lifecycleOwner) {
+        this.lifecycleOwner = lifecycleOwner;
     }
 
     /**
-     * Returns parent {@link LifecycleBindable} that this delegate created from (e.g. Activity or ViewController).
+     * Returns parent {@link LifecycleOwner} that this delegate created from (e.g. Activity, Fragment or ViewController).
      *
-     * @return Parent {@link LifecycleBindable}.
+     * @return Parent {@link LifecycleOwner}.
      */
     @NonNull
-    public LifecycleBindable getParentLifecycleBindable() {
-        return parentLifecycleBindable;
+    public LifecycleOwner getLifecycleOwner() {
+        return lifecycleOwner;
     }
 
     /**
@@ -78,185 +67,5 @@ public abstract class AdapterDelegate<TViewHolder extends BindableViewHolder> im
      */
     @NonNull
     public abstract TViewHolder onCreateViewHolder(@NonNull final ViewGroup parent);
-
-    @SuppressWarnings("CPD-START")
-    //CPD: it is same as in other implementation based on BaseLifecycleBindable
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable) {
-        return parentLifecycleBindable.untilStop(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return parentLifecycleBindable.untilStop(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable,
-                                    @NonNull final Consumer<T> onNextAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilStop(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable,
-                                    @NonNull final Consumer<T> onNextAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction,
-                                    @NonNull final Action onCompletedAction) {
-        return parentLifecycleBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single) {
-        return parentLifecycleBindable.untilStop(single);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return parentLifecycleBindable.untilStop(single, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single,
-                                    @NonNull final Consumer<T> onSuccessAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilStop(single, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable) {
-        return parentLifecycleBindable.untilStop(completable);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return parentLifecycleBindable.untilStop(completable, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable,
-                                @NonNull final Action onCompletedAction,
-                                @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilStop(completable, onCompletedAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe) {
-        return parentLifecycleBindable.untilStop(maybe);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onSuccessAction) {
-        return parentLifecycleBindable.untilStop(maybe, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe,
-                                    @NonNull final Consumer<T> onSuccessAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilStop(maybe, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable) {
-        return parentLifecycleBindable.untilDestroy(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return parentLifecycleBindable.untilDestroy(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
-                                       @NonNull final Consumer<T> onNextAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
-                                       @NonNull final Consumer<T> onNextAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction,
-                                       @NonNull final Action onCompletedAction) {
-        return parentLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single) {
-        return parentLifecycleBindable.untilDestroy(single);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return parentLifecycleBindable.untilDestroy(single, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single,
-                                       @NonNull final Consumer<T> onSuccessAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilDestroy(single, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable) {
-        return parentLifecycleBindable.untilDestroy(completable);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return parentLifecycleBindable.untilDestroy(completable, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable,
-                                   @NonNull final Action onCompletedAction,
-                                   @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilDestroy(completable, onCompletedAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe) {
-        return parentLifecycleBindable.untilDestroy(maybe);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onSuccessAction) {
-        return parentLifecycleBindable.untilDestroy(maybe, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe,
-                                       @NonNull final Consumer<T> onSuccessAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return parentLifecycleBindable.untilDestroy(maybe, onSuccessAction, onErrorAction);
-    }
 
 }

@@ -19,39 +19,27 @@
 
 package ru.touchin.roboswag.components.navigation;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LifecycleRegistry;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivity;
 import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment;
-import ru.touchin.roboswag.components.utils.BaseLifecycleBindable;
-import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
-import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
 
 /**
  * Created by Gavriil Sitnikov on 21/10/2015.
@@ -60,20 +48,16 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  * @param <TActivity> Type of activity where such {@link ViewController} could be;
  * @param <TFragment> Type of fragment where such {@link ViewController} could be;
  */
-@SuppressWarnings({"PMD.TooManyMethods", "PMD.ExcessivePublicCount"})
-public class ViewController<TActivity extends ViewControllerActivity<?>,
-        TFragment extends ViewControllerFragment<?, TActivity>>
-        implements LifecycleBindable {
+public class ViewController<TActivity extends FragmentActivity, TFragment extends ViewControllerFragment<?, TActivity>> implements LifecycleOwner {
 
+    @NonNull
+    private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
     @NonNull
     private final TActivity activity;
     @NonNull
     private final TFragment fragment;
     @NonNull
     private final ViewGroup container;
-    @NonNull
-    private final BaseLifecycleBindable baseLifecycleBindable = new BaseLifecycleBindable();
-    private boolean destroyed;
 
     @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
     //UnusedFormalParameter: savedInstanceState could be used by children
@@ -81,6 +65,12 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
         this.activity = (TActivity) creationContext.activity;
         this.fragment = (TFragment) creationContext.fragment;
         this.container = creationContext.container;
+    }
+
+    @NonNull
+    @Override
+    public Lifecycle getLifecycle() {
+        return lifecycleRegistry;
     }
 
     /**
@@ -112,37 +102,6 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
     @NonNull
     public final ViewGroup getContainer() {
         return container;
-    }
-
-    /**
-     * Returns if {@link ViewController} destroyed or not.
-     *
-     * @return True if it is destroyed.
-     */
-    public final boolean isDestroyed() {
-        return destroyed;
-    }
-
-    /**
-     * Return a localized string from the application's package's default string table.
-     *
-     * @param resId Resource id for the string
-     */
-    @NonNull
-    public final String getString(@StringRes final int resId) {
-        return getActivity().getString(resId);
-    }
-
-    /**
-     * Return a localized formatted string from the application's package's default string table, substituting the format arguments as defined in
-     * {@link java.util.Formatter} and {@link java.lang.String#format}.
-     *
-     * @param resId      Resource id for the format string
-     * @param formatArgs The format arguments that will be used for substitution.
-     */
-    @NonNull
-    public final String getString(@StringRes final int resId, @NonNull final Object... formatArgs) {
-        return getActivity().getString(resId, formatArgs);
     }
 
     /**
@@ -189,39 +148,8 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * @return The view that has the given id in the hierarchy.
      */
     @NonNull
-    @SuppressWarnings("unchecked")
-    public <T extends View> T findViewById(@IdRes final int id) {
-        final T viewById = (T) getContainer().findViewById(id);
-        if (viewById == null) {
-            throw new ShouldNotHappenException("No view for id=" + getActivity().getResources().getResourceName(id));
-        }
-        return viewById;
-    }
-
-    /**
-     * Return the color value associated with a particular resource ID.
-     * Starting in {@link android.os.Build.VERSION_CODES#M}, the returned
-     * color will be styled for the specified Context's theme.
-     *
-     * @param resId The resource id to search for data;
-     * @return int A single color value in the form 0xAARRGGBB.
-     */
-    @ColorInt
-    public int getColor(@ColorRes final int resId) {
-        return getActivity().getColorCompat(resId);
-    }
-
-    /**
-     * Returns a drawable object associated with a particular resource ID.
-     * Starting in {@link android.os.Build.VERSION_CODES#LOLLIPOP}, the
-     * returned drawable will be styled for the specified Context's theme.
-     *
-     * @param resId The resource id to search for data;
-     * @return Drawable An object that can be used to draw this resource.
-     */
-    @NonNull
-    public Drawable getDrawable(@DrawableRes final int resId) {
-        return getActivity().getDrawableCompat(resId);
+    public final <T extends View> T findViewById(@IdRes final int id) {
+        return getContainer().findViewById(id);
     }
 
     /**
@@ -231,28 +159,28 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      * @param menu     The options menu in which you place your items;
      * @param inflater Helper to inflate menu items.
      */
-    public void onConfigureNavigation(@NonNull final Menu menu, @NonNull final MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull final Menu menu, @NonNull final MenuInflater inflater) {
         // do nothing
     }
 
     /**
      * Calls right after construction of {@link ViewController}.
-     * Happens at {@link ViewControllerFragment#onActivityCreated(View, ViewControllerActivity, Bundle)}.
+     * Happens at {@link ViewControllerFragment#onActivityCreated(Bundle)}.
      */
     @CallSuper
     public void onCreate() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onCreate();
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
     }
 
     /**
      * Calls when {@link ViewController} have started.
-     * Happens at {@link ViewControllerFragment#onStart(View, ViewControllerActivity)}.
+     * Happens at {@link ViewControllerFragment#onStart()}.
      */
     @CallSuper
     public void onStart() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onStart();
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START);
     }
 
     /**
@@ -265,12 +193,12 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
 
     /**
      * Calls when {@link ViewController} have resumed.
-     * Happens at {@link ViewControllerFragment#onResume(View, ViewControllerActivity)}.
+     * Happens at {@link ViewControllerFragment#onResume()}.
      */
     @CallSuper
     public void onResume() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onResume();
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME);
     }
 
     /**
@@ -284,11 +212,12 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
 
     /**
      * Calls when {@link ViewController} have paused.
-     * Happens at {@link ViewControllerFragment#onPause(View, ViewControllerActivity)}.
+     * Happens at {@link ViewControllerFragment#onPause()}.
      */
     @CallSuper
     public void onPause() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE);
     }
 
     /**
@@ -298,7 +227,6 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
      */
     @CallSuper
     public void onSaveInstanceState(@NonNull final Bundle savedInstanceState) {
-        baseLifecycleBindable.onSaveInstanceState();
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
     }
 
@@ -312,30 +240,29 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
 
     /**
      * Calls when {@link ViewController} have stopped.
-     * Happens at {@link ViewControllerFragment#onStop(View, ViewControllerActivity)}.
+     * Happens at {@link ViewControllerFragment#onStop()}.
      */
     @CallSuper
     public void onStop() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onStop();
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP);
     }
 
     /**
      * Calls when {@link ViewController} have destroyed.
-     * Happens usually at {@link ViewControllerFragment#onDestroyView(View)}. In some cases at {@link ViewControllerFragment#onDestroy()}.
+     * Happens usually at {@link ViewControllerFragment#onDestroyView()}. In some cases at {@link ViewControllerFragment#onDestroy()}.
      */
     @CallSuper
     public void onDestroy() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onDestroy();
-        destroyed = true;
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY);
     }
 
     /**
      * Callback from parent fragment.
      */
     public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
-        // Do nothing
+        UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
     }
 
     /**
@@ -348,200 +275,23 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
         return false;
     }
 
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable) {
-        return baseLifecycleBindable.untilStop(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return baseLifecycleBindable.untilStop(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable,
-                                    @NonNull final Consumer<T> onNextAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable,
-                                    @NonNull final Consumer<T> onNextAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction,
-                                    @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single) {
-        return baseLifecycleBindable.untilStop(single);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return baseLifecycleBindable.untilStop(single, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single,
-                                    @NonNull final Consumer<T> onSuccessAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(single, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable) {
-        return baseLifecycleBindable.untilStop(completable);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilStop(completable, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable,
-                                @NonNull final Action onCompletedAction,
-                                @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(completable, onCompletedAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe) {
-        return baseLifecycleBindable.untilStop(maybe);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onSuccessAction) {
-        return baseLifecycleBindable.untilStop(maybe, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe,
-                                    @NonNull final Consumer<T> onSuccessAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(maybe, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable) {
-        return baseLifecycleBindable.untilDestroy(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return baseLifecycleBindable.untilDestroy(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
-                                       @NonNull final Consumer<T> onNextAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
-                                       @NonNull final Consumer<T> onNextAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction,
-                                       @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single) {
-        return baseLifecycleBindable.untilDestroy(single);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return baseLifecycleBindable.untilDestroy(single, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single,
-                                       @NonNull final Consumer<T> onSuccessAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(single, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable) {
-        return baseLifecycleBindable.untilDestroy(completable);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilDestroy(completable, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable,
-                                   @NonNull final Action onCompletedAction,
-                                   @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(completable, onCompletedAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe) {
-        return baseLifecycleBindable.untilDestroy(maybe);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onCompletedAction) {
-        return baseLifecycleBindable.untilDestroy(maybe, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe,
-                                       @NonNull final Consumer<T> onCompletedAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(maybe, onCompletedAction, onErrorAction);
-    }
-
-    @SuppressWarnings("CPD-END")
     /*
      * Helper class to simplify constructor override.
      */
     public static class CreationContext {
 
         @NonNull
-        private final ViewControllerActivity activity;
+        private final FragmentActivity activity;
         @NonNull
         private final ViewControllerFragment fragment;
         @NonNull
         private final ViewGroup container;
 
-        public CreationContext(@NonNull final ViewControllerActivity activity,
-                               @NonNull final ViewControllerFragment fragment,
-                               @NonNull final ViewGroup container) {
+        public CreationContext(
+                @NonNull final FragmentActivity activity,
+                @NonNull final ViewControllerFragment fragment,
+                @NonNull final ViewGroup container
+        ) {
             this.activity = activity;
             this.fragment = fragment;
             this.container = container;

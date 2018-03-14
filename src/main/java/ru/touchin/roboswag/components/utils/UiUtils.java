@@ -21,13 +21,14 @@ package ru.touchin.roboswag.components.utils;
 
 import android.app.Activity;
 import android.app.Application;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -41,11 +42,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
-import ru.touchin.roboswag.components.navigation.activities.BaseActivity;
 import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.log.LcGroup;
 
@@ -130,9 +128,11 @@ public final class UiUtils {
         }
 
         final Runnable runnable = () -> {
+            final Context context = targetView.getContext();
             if (targetView.getWindowVisibility() != View.VISIBLE
                     || !targetView.hasWindowFocus()
-                    || (targetView.getContext() instanceof BaseActivity && !((BaseActivity) targetView.getContext()).isActuallyResumed())) {
+                    || (context instanceof LifecycleOwner
+                    && !((LifecycleOwner) context).getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED))) {
                 return;
             }
             try {
@@ -291,35 +291,6 @@ public final class UiUtils {
      * Utilities methods related to views.
      */
     public static class OfViews {
-
-        private static final int GENERATED_ID_THRESHOLD = 0x00FFFFFF;
-        private static final AtomicInteger NEXT_GENERATED_ID = new AtomicInteger(1);
-
-        /**
-         * Generates unique ID for view. See android {@link View#generateViewId()}.
-         *
-         * @return Unique ID.
-         */
-        @IdRes
-        public static int generateViewId() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                return View.generateViewId();
-            }
-            int result = 0;
-            boolean isGenerated = false;
-            while (!isGenerated) {
-                result = NEXT_GENERATED_ID.get();
-                // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
-                int newValue = result + 1;
-                if (newValue > GENERATED_ID_THRESHOLD) {
-                    newValue = 1; // Roll over to 1, not 0.
-                }
-                if (NEXT_GENERATED_ID.compareAndSet(result, newValue)) {
-                    isGenerated = true;
-                }
-            }
-            return result;
-        }
 
         /**
          * Returns string representation of {@link View}'s ID.

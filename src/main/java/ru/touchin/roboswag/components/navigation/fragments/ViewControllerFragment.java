@@ -24,10 +24,11 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Parcel;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.InflateException;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,33 +37,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.BehaviorSubject;
-import ru.touchin.roboswag.components.navigation.AbstractState;
 import ru.touchin.roboswag.components.navigation.ViewController;
-import ru.touchin.roboswag.components.navigation.activities.ViewControllerActivity;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
-import ru.touchin.roboswag.core.utils.Optional;
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
-import ru.touchin.roboswag.core.utils.pairs.NullablePair;
 
 /**
  * Created by Gavriil Sitnikov on 21/10/2015.
  * Fragment instantiated in specific activity of {@link TActivity} type that is holding {@link ViewController} inside.
  *
  * @param <TState>    Type of object which is representing it's fragment state;
- * @param <TActivity> Type of {@link ViewControllerActivity} where fragment could be attached to.
+ * @param <TActivity> Type of {@link FragmentActivity} where fragment could be attached to.
  */
-@SuppressWarnings("PMD.TooManyMethods")
-public abstract class ViewControllerFragment<TState extends AbstractState, TActivity extends ViewControllerActivity<?>>
-        extends ViewFragment<TActivity> {
+public abstract class ViewControllerFragment<TState extends Parcelable, TActivity extends FragmentActivity> extends ViewFragment<TActivity> {
 
+    private static final String VIEW_CONTROLLER_CLASS_EXTRA = "VIEW_CONTROLLER_CLASS_EXTRA";
     private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
 
     private static boolean inDebugMode;
@@ -84,17 +75,16 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         ViewControllerFragment.acceptableUiCalculationTime = acceptableUiCalculationTime;
     }
 
-    @SuppressWarnings("unchecked")
     @NonNull
-    private static <T extends Serializable> T reserialize(@NonNull final T serializable) {
+    private static <T extends Parcelable> T reserialize(@NonNull final T parcelable) {
         Parcel parcel = Parcel.obtain();
-        parcel.writeSerializable(serializable);
+        parcel.writeParcelable(parcelable, 0);
         final byte[] serializableBytes = parcel.marshall();
         parcel.recycle();
         parcel = Parcel.obtain();
         parcel.unmarshall(serializableBytes, 0, serializableBytes.length);
         parcel.setDataPosition(0);
-        final T result = (T) parcel.readSerializable();
+        final T result = parcel.readParcelable(parcelable.getClass().getClassLoader());
         parcel.recycle();
         return result;
     }
@@ -106,32 +96,20 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
      * @return Returns bundle with state inside.
      */
     @NonNull
-    public static Bundle createState(@Nullable final AbstractState state) {
+    public static Bundle args(@NonNull final Class<? extends ViewController> viewControllerClass, @Nullable final Parcelable state) {
         final Bundle result = new Bundle();
-        result.putSerializable(VIEW_CONTROLLER_STATE_EXTRA, state);
+        result.putSerializable(VIEW_CONTROLLER_CLASS_EXTRA, viewControllerClass);
+        result.putParcelable(VIEW_CONTROLLER_STATE_EXTRA, state);
         return result;
     }
 
-    @NonNull
-    private final BehaviorSubject<Optional<TActivity>> activitySubject = BehaviorSubject.create();
-    @NonNull
-    private final BehaviorSubject<NullablePair<PlaceholderView, Bundle>> viewSubject = BehaviorSubject.create();
     @Nullable
     private ViewController viewController;
-    private Disposable viewControllerSubscription;
+    private Class<ViewController<TActivity, ViewControllerFragment<TState, TActivity>>> viewControllerClass;
     private TState state;
-    private boolean started;
-    private boolean stateCreated;
-
-    private void tryCreateState(@Nullable final Context context) {
-        if (!stateCreated && state != null && context != null) {
-            state.onCreate();
-            stateCreated = true;
-        }
-    }
 
     /**
-     * Returns specific {@link AbstractState} which contains state of fragment and it's {@link ViewController}.
+     * Returns specific {@link Parcelable} which contains state of fragment and it's {@link ViewController}.
      *
      * @return Object represents state.
      */
@@ -140,64 +118,37 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         return state;
     }
 
-    /**
-     * It should return specific {@link ViewController} class to control instantiated view by logic after activity creation.
-     *
-     * @return Returns class of specific {@link ViewController}.
-     */
-    @NonNull
-    public abstract Class<? extends ViewController<TActivity,
-            ? extends ViewControllerFragment<TState, TActivity>>> getViewControllerClass();
-
-    /**
-     * Returns if ViewControllerFragment requires state or not.
-     *
-     * @return true if state is required
-     */
-    protected abstract boolean isStateRequired();
-
-    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(!isChildFragment());
 
+        //noinspection unchecked
+        viewControllerClass = (Class<ViewController<TActivity, ViewControllerFragment<TState, TActivity>>>)
+                getArguments().getSerializable(VIEW_CONTROLLER_CLASS_EXTRA);
         state = savedInstanceState != null
-                ? (TState) savedInstanceState.getSerializable(VIEW_CONTROLLER_STATE_EXTRA)
-                : (getArguments() != null ? (TState) getArguments().getSerializable(VIEW_CONTROLLER_STATE_EXTRA) : null);
+                ? savedInstanceState.getParcelable(VIEW_CONTROLLER_STATE_EXTRA)
+                : (getArguments() != null ? getArguments().getParcelable(VIEW_CONTROLLER_STATE_EXTRA) : null);
         if (state != null) {
             if (inDebugMode) {
                 state = reserialize(state);
             }
-            tryCreateState(getContext());
-        } else if (isStateRequired()) {
+        } else {
             Lc.assertion("State is required and null");
         }
-        viewControllerSubscription = Observable
-                .combineLatest(activitySubject.distinctUntilChanged(), viewSubject.distinctUntilChanged(),
-                        (activityOptional, viewInfo) -> {
-                            final TActivity activity = activityOptional.get();
-                            final PlaceholderView container = viewInfo.getFirst();
-                            if (activity == null || container == null) {
-                                return new Optional<ViewController>(null);
-                            }
-                            final ViewController newViewController = createViewController(activity, container, viewInfo.getSecond());
-                            newViewController.onCreate();
-                            return new Optional<>(newViewController);
-                        })
-                .subscribe(this::onViewControllerChanged,
-                        throwable -> Lc.cutAssertion(throwable, InvocationTargetException.class, InflateException.class));
     }
 
     @NonNull
-    private ViewController createViewController(@NonNull final TActivity activity, @NonNull final PlaceholderView view,
-                                                @Nullable final Bundle savedInstanceState) {
-
-        if (getViewControllerClass().getConstructors().length != 1) {
-            throw new ShouldNotHappenException("There should be single constructor for " + getViewControllerClass());
+    private ViewController createViewController(
+            @NonNull final FragmentActivity activity,
+            @NonNull final PlaceholderView view,
+            @Nullable final Bundle savedInstanceState
+    ) {
+        if (viewControllerClass.getConstructors().length != 1) {
+            throw new ShouldNotHappenException("There should be single constructor for " + viewControllerClass);
         }
-        final Constructor<?> constructor = getViewControllerClass().getConstructors()[0];
+        final Constructor<?> constructor = viewControllerClass.getConstructors()[0];
         final ViewController.CreationContext creationContext = new ViewController.CreationContext(activity, this, view);
         final long creationTime = inDebugMode ? SystemClock.elapsedRealtime() : 0;
         try {
@@ -209,7 +160,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
                 default:
                     throw new ShouldNotHappenException("Wrong constructor parameters count: " + constructor.getParameterTypes().length);
             }
-        } catch (final Exception exception) {
+        } catch (@NonNull final Exception exception) {
             throw new ShouldNotHappenException(exception);
         } finally {
             checkCreationTime(creationTime);
@@ -220,46 +171,33 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         if (inDebugMode) {
             final long creationPeriod = SystemClock.elapsedRealtime() - creationTime;
             if (creationPeriod > acceptableUiCalculationTime) {
-                UiUtils.UI_METRICS_LC_GROUP.w("Creation of %s took too much: %dms", getViewControllerClass(), creationPeriod);
+                UiUtils.UI_METRICS_LC_GROUP.w("Creation of %s took too much: %dms", viewControllerClass, creationPeriod);
             }
         }
     }
 
-    @Override
-    public void onAttach(@NonNull final Context context) {
-        super.onAttach(context);
-        tryCreateState(context);
-    }
-
-    @Deprecated
     @NonNull
     @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater,
-                             @Nullable final ViewGroup container,
-                             @Nullable final Bundle savedInstanceState) {
-        return new PlaceholderView(inflater.getContext(), getViewControllerClass().getName());
+    public final View onCreateView(
+            @NonNull final LayoutInflater inflater,
+            @Nullable final ViewGroup container,
+            @Nullable final Bundle savedInstanceState
+    ) {
+        return new PlaceholderView(inflater.getContext(), viewControllerClass.getName());
     }
 
     @Override
-    public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        if (view instanceof PlaceholderView) {
-            viewSubject.onNext(new NullablePair<>((PlaceholderView) view, savedInstanceState));
-        } else {
-            Lc.assertion("View should be instanceof PlaceholderView");
-        }
-    }
-
-    @Override
-    public void onActivityCreated(@NonNull final View view, @NonNull final TActivity activity, @Nullable final Bundle savedInstanceState) {
-        super.onActivityCreated(view, activity, savedInstanceState);
-        activitySubject.onNext(new Optional<>(activity));
+    public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        //noinspection ConstantConditions
+        viewController = createViewController(requireActivity(), (PlaceholderView) getView(), savedInstanceState);
+        viewController.onCreate();
+        requireActivity().invalidateOptionsMenu();
     }
 
     @Override
     protected void onStart(@NonNull final View view, @NonNull final TActivity activity) {
         super.onStart(view, activity);
-        started = true;
         if (viewController != null) {
             viewController.onStart();
         }
@@ -289,41 +227,17 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         }
     }
 
-    /**
-     * Calls when activity configuring ActionBar, Toolbar, Sidebar etc.
-     * If it will be called or not depends on {@link #hasOptionsMenu()} and {@link #isMenuVisible()}.
-     *
-     * @param menu     The options menu in which you place your items;
-     * @param inflater Helper to inflate menu items.
-     */
-    protected void onConfigureNavigation(@NonNull final Menu menu, @NonNull final MenuInflater inflater) {
-        if (viewController != null) {
-            viewController.onConfigureNavigation(menu, inflater);
-        }
-    }
-
     @Override
     public void onCreateOptionsMenu(@NonNull final Menu menu, @NonNull final MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        onConfigureNavigation(menu, inflater);
+        if (viewController != null) {
+            viewController.onCreateOptionsMenu(menu, inflater);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
         return (viewController != null && viewController.onOptionsItemSelected(item)) || super.onOptionsItemSelected(item);
-    }
-
-    private void onViewControllerChanged(@NonNull final Optional<ViewController> viewControllerOptional) {
-        if (this.viewController != null) {
-            this.viewController.onDestroy();
-        }
-        this.viewController = viewControllerOptional.get();
-        if (this.viewController != null) {
-            if (started) {
-                this.viewController.onStart();
-            }
-            this.viewController.getActivity().reconfigureNavigation();
-        }
     }
 
     @Override
@@ -340,7 +254,7 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         if (viewController != null) {
             viewController.onSaveInstanceState(savedInstanceState);
         }
-        savedInstanceState.putSerializable(VIEW_CONTROLLER_STATE_EXTRA, state);
+        savedInstanceState.putParcelable(VIEW_CONTROLLER_STATE_EXTRA, state);
     }
 
     @Override
@@ -353,7 +267,6 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
 
     @Override
     protected void onStop(@NonNull final View view, @NonNull final TActivity activity) {
-        started = false;
         if (viewController != null) {
             viewController.onStop();
         }
@@ -361,25 +274,12 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     }
 
     @Override
-    protected void onDestroyView(@NonNull final View view) {
-        viewSubject.onNext(new NullablePair<>(null, null));
-        super.onDestroyView(view);
-    }
-
-    @Override
-    public void onDetach() {
-        activitySubject.onNext(new Optional<>(null));
-        super.onDetach();
-    }
-
-    @Override
-    public void onDestroy() {
-        viewControllerSubscription.dispose();
-        if (viewController != null && !viewController.isDestroyed()) {
+    public void onDestroyView() {
+        if (viewController != null) {
             viewController.onDestroy();
             viewController = null;
         }
-        super.onDestroy();
+        super.onDestroyView();
     }
 
     @Override

@@ -24,7 +24,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,8 +39,7 @@ import ru.touchin.roboswag.core.log.Lc;
  *
  * @param <TActivity> Type of activity which to such fragment could be attached.
  */
-public abstract class ViewFragment<TActivity extends AppCompatActivity> extends Fragment
-        implements OnFragmentStartedListener {
+public abstract class ViewFragment<TActivity extends FragmentActivity> extends Fragment implements OnFragmentStartedListener {
 
     private boolean appeared;
     private boolean started;
@@ -88,27 +87,12 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
         //do nothing
     }
 
-    @Deprecated
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (getView() == null || getBaseActivity() == null) {
             Lc.assertion("View and activity shouldn't be null");
-            return;
         }
-        onActivityCreated(getView(), getBaseActivity(), savedInstanceState);
-    }
-
-    /**
-     * Replacement of {@link #onActivityCreated} with non null activity as first parameter.
-     *
-     * @param view               Instantiated view.
-     * @param activity           Activity which fragment attached to.
-     * @param savedInstanceState If the fragment is being re-created from a previous saved state, this is the state.
-     */
-    @CallSuper
-    public void onActivityCreated(@NonNull final View view, @NonNull final TActivity activity, @Nullable final Bundle savedInstanceState) {
-        //do nothing
     }
 
     private void callMethodAfterInstantiation(@NonNull final BiConsumer<View, TActivity> action) {
@@ -241,27 +225,6 @@ public abstract class ViewFragment<TActivity extends AppCompatActivity> extends 
         if (appeared) {
             onDisappear(view, activity);
         }
-    }
-
-    @Deprecated
-    @Override
-    public void onDestroyView() {
-        if (getView() == null) {
-            Lc.assertion("View shouldn't be null");
-            return;
-        }
-        onDestroyView(getView());
-        super.onDestroyView();
-    }
-
-    /**
-     * Replacement of {@link #onDestroyView} with non null activity as first parameter.
-     *
-     * @param view Instantiated view.
-     */
-    @CallSuper
-    protected void onDestroyView(@NonNull final View view) {
-        //do nothing
     }
 
 }

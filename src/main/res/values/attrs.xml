@@ -19,11 +19,6 @@
         <attr name="isMultiline" format="boolean"/>
     </declare-styleable>
 
-    <declare-styleable name="AspectRatioFrameLayout">
-        <attr name="aspectRatio" format="float" />
-        <attr name="wrapToContent" format="boolean" />
-    </declare-styleable>
-
     <declare-styleable name="MaterialLoadingBar">
         <attr name="strokeWidth" format="dimension"/>
         <attr name="color" format="color"/>

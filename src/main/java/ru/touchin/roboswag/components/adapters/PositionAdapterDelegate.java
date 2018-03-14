@@ -1,11 +1,10 @@
 package ru.touchin.roboswag.components.adapters;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import java.util.List;
-
-import ru.touchin.roboswag.components.utils.LifecycleBindable;
 
 /**
  * Objects of such class controls creation and binding of specific type of RecyclerView's ViewHolders.
@@ -16,8 +15,8 @@ import ru.touchin.roboswag.components.utils.LifecycleBindable;
  */
 public abstract class PositionAdapterDelegate<TViewHolder extends BindableViewHolder> extends AdapterDelegate<TViewHolder> {
 
-    public PositionAdapterDelegate(@NonNull final LifecycleBindable parentLifecycleBindable) {
-        super(parentLifecycleBindable);
+    public PositionAdapterDelegate(@NonNull final LifecycleOwner lifecycleOwner) {
+        super(lifecycleOwner);
     }
 
     /**

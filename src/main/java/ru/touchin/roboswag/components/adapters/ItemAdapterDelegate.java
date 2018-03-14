@@ -1,24 +1,23 @@
 package ru.touchin.roboswag.components.adapters;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import java.util.List;
-
-import ru.touchin.roboswag.components.utils.LifecycleBindable;
 
 /**
  * Objects of such class controls creation and binding of specific type of RecyclerView's ViewHolders.
  * Such delegates are creating and binding ViewHolders for specific items.
  * Default {@link #getItemViewType} is generating on construction of object.
  *
- * @param <TViewHolder> Type of {@link BindableViewHolder} of delegate;
- * @param <TItem>       Type of items to bind to {@link BindableViewHolder}s.
+ * @param <TViewHolder> Type of {@link LifecycleOwner} of delegate;
+ * @param <TItem>       Type of items to bind to {@link LifecycleOwner}s.
  */
 public abstract class ItemAdapterDelegate<TViewHolder extends BindableViewHolder, TItem> extends AdapterDelegate<TViewHolder> {
 
-    public ItemAdapterDelegate(@NonNull final LifecycleBindable parentLifecycleBindable) {
-        super(parentLifecycleBindable);
+    public ItemAdapterDelegate(@NonNull final LifecycleOwner lifecycleOwner) {
+        super(lifecycleOwner);
     }
 
     /**
@@ -61,8 +60,12 @@ public abstract class ItemAdapterDelegate<TViewHolder extends BindableViewHolder
      * @param positionInAdapter    Position of item in adapter;
      * @param positionInCollection Position of item in collection that contains item;
      */
-    public abstract void onBindViewHolder(@NonNull final TViewHolder holder, @NonNull final TItem item,
-                                          final int positionInAdapter, final int positionInCollection);
+    public abstract void onBindViewHolder(
+            @NonNull final TViewHolder holder,
+            @NonNull final TItem item,
+            final int positionInAdapter,
+            final int positionInCollection
+    );
 
     /**
      * Binds item with payloads to created by this object ViewHolder.
@@ -73,8 +76,13 @@ public abstract class ItemAdapterDelegate<TViewHolder extends BindableViewHolder
      * @param positionInAdapter    Position of item in adapter;
      * @param positionInCollection Position of item in collection that contains item;
      */
-    public void onBindViewHolder(@NonNull final TViewHolder holder, @NonNull final TItem item, @NonNull final List<Object> payloads,
-                                 final int positionInAdapter, final int positionInCollection) {
+    public void onBindViewHolder(
+            @NonNull final TViewHolder holder,
+            @NonNull final TItem item,
+            @NonNull final List<Object> payloads,
+            final int positionInAdapter,
+            final int positionInCollection
+    ) {
         //do nothing by default
     }
 

@@ -35,130 +35,52 @@ import android.view.inputmethod.InputMethodManager;
 
 import java.util.ArrayList;
 
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.subjects.BehaviorSubject;
-import ru.touchin.roboswag.components.utils.BaseLifecycleBindable;
-import ru.touchin.roboswag.components.utils.LifecycleBindable;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
-import ru.touchin.roboswag.core.utils.Optional;
-import ru.touchin.roboswag.core.utils.pairs.HalfNullablePair;
 
 /**
  * Created by Gavriil Sitnikov on 08/03/2016.
  * Base activity to use in components repository.
  */
-@SuppressWarnings("PMD.TooManyMethods")
-public abstract class BaseActivity extends AppCompatActivity
-        implements LifecycleBindable {
-
-    private static final String ACTIVITY_RESULT_CODE_EXTRA = "ACTIVITY_RESULT_CODE_EXTRA";
-    private static final String ACTIVITY_RESULT_DATA_EXTRA = "ACTIVITY_RESULT_DATA_EXTRA";
+public abstract class BaseActivity extends AppCompatActivity {
 
     @NonNull
     private final ArrayList<OnBackPressedListener> onBackPressedListeners = new ArrayList<>();
-    @NonNull
-    private final BaseLifecycleBindable baseLifecycleBindable = new BaseLifecycleBindable();
-    private boolean resumed;
-
-    @NonNull
-    private final BehaviorSubject<Optional<HalfNullablePair<Integer, Intent>>> lastActivityResult
-            = BehaviorSubject.createDefault(new Optional<HalfNullablePair<Integer, Intent>>(null));
-
-    /**
-     * Returns if activity resumed.
-     *
-     * @return True if resumed.
-     */
-    public boolean isActuallyResumed() {
-        return resumed;
-    }
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onCreate();
-        restoreLastActivityResult(savedInstanceState);
-    }
-
-    private void restoreLastActivityResult(@Nullable final Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            return;
-        }
-
-        lastActivityResult.onNext(new Optional<>(new HalfNullablePair<>(savedInstanceState.getInt(ACTIVITY_RESULT_CODE_EXTRA),
-                savedInstanceState.getParcelable(ACTIVITY_RESULT_DATA_EXTRA))));
     }
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this) + " requestCode: " + requestCode + "; resultCode: " + resultCode);
-        if (resultCode == RESULT_OK) {
-            lastActivityResult.onNext(new Optional<>(new HalfNullablePair<>(requestCode, data)));
-        }
-    }
-
-    /**
-     * Observes activity result by request code coming from {@link #onActivityResult(int, int, Intent)}
-     *
-     * @param requestCode Unique code to identify activity result;
-     * @return {@link Observable} which will emit data (Intents) from other activities (endlessly).
-     */
-    @NonNull
-    public Observable<Intent> observeActivityResult(final int requestCode) {
-        return lastActivityResult
-                .concatMap(optional -> {
-                    final HalfNullablePair<Integer, Intent> activityResult = optional.get();
-                    if (activityResult == null || activityResult.getFirst() != requestCode) {
-                        return Observable.empty();
-                    }
-                    return Observable.just(activityResult.getSecond() != null ? activityResult.getSecond() : new Intent())
-                            .doOnNext(result -> lastActivityResult.onNext(new Optional<>(null)));
-                });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onStart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        resumed = true;
-        baseLifecycleBindable.onResume();
     }
 
     @Override
     protected void onPause() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        resumed = false;
         super.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull final Bundle stateToSave) {
         super.onSaveInstanceState(stateToSave);
-        baseLifecycleBindable.onSaveInstanceState();
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        final HalfNullablePair<Integer, Intent> activityResult = lastActivityResult.getValue().get();
-        if (activityResult != null) {
-            stateToSave.putInt(ACTIVITY_RESULT_CODE_EXTRA, activityResult.getFirst());
-            if (activityResult.getSecond() != null) {
-                stateToSave.putParcelable(ACTIVITY_RESULT_DATA_EXTRA, activityResult.getSecond());
-            }
-        }
     }
 
     @Override
@@ -170,14 +92,12 @@ public abstract class BaseActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onStop();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
-        baseLifecycleBindable.onDestroy();
         super.onDestroy();
     }
 
@@ -229,7 +149,7 @@ public abstract class BaseActivity extends AppCompatActivity
      * @param resId The resource id to search for data;
      * @return Drawable An object that can be used to draw this resource.
      */
-    @NonNull
+    @Nullable
     public Drawable getDrawableCompat(@DrawableRes final int resId) {
         return ContextCompat.getDrawable(this, resId);
     }
@@ -257,187 +177,6 @@ public abstract class BaseActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("CPD-START")
-    //CPD: it's ok as it's LifecycleBindable
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable) {
-        return baseLifecycleBindable.untilStop(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return baseLifecycleBindable.untilStop(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable,
-                                    @NonNull final Consumer<T> onNextAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Observable<T> observable,
-                                    @NonNull final Consumer<T> onNextAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction,
-                                    @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilStop(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single) {
-        return baseLifecycleBindable.untilStop(single);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return baseLifecycleBindable.untilStop(single, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Single<T> single,
-                                    @NonNull final Consumer<T> onSuccessAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(single, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable) {
-        return baseLifecycleBindable.untilStop(completable);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilStop(completable, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilStop(@NonNull final Completable completable,
-                                @NonNull final Action onCompletedAction,
-                                @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(completable, onCompletedAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe) {
-        return baseLifecycleBindable.untilStop(maybe);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onSuccessAction) {
-        return baseLifecycleBindable.untilStop(maybe, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilStop(@NonNull final Maybe<T> maybe,
-                                    @NonNull final Consumer<T> onSuccessAction,
-                                    @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilStop(maybe, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable) {
-        return baseLifecycleBindable.untilDestroy(observable);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable, @NonNull final Consumer<T> onNextAction) {
-        return baseLifecycleBindable.untilDestroy(observable, onNextAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
-                                       @NonNull final Consumer<T> onNextAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Observable<T> observable,
-                                       @NonNull final Consumer<T> onNextAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction,
-                                       @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilDestroy(observable, onNextAction, onErrorAction, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single) {
-        return baseLifecycleBindable.untilDestroy(single);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single, @NonNull final Consumer<T> onSuccessAction) {
-        return baseLifecycleBindable.untilDestroy(single, onSuccessAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Single<T> single,
-                                       @NonNull final Consumer<T> onSuccessAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(single, onSuccessAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable) {
-        return baseLifecycleBindable.untilDestroy(completable);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable, @NonNull final Action onCompletedAction) {
-        return baseLifecycleBindable.untilDestroy(completable, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public Disposable untilDestroy(@NonNull final Completable completable,
-                                   @NonNull final Action onCompletedAction,
-                                   @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(completable, onCompletedAction, onErrorAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe) {
-        return baseLifecycleBindable.untilDestroy(maybe);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe, @NonNull final Consumer<T> onCompletedAction) {
-        return baseLifecycleBindable.untilDestroy(maybe, onCompletedAction);
-    }
-
-    @NonNull
-    @Override
-    public <T> Disposable untilDestroy(@NonNull final Maybe<T> maybe,
-                                       @NonNull final Consumer<T> onCompletedAction,
-                                       @NonNull final Consumer<Throwable> onErrorAction) {
-        return baseLifecycleBindable.untilDestroy(maybe, onCompletedAction, onErrorAction);
-    }
-
-    @SuppressWarnings("CPD-END")
     /*
      * Interface to be implemented for someone who want to intercept device back button pressing event.
      */

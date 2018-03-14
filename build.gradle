@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion compileSdk
@@ -15,6 +16,8 @@ android {
 
 dependencies {
     api project(':libraries:core')
+
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     compileOnly "com.android.support:appcompat-v7:$supportLibraryVersion"
     compileOnly "com.android.support:design:$supportLibraryVersion"
