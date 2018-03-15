@@ -26,4 +26,5 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
+    implementation "android.arch.paging:runtime:$pagingVersion"
 }
