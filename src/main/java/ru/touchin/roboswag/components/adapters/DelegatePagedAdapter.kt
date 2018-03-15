@@ -35,8 +35,6 @@ import ru.touchin.roboswag.components.utils.UiUtils
 import ru.touchin.roboswag.components.utils.lifecycle.Stopable
 import android.support.v7.util.DiffUtil
 import ru.touchin.roboswag.core.log.Lc
-import ru.touchin.roboswag.core.observables.collections.ObservableCollection
-import ru.touchin.roboswag.core.observables.collections.loadable.LoadingMoreList
 import ru.touchin.roboswag.core.utils.ShouldNotHappenException
 
 /**
