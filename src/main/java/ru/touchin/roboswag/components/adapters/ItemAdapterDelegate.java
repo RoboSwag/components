@@ -1,7 +1,7 @@
 package ru.touchin.roboswag.components.adapters;
 
-import android.arch.lifecycle.LifecycleOwner;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -11,14 +11,10 @@ import java.util.List;
  * Such delegates are creating and binding ViewHolders for specific items.
  * Default {@link #getItemViewType} is generating on construction of object.
  *
- * @param <TViewHolder> Type of {@link LifecycleViewHolder} of delegate;
- * @param <TItem>       Type of items to bind to {@link LifecycleViewHolder}s.
+ * @param <TViewHolder> Type of {@link RecyclerView.ViewHolder} of delegate;
+ * @param <TItem>       Type of items to bind to {@link RecyclerView.ViewHolder}s.
  */
-public abstract class ItemAdapterDelegate<TViewHolder extends LifecycleViewHolder, TItem> extends AdapterDelegate<TViewHolder> {
-
-    public ItemAdapterDelegate(@NonNull final LifecycleOwner lifecycleOwner) {
-        super(lifecycleOwner);
-    }
+public abstract class ItemAdapterDelegate<TViewHolder extends RecyclerView.ViewHolder, TItem> extends AdapterDelegate<TViewHolder> {
 
     /**
      * Returns if object is processable by this delegate.
