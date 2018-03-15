@@ -32,7 +32,7 @@ open class StateViewModel<TState : AbstractState>(application: Application,
         untilDestroy(Observable.just(Any()), Consumer { onStateCreated() })
     }
 
-    protected fun onStateCreated() {
+    protected open fun onStateCreated() {
 
     }
 

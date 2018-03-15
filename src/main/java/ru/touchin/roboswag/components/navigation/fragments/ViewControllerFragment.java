@@ -103,7 +103,7 @@ public class ViewControllerFragment<TState extends AbstractState, TActivity exte
 
     private ViewController viewController;
     private Disposable viewControllerSubscription;
-    private TState state;
+    public TState state;
     private boolean started;
     private boolean stateCreated;
 
@@ -199,9 +199,18 @@ public class ViewControllerFragment<TState extends AbstractState, TActivity exte
         } catch (ShouldNotHappenException ignored) {
             // ignored, it`s ok to get null state there
         }
+
         state = savedInstanceState != null
                 ? stateFromViewModel != null ? stateFromViewModel : (TState) savedInstanceState.getSerializable(VIEW_CONTROLLER_STATE_EXTRA)
                 : (getArguments() != null ? (TState) getArguments().getSerializable(VIEW_CONTROLLER_STATE_EXTRA) : null);
+        if (state != null) {
+            if (inDebugMode) {
+                state = reserialize(state);
+            }
+            tryCreateState(getContext());
+        } else if (isStateRequired()) {
+            Lc.assertion("State is required and null");
+        }
         if (stateFromViewModel == null) {
             try {
                 Method stateSetter = viewModelClass.getSuperclass().getDeclaredMethod("setState", state.getClass().getSuperclass());
@@ -211,14 +220,6 @@ public class ViewControllerFragment<TState extends AbstractState, TActivity exte
             } catch (NoSuchMethodException ignored) {
             } catch (InvocationTargetException ignored) {
             }
-        }
-        if (state != null) {
-            if (inDebugMode) {
-                state = reserialize(state);
-            }
-            tryCreateState(getContext());
-        } else if (isStateRequired()) {
-            Lc.assertion("State is required and null");
         }
 
         viewControllerSubscription = Observable
