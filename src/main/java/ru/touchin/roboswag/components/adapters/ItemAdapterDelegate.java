@@ -2,7 +2,6 @@ package ru.touchin.roboswag.components.adapters;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -14,72 +13,73 @@ import java.util.List;
  * @param <TViewHolder> Type of {@link RecyclerView.ViewHolder} of delegate;
  * @param <TItem>       Type of items to bind to {@link RecyclerView.ViewHolder}s.
  */
+@SuppressWarnings("unchecked")
 public abstract class ItemAdapterDelegate<TViewHolder extends RecyclerView.ViewHolder, TItem> extends AdapterDelegate<TViewHolder> {
+
+    @Override
+    public boolean isForViewType(@NonNull final List<Object> items, final int adapterPosition, final int collectionPosition) {
+        return collectionPosition >= 0
+                && collectionPosition < items.size()
+                && isForViewType(items.get(collectionPosition), adapterPosition, collectionPosition);
+    }
 
     /**
      * Returns if object is processable by this delegate.
-     * This item will be casted to {@link TItem} and passes to {@link #onBindViewHolder(TViewHolder, TItem, int, int)}.
+     * This item will be casted to {@link TItem} and passes to {@link #onBindViewHolder(TViewHolder, TItem, int, int, List)}.
      *
-     * @param item                   Item to check;
-     * @param positionInAdapter      Position of item in adapter;
-     * @param itemCollectionPosition Position of item in collection that contains item;
+     * @param item                  Item to check;
+     * @param adapterPosition       Position of item in adapter;
+     * @param collectionPosition    Position of item in collection that contains item;
      * @return True if item is processable by this delegate.
      */
-    public abstract boolean isForViewType(@NonNull final Object item, final int positionInAdapter, final int itemCollectionPosition);
+    public boolean isForViewType(@NonNull final Object item, final int adapterPosition, final int collectionPosition) {
+        return true;
+    }
+
+    @Override
+    public long getItemId(@NonNull final List<Object> items, final int adapterPosition, final int collectionPosition) {
+        return getItemId((TItem) items.get(collectionPosition), adapterPosition, collectionPosition);
+    }
 
     /**
      * Returns unique ID of item to support stable ID's logic of RecyclerView's adapter.
      *
-     * @param item                 Item to check;
-     * @param positionInAdapter    Position of item in adapter;
-     * @param positionInCollection Position of item in collection that contains item;
+     * @param item                 Item in adapter;
+     * @param adapterPosition      Position of item in adapter;
+     * @param collectionPosition   Position of item in collection that contains item;
      * @return Unique item ID.
      */
-    public long getItemId(@NonNull final TItem item, final int positionInAdapter, final int positionInCollection) {
+    public long getItemId(@NonNull final TItem item, final int adapterPosition, final int collectionPosition) {
         return 0;
     }
 
-    /**
-     * Creates ViewHolder to bind item to it later.
-     *
-     * @param parent Container of ViewHolder's view.
-     * @return New ViewHolder.
-     */
-    @NonNull
-    public abstract TViewHolder onCreateViewHolder(@NonNull final ViewGroup parent);
-
-    /**
-     * Binds item to created by this object ViewHolder.
-     *
-     * @param holder               ViewHolder to bind item to;
-     * @param item                 Item to check;
-     * @param positionInAdapter    Position of item in adapter;
-     * @param positionInCollection Position of item in collection that contains item;
-     */
-    public abstract void onBindViewHolder(
-            @NonNull final TViewHolder holder,
-            @NonNull final TItem item,
-            final int positionInAdapter,
-            final int positionInCollection
-    );
+    @Override
+    public void onBindViewHolder(
+            @NonNull final RecyclerView.ViewHolder holder,
+            @NonNull final List<Object> items,
+            final int adapterPosition,
+            final int collectionPosition,
+            @NonNull final List<Object> payloads
+    ) {
+        //noinspection unchecked
+        onBindViewHolder((TViewHolder) holder, (TItem) items.get(collectionPosition), adapterPosition, collectionPosition, payloads);
+    }
 
     /**
      * Binds item with payloads to created by this object ViewHolder.
      *
      * @param holder               ViewHolder to bind item to;
-     * @param item                 Item to check;
+     * @param item                 Item in adapter;
+     * @param adapterPosition      Position of item in adapter;
+     * @param collectionPosition   Position of item in collection that contains item;
      * @param payloads             Payloads;
-     * @param positionInAdapter    Position of item in adapter;
-     * @param positionInCollection Position of item in collection that contains item;
      */
-    public void onBindViewHolder(
+    public abstract void onBindViewHolder(
             @NonNull final TViewHolder holder,
             @NonNull final TItem item,
-            @NonNull final List<Object> payloads,
-            final int positionInAdapter,
-            final int positionInCollection
-    ) {
-        //do nothing by default
-    }
+            final int adapterPosition,
+            final int collectionPosition,
+            @NonNull final List<Object> payloads
+    );
 
 }
