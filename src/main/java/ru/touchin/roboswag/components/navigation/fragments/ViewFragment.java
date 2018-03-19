@@ -19,6 +19,7 @@
 
 package ru.touchin.roboswag.components.navigation.fragments;
 
+import android.arch.lifecycle.Lifecycle;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -42,7 +43,6 @@ import ru.touchin.roboswag.core.log.Lc;
 public abstract class ViewFragment<TActivity extends FragmentActivity> extends Fragment implements OnFragmentStartedListener {
 
     private boolean appeared;
-    private boolean started;
 
     /**
      * Returns if fragment have parent fragment.
@@ -111,7 +111,6 @@ public abstract class ViewFragment<TActivity extends FragmentActivity> extends F
     @Override
     public void onStart() {
         super.onStart();
-        started = true;
         callMethodAfterInstantiation(this::onStart);
     }
 
@@ -168,6 +167,7 @@ public abstract class ViewFragment<TActivity extends FragmentActivity> extends F
     public void setMenuVisibility(final boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
         if (getBaseActivity() != null && getView() != null) {
+            final boolean started = getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED);
             if (!appeared && menuVisible && started) {
                 onAppear(getView(), getBaseActivity());
             }
@@ -209,7 +209,6 @@ public abstract class ViewFragment<TActivity extends FragmentActivity> extends F
     @Deprecated
     @Override
     public void onStop() {
-        started = false;
         callMethodAfterInstantiation(this::onStop);
         super.onStop();
     }

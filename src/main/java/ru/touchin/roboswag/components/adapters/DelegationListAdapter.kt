@@ -41,18 +41,18 @@ open class DelegationListAdapter<TItem>(diffCallback: DiffUtil.ItemCallback<TIte
     final override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) = Unit
 
     /**
-     * Adds [ItemAdapterDelegate] to adapter.
+     * Adds [AdapterDelegate] to adapter.
      *
      * @param delegate Delegate to add.
      */
-    fun addDelegate(delegate: ItemAdapterDelegate<*, *>) = delegatesManager.addDelegate(delegate)
+    fun addDelegate(delegate: AdapterDelegate<*>) = delegatesManager.addDelegate(delegate)
 
     /**
-     * Adds [PositionAdapterDelegate] to adapter.
+     * Removes [AdapterDelegate] from adapter.
      *
-     * @param delegate Delegate to add.
+     * @param delegate Delegate to remove.
      */
-    fun addDelegate(delegate: PositionAdapterDelegate<*>) = delegatesManager.addDelegate(delegate)
+    fun removeDelegate(delegate: AdapterDelegate<*>) = delegatesManager.removeDelegate(delegate)
 
     /**
      * Submits a new list to be diffed, and displayed.

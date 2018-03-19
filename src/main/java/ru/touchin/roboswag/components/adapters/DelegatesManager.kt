@@ -18,7 +18,7 @@ class DelegatesManager {
                 return delegate.itemViewType
             }
         }
-        throw IllegalStateException("Delegate not found")
+        throw IllegalStateException("Delegate not found for adapterPosition: $adapterPosition")
     }
 
     fun getItemId(items: List<*>, adapterPosition: Int, collectionPosition: Int): Long {
@@ -34,18 +34,11 @@ class DelegatesManager {
     }
 
     /**
-     * Adds [ItemAdapterDelegate] to adapter.
-     *
-     * @param delegate Delegate to add.
-     */
-    fun addDelegate(delegate: ItemAdapterDelegate<*, *>) = delegates.put(delegate.itemViewType, delegate)
-
-    /**
      * Adds [PositionAdapterDelegate] to adapter.
      *
      * @param delegate Delegate to add.
      */
-    fun addDelegate(delegate: PositionAdapterDelegate<*>) = delegates.put(delegate.itemViewType, delegate)
+    fun addDelegate(delegate: AdapterDelegate<*>) = delegates.put(delegate.itemViewType, delegate)
 
     /**
      * Removes [AdapterDelegate] from adapter.

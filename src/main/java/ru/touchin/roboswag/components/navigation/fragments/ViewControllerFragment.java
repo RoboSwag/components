@@ -107,6 +107,8 @@ public class ViewControllerFragment<TState extends Parcelable, TActivity extends
     private ViewController viewController;
     private Class<ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>> viewControllerClass;
     private TState state;
+    @Nullable
+    private ActivityResult pendingActivityResult;
 
     /**
      * Returns specific {@link Parcelable} which contains state of fragment and it's {@link ViewController}.
@@ -192,6 +194,10 @@ public class ViewControllerFragment<TState extends Parcelable, TActivity extends
         //noinspection ConstantConditions
         viewController = createViewController(requireActivity(), (PlaceholderView) getView(), savedInstanceState);
         viewController.onCreate();
+        if (pendingActivityResult != null) {
+            viewController.onActivityResult(pendingActivityResult.requestCode, pendingActivityResult.resultCode, pendingActivityResult.data);
+            pendingActivityResult = null;
+        }
         requireActivity().invalidateOptionsMenu();
     }
 
@@ -286,8 +292,9 @@ public class ViewControllerFragment<TState extends Parcelable, TActivity extends
     public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
         if (viewController != null) {
             viewController.onActivityResult(requestCode, resultCode, data);
+        } else {
+            pendingActivityResult = new ActivityResult(requestCode, resultCode, data);
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private static class PlaceholderView extends FrameLayout {
@@ -321,6 +328,19 @@ public class ViewControllerFragment<TState extends Parcelable, TActivity extends
             }
         }
 
+    }
+
+    private static class ActivityResult {
+        final int requestCode;
+        final int resultCode;
+        @Nullable
+        final Intent data;
+
+        ActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
+            this.requestCode = requestCode;
+            this.resultCode = resultCode;
+            this.data = data;
+        }
     }
 
 }
