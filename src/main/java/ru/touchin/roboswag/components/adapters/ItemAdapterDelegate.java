@@ -13,7 +13,6 @@ import java.util.List;
  * @param <TViewHolder> Type of {@link RecyclerView.ViewHolder} of delegate;
  * @param <TItem>       Type of items to bind to {@link RecyclerView.ViewHolder}s.
  */
-@SuppressWarnings("unchecked")
 public abstract class ItemAdapterDelegate<TViewHolder extends RecyclerView.ViewHolder, TItem> extends AdapterDelegate<TViewHolder> {
 
     @Override
@@ -38,6 +37,7 @@ public abstract class ItemAdapterDelegate<TViewHolder extends RecyclerView.ViewH
 
     @Override
     public long getItemId(@NonNull final List<Object> items, final int adapterPosition, final int collectionPosition) {
+        //noinspection unchecked
         return getItemId((TItem) items.get(collectionPosition), adapterPosition, collectionPosition);
     }
 

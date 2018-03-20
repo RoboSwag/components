@@ -47,7 +47,6 @@ class DelegatesManager {
      */
     fun removeDelegate(delegate: AdapterDelegate<*>) = delegates.remove(delegate.itemViewType)
 
-    private fun getDelegate(viewType: Int): AdapterDelegate<*> =
-            delegates[viewType] ?: throw IllegalStateException("No AdapterDelegate added for view type: $viewType")
+    private fun getDelegate(viewType: Int) = delegates[viewType] ?: throw IllegalStateException("No AdapterDelegate added for view type: $viewType")
 
 }

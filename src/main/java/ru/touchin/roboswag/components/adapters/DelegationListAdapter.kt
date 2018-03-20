@@ -9,31 +9,35 @@ import android.view.ViewGroup
 /**
  * Base adapter with delegation and diff computing on background thread.
  */
-open class DelegationListAdapter<TItem>(diffCallback: DiffUtil.ItemCallback<TItem>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+open class DelegationListAdapter<TItem>(config: AsyncDifferConfig<TItem>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    constructor(diffCallback: DiffUtil.ItemCallback<TItem>) : this(AsyncDifferConfig.Builder<TItem>(diffCallback).build())
 
     var itemClickListener: ((TItem, RecyclerView.ViewHolder) -> Unit)? = null
 
     private val delegatesManager = DelegatesManager()
-    private var differ = AsyncListDiffer(OffsetAdapterUpdateCallback(this, ::getHeadersCount), AsyncDifferConfig.Builder<TItem>(diffCallback).build())
+    private var differ = AsyncListDiffer(OffsetAdapterUpdateCallback(this, ::getHeadersCount), config)
 
-    open fun getHeadersCount(): Int = 0
+    open fun getHeadersCount() = 0
 
-    open fun getFootersCount(): Int = 0
+    open fun getFootersCount() = 0
 
-    override fun getItemCount(): Int = getHeadersCount() + differ.currentList.size + getFootersCount()
+    override fun getItemCount() = getHeadersCount() + getList().size + getFootersCount()
 
-    override fun getItemViewType(position: Int): Int = delegatesManager.getItemViewType(getList(), position, getCollectionPosition(position))
+    override fun getItemViewType(position: Int) = delegatesManager.getItemViewType(getList(), position, getCollectionPosition(position))
 
-    override fun getItemId(position: Int): Long = delegatesManager.getItemId(getList(), position, getCollectionPosition(position))
+    override fun getItemId(position: Int) = delegatesManager.getItemId(getList(), position, getCollectionPosition(position))
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = delegatesManager.onCreateViewHolder(parent, viewType)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = delegatesManager.onCreateViewHolder(parent, viewType)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any>) {
         val collectionPosition = getCollectionPosition(position)
-        if (itemClickListener != null && collectionPosition in 0 until getList().size) {
-            holder.itemView.setOnClickListener { itemClickListener?.invoke(getList()[collectionPosition], holder) }
-        } else {
-            holder.itemView.setOnClickListener(null)
+        if (collectionPosition in 0 until getList().size) {
+            if (itemClickListener != null) {
+                holder.itemView.setOnClickListener { itemClickListener?.invoke(getList()[collectionPosition], holder) }
+            } else {
+                holder.itemView.setOnClickListener(null)
+            }
         }
         delegatesManager.onBindViewHolder(holder, getList(), position, collectionPosition, payloads)
     }
@@ -77,6 +81,6 @@ open class DelegationListAdapter<TItem>(diffCallback: DiffUtil.ItemCallback<TIte
      */
     fun getList(): List<TItem> = differ.currentList
 
-    fun getCollectionPosition(adapterPosition: Int): Int = adapterPosition - getHeadersCount()
+    fun getCollectionPosition(adapterPosition: Int) = adapterPosition - getHeadersCount()
 
 }
