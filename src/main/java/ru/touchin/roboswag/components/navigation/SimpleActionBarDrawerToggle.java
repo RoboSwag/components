@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import ru.touchin.roboswag.components.navigation.activities.BaseActivity;
+import ru.touchin.roboswag.components.utils.UiUtils;
 
 /**
  * Created by Gavriil Sitnikov on 11/03/16.
@@ -206,7 +207,7 @@ public class SimpleActionBarDrawerToggle extends ActionBarDrawerToggle
     @Override
     public void onDrawerClosed(@NonNull final View view) {
         if (isInvalidateOptionsMenuSupported) {
-            activity.supportInvalidateOptionsMenu();
+            activity.invalidateOptionsMenu();
         }
     }
 
@@ -221,9 +222,9 @@ public class SimpleActionBarDrawerToggle extends ActionBarDrawerToggle
 
     @Override
     public void onDrawerOpened(@NonNull final View drawerView) {
-        activity.hideSoftInput();
+        UiUtils.OfViews.hideSoftInput(activity);
         if (isInvalidateOptionsMenuSupported) {
-            activity.supportInvalidateOptionsMenu();
+            activity.invalidateOptionsMenu();
         }
     }
 

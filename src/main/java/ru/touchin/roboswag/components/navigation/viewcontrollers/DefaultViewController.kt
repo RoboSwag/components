@@ -10,7 +10,7 @@ abstract class DefaultViewController<TActivity : FragmentActivity, TState : Parc
         @LayoutRes layoutRes: Int,
         creationContext: CreationContext,
         savedInstanceState: Bundle?
-) : ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>(
+) : ViewController<TActivity, ViewControllerFragment<TActivity, TState>, TState>(
         creationContext,
         savedInstanceState
 ) {

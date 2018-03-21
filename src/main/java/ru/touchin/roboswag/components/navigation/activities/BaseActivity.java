@@ -19,21 +19,14 @@
 
 package ru.touchin.roboswag.components.navigation.activities;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.util.ArraySet;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
-import java.util.ArrayList;
+import java.util.Set;
 
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
@@ -45,7 +38,7 @@ import ru.touchin.roboswag.core.log.Lc;
 public abstract class BaseActivity extends AppCompatActivity {
 
     @NonNull
-    private final ArrayList<OnBackPressedListener> onBackPressedListeners = new ArrayList<>();
+    private final Set<OnBackPressedListener> onBackPressedListeners = new ArraySet<>();
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -101,59 +94,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    /**
-     * Hides device keyboard that is showing over {@link Activity}.
-     * Do NOT use it if keyboard is over {@link android.app.Dialog} - it won't work as they have different {@link Activity#getWindow()}.
-     */
-    public void hideSoftInput() {
-        if (getCurrentFocus() == null) {
-            return;
-        }
-        final InputMethodManager inputManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-        getWindow().getDecorView().requestFocus();
-    }
-
-    /**
-     * Shows device keyboard over {@link Activity} and focuses {@link View}.
-     * Do NOT use it if keyboard is over {@link android.app.Dialog} - it won't work as they have different {@link Activity#getWindow()}.
-     * Do NOT use it if you are not sure that view is already added on screen.
-     * Better use it onStart of element if view is part of it or onConfigureNavigation if view is part of navigation.
-     *
-     * @param view View to get focus for input from keyboard.
-     */
-    public void showSoftInput(@NonNull final View view) {
-        view.requestFocus();
-        final InputMethodManager inputManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        inputManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-    }
-
-    /**
-     * Return the color value associated with a particular resource ID.
-     * Starting in {@link android.os.Build.VERSION_CODES#M}, the returned
-     * color will be styled for the specified Context's theme.
-     *
-     * @param resId The resource id to search for data;
-     * @return int A single color value in the form 0xAARRGGBB.
-     */
-    @ColorInt
-    public int getColorCompat(@ColorRes final int resId) {
-        return ContextCompat.getColor(this, resId);
-    }
-
-    /**
-     * Returns a drawable object associated with a particular resource ID.
-     * Starting in {@link android.os.Build.VERSION_CODES#LOLLIPOP}, the
-     * returned drawable will be styled for the specified Context's theme.
-     *
-     * @param resId The resource id to search for data;
-     * @return Drawable An object that can be used to draw this resource.
-     */
-    @Nullable
-    public Drawable getDrawableCompat(@DrawableRes final int resId) {
-        return ContextCompat.getDrawable(this, resId);
-    }
-
     public void addOnBackPressedListener(@NonNull final OnBackPressedListener onBackPressedListener) {
         onBackPressedListeners.add(onBackPressedListener);
     }
@@ -169,12 +109,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 return;
             }
         }
-
-        if (getSupportFragmentManager().getBackStackEntryCount() <= 1) {
-            supportFinishAfterTransition();
-        } else {
-            getSupportFragmentManager().popBackStack();
-        }
+        super.onBackPressed();
     }
 
     /*

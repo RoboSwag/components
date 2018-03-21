@@ -51,7 +51,7 @@ import ru.touchin.roboswag.core.log.Lc;
  */
 public class ViewController<
         TActivity extends FragmentActivity,
-        TFragment extends ViewControllerFragment<TState, TActivity>,
+        TFragment extends ViewControllerFragment<TActivity, TState>,
         TState extends Parcelable> implements LifecycleOwner {
 
     @NonNull
@@ -276,7 +276,7 @@ public class ViewController<
      * Callback from parent fragment.
      */
     public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
-        UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
+        // do nothing
     }
 
     /**

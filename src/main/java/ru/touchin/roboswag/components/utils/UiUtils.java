@@ -41,6 +41,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
@@ -304,6 +305,42 @@ public final class UiUtils {
                 return view.getResources().getResourceName(view.getId());
             } catch (final Resources.NotFoundException exception) {
                 return String.valueOf(view.getId());
+            }
+        }
+
+        /**
+         * Hides device keyboard for target activity.
+         */
+        public static void hideSoftInput(@NonNull final Activity activity) {
+            final View focusedView = activity.getCurrentFocus();
+            if (focusedView != null) {
+                hideSoftInput(focusedView);
+            }
+        }
+
+        /**
+         * Hides device keyboard for target view.
+         */
+        public static void hideSoftInput(@NonNull final View view) {
+            view.clearFocus();
+            final InputMethodManager inputManager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (inputManager != null) {
+                inputManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }
+
+        /**
+         * Shows device keyboard over {@link Activity} and focuses {@link View}.
+         * Do NOT use it if keyboard is over {@link android.app.Dialog} - it won't work as they have different {@link Activity#getWindow()}.
+         * Do NOT use it if you are not sure that view is already added on screen.
+         *
+         * @param view View to get focus for input from keyboard.
+         */
+        public static void showSoftInput(@NonNull final View view) {
+            view.requestFocus();
+            final InputMethodManager inputManager = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (inputManager != null) {
+                inputManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
             }
         }
 

@@ -51,7 +51,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  * @param <TState>    Type of object which is representing it's fragment state;
  * @param <TActivity> Type of {@link FragmentActivity} where fragment could be attached to.
  */
-public class ViewControllerFragment<TState extends Parcelable, TActivity extends FragmentActivity> extends ViewFragment<TActivity> {
+public class ViewControllerFragment<TActivity extends FragmentActivity, TState extends Parcelable> extends ViewFragment<TActivity> {
 
     private static final String VIEW_CONTROLLER_CLASS_EXTRA = "VIEW_CONTROLLER_CLASS_EXTRA";
     private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
@@ -105,7 +105,7 @@ public class ViewControllerFragment<TState extends Parcelable, TActivity extends
 
     @Nullable
     private ViewController viewController;
-    private Class<ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>> viewControllerClass;
+    private Class<ViewController<TActivity, ViewControllerFragment<TActivity, TState>, TState>> viewControllerClass;
     private TState state;
     @Nullable
     private ActivityResult pendingActivityResult;
@@ -127,7 +127,7 @@ public class ViewControllerFragment<TState extends Parcelable, TActivity extends
         setHasOptionsMenu(!isChildFragment());
 
         //noinspection unchecked
-        viewControllerClass = (Class<ViewController<TActivity, ViewControllerFragment<TState, TActivity>, TState>>)
+        viewControllerClass = (Class<ViewController<TActivity, ViewControllerFragment<TActivity, TState>, TState>>)
                 getArguments().getSerializable(VIEW_CONTROLLER_CLASS_EXTRA);
         state = savedInstanceState != null
                 ? savedInstanceState.getParcelable(VIEW_CONTROLLER_STATE_EXTRA)
