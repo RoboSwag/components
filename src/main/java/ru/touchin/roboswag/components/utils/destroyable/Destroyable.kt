@@ -1,6 +1,7 @@
 package ru.touchin.roboswag.components.utils.destroyable
 
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -22,6 +23,24 @@ interface Destroyable {
             Lc.assertion(ShouldNotHappenException("Unexpected error on $method at $codePoint", throwable))
         }
     }
+
+    /**
+     * Method should be used to guarantee that observable won't be subscribed after onDestroy.
+     * It is automatically subscribing to the observable and calls onNextAction and onErrorAction on observable events.
+     * Don't forget to process errors if observable can emit them.
+     *
+     * @param flowable      [Flowable] to subscribe until onDestroy;
+     * @param onNextAction  Action which will raise on every [io.reactivex.Emitter.onNext] item;
+     * @param onErrorAction Action which will raise on every [io.reactivex.Emitter.onError] throwable;
+     * @param T             Type of emitted by observable items;
+     * @return [Disposable] which is wrapping source observable to unsubscribe from it onDestroy.
+     */
+    fun <T> untilDestroy(
+            flowable: Flowable<T>,
+            onNextAction: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
+            onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
+            onCompletedAction: () -> Unit = Functions.EMPTY_ACTION::run
+    ): Disposable
 
     /**
      * Method should be used to guarantee that observable won't be subscribed after onDestroy.

@@ -1,6 +1,7 @@
 package ru.touchin.roboswag.components.utils.destroyable
 
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -20,6 +21,16 @@ open class BaseDestroyable : Destroyable {
      * Call it on parent's onDestroy method.
      */
     fun onDestroy() = subscriptions.dispose()
+
+    override fun <T> untilDestroy(
+            flowable: Flowable<T>,
+            onNextAction: (T) -> Unit,
+            onErrorAction: (Throwable) -> Unit,
+            onCompletedAction: () -> Unit
+    ): Disposable = flowable
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(onNextAction, onErrorAction, onCompletedAction)
+            .also { subscriptions.add(it) }
 
     override fun <T> untilDestroy(
             observable: Observable<T>,
