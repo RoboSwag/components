@@ -174,13 +174,24 @@ public class ViewController<
     }
 
     /**
+     * Return a localized, styled CharSequence from the application's package's
+     * default string table.
+     *
+     * @param resId Resource id for the CharSequence text
+     */
+    @NonNull
+    public final CharSequence getText(@StringRes final int resId) {
+        return activity.getText(resId);
+    }
+
+    /**
      * Return a localized string from the application's package's default string table.
      *
      * @param resId Resource id for the string
      */
     @NonNull
     public final String getString(@StringRes final int resId) {
-        return getActivity().getString(resId);
+        return activity.getString(resId);
     }
 
     /**
@@ -192,7 +203,7 @@ public class ViewController<
      */
     @NonNull
     public final String getString(@StringRes final int resId, @NonNull final Object... formatArgs) {
-        return getActivity().getString(resId, formatArgs);
+        return activity.getString(resId, formatArgs);
     }
 
     /**
@@ -223,7 +234,7 @@ public class ViewController<
      */
     @Nullable
     public final ColorStateList getColorStateList(@ColorRes final int resId) {
-        return ContextCompat.getColorStateList(getActivity(), resId);
+        return ContextCompat.getColorStateList(activity, resId);
     }
 
     /**
@@ -236,7 +247,7 @@ public class ViewController<
      */
     @Nullable
     public final Drawable getDrawable(@DrawableRes final int resId) {
-        return ContextCompat.getDrawable(getActivity(), resId);
+        return ContextCompat.getDrawable(activity, resId);
     }
 
     /**

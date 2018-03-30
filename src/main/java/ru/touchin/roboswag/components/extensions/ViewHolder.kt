@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
+import android.support.annotation.DrawableRes
 import android.support.annotation.IdRes
 import android.support.annotation.StringRes
 import android.support.v4.content.ContextCompat
@@ -23,4 +24,4 @@ fun RecyclerView.ViewHolder.getColor(@ColorRes resId: Int): Int = ContextCompat.
 
 fun RecyclerView.ViewHolder.getColorStateList(@ColorRes resId: Int): ColorStateList? = ContextCompat.getColorStateList(itemView.context, resId)
 
-fun RecyclerView.ViewHolder.getDrawable(@ColorRes resId: Int): Drawable? = ContextCompat.getDrawable(itemView.context, resId)
+fun RecyclerView.ViewHolder.getDrawable(@DrawableRes resId: Int): Drawable? = ContextCompat.getDrawable(itemView.context, resId)
