@@ -21,17 +21,12 @@ package ru.touchin.roboswag.components.utils;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -43,9 +38,6 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.log.LcGroup;
 
 /**
@@ -62,12 +54,6 @@ public final class UiUtils {
      * Logging group to log UI lifecycle (onCreate, onStart, onResume etc.).
      */
     public static final LcGroup UI_LIFECYCLE_LC_GROUP = new LcGroup("UI_LIFECYCLE");
-    /**
-     * Delay to let user view ripple effect before screen changed.
-     */
-    public static final long RIPPLE_EFFECT_DELAY = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 150 : 0;
-
-    private static final Handler RIPPLE_HANDLER = new Handler(Looper.getMainLooper());
 
     /**
      * Method to inflate view with right layout parameters based on container and add inflated view as a child to it.
@@ -92,61 +78,6 @@ public final class UiUtils {
     @NonNull
     public static View inflate(@LayoutRes final int layoutId, @NonNull final ViewGroup parent) {
         return LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
-    }
-
-    /**
-     * Sets click listener to view. On click it will call something after delay.
-     *
-     * @param targetView      View to set click listener to;
-     * @param onClickListener Click listener;
-     * @param delay           Delay after which click listener will be called.
-     */
-    public static void setOnRippleClickListener(@NonNull final View targetView, @Nullable final Action onClickListener, final long delay) {
-        setOnRippleClickListener(targetView, onClickListener != null ? view -> onClickListener.run() : null, delay);
-    }
-
-    /**
-     * Sets click listener to view. On click it will call something with {@link #RIPPLE_EFFECT_DELAY}.
-     *
-     * @param targetView      View to set click listener to;
-     * @param onClickListener Click listener.
-     */
-    public static void setOnRippleClickListener(@NonNull final View targetView, @Nullable final Action onClickListener) {
-        setOnRippleClickListener(targetView, onClickListener != null ? view -> onClickListener.run() : null, RIPPLE_EFFECT_DELAY);
-    }
-
-    /**
-     * Sets click listener to view. On click it will call something after delay.
-     *
-     * @param targetView      View to set click listener to;
-     * @param onClickListener Click listener;
-     * @param delay           Delay after which click listener will be called.
-     */
-    public static void setOnRippleClickListener(@NonNull final View targetView, @Nullable final Consumer<View> onClickListener, final long delay) {
-        if (onClickListener == null) {
-            targetView.setOnClickListener(null);
-            return;
-        }
-
-        final Runnable runnable = () -> {
-            final Context context = targetView.getContext();
-            if (targetView.getWindowVisibility() != View.VISIBLE
-                    || !targetView.hasWindowFocus()
-                    || (context instanceof LifecycleOwner
-                    && !((LifecycleOwner) context).getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED))) {
-                return;
-            }
-            try {
-                onClickListener.accept(targetView);
-            } catch (final Exception exception) {
-                Lc.assertion(exception);
-            }
-        };
-
-        targetView.setOnClickListener(v -> {
-            RIPPLE_HANDLER.removeCallbacksAndMessages(null);
-            RIPPLE_HANDLER.postDelayed(runnable, delay);
-        });
     }
 
     private UiUtils() {

@@ -5,6 +5,7 @@ import android.support.v7.recyclerview.extensions.AsyncListDiffer
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import ru.touchin.roboswag.components.extensions.setOnRippleClickListener
 
 /**
  * Base adapter with delegation and diff computing on background thread.
@@ -34,7 +35,7 @@ open class DelegationListAdapter<TItem>(config: AsyncDifferConfig<TItem>) : Recy
         val collectionPosition = getCollectionPosition(position)
         if (collectionPosition in 0 until getList().size) {
             if (itemClickListener != null) {
-                holder.itemView.setOnClickListener { itemClickListener?.invoke(getList()[collectionPosition], holder) }
+                holder.itemView.setOnRippleClickListener { itemClickListener?.invoke(getList()[collectionPosition], holder) }
             } else {
                 holder.itemView.setOnClickListener(null)
             }
