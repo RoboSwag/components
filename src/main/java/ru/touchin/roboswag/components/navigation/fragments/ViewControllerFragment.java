@@ -85,7 +85,7 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         parcel = Parcel.obtain();
         parcel.unmarshall(serializableBytes, 0, serializableBytes.length);
         parcel.setDataPosition(0);
-        final T result = parcel.readParcelable(parcelable.getClass().getClassLoader());
+        final T result = parcel.readParcelable(Thread.currentThread().getContextClassLoader());
         parcel.recycle();
         return result;
     }
@@ -331,12 +331,11 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
 
     }
 
-    @SuppressWarnings("PMD.DefaultPackage")
     private static class ActivityResult {
-        final int requestCode;
-        final int resultCode;
+        public final int requestCode;
+        public final int resultCode;
         @Nullable
-        final Intent data;
+        public final Intent data;
 
         ActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
             this.requestCode = requestCode;
