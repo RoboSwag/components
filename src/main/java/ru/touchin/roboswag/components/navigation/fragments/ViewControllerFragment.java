@@ -75,7 +75,6 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         ViewControllerFragment.acceptableUiCalculationTime = acceptableUiCalculationTime;
     }
 
-    @SuppressWarnings("PMD.UseProperClassLoader")
     @NonNull
     private static <T extends Parcelable> T reserialize(@NonNull final T parcelable) {
         Parcel parcel = Parcel.obtain();
