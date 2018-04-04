@@ -94,7 +94,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
                 targetRequestCode,
                 true,
                 ViewControllerFragment.args(viewControllerClass, state),
-                viewControllerClass.name + ';'.toString() + WITH_TARGET_FRAGMENT_TAG_MARK,
+                null,
                 transactionSetup
         )
     }
@@ -111,15 +111,16 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
     fun <TState : Parcelable> setViewControllerAsTop(
             viewControllerClass: Class<out ViewController<TActivity, ViewControllerFragment<TActivity, TState>, TState>>,
             state: TState,
+            addToStack: Boolean = true,
             transactionSetup: ((FragmentTransaction) -> Unit)? = null
     ) {
         addToStack(
                 ViewControllerFragment::class.java,
                 null,
                 0,
-                true,
+                addToStack,
                 ViewControllerFragment.args(viewControllerClass, state),
-                viewControllerClass.name + ';'.toString() + TOP_FRAGMENT_TAG_MARK,
+                "${viewControllerClass.name};$TOP_FRAGMENT_TAG_MARK",
                 transactionSetup
         )
     }
@@ -139,7 +140,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
             transactionSetup: ((FragmentTransaction) -> Unit)? = null
     ) {
         beforeSetInitialActions()
-        setViewControllerAsTop(viewControllerClass, state, transactionSetup)
+        setViewControllerAsTop(viewControllerClass, state, false, transactionSetup)
     }
 
 }

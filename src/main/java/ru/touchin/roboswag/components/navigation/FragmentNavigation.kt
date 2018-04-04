@@ -52,7 +52,6 @@ open class FragmentNavigation(
 
     companion object {
         const val TOP_FRAGMENT_TAG_MARK = "TOP_FRAGMENT"
-        const val WITH_TARGET_FRAGMENT_TAG_MARK = "FRAGMENT_WITH_TARGET"
     }
 
     /**
@@ -206,7 +205,7 @@ open class FragmentNavigation(
                 targetRequestCode,
                 true,
                 args,
-                fragmentClass.name + ';'.toString() + WITH_TARGET_FRAGMENT_TAG_MARK,
+                null,
                 transactionSetup
         )
     }
@@ -222,9 +221,10 @@ open class FragmentNavigation(
     fun setAsTop(
             fragmentClass: Class<out Fragment>,
             args: Bundle? = null,
+            addToStack: Boolean = true,
             transactionSetup: ((FragmentTransaction) -> Unit)? = null
     ) {
-        addToStack(fragmentClass, null, 0, true, args, fragmentClass.name + ';'.toString() + TOP_FRAGMENT_TAG_MARK, transactionSetup)
+        addToStack(fragmentClass, null, 0, addToStack, args, "${fragmentClass.name};$TOP_FRAGMENT_TAG_MARK", transactionSetup)
     }
 
     /**
@@ -241,7 +241,7 @@ open class FragmentNavigation(
             transactionSetup: ((FragmentTransaction) -> Unit)? = null
     ) {
         beforeSetInitialActions()
-        setAsTop(fragmentClass, args, transactionSetup)
+        setAsTop(fragmentClass, args, false, transactionSetup)
     }
 
     /**
