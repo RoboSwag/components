@@ -95,16 +95,6 @@ public class ViewController<
     }
 
     /**
-     * Returns state from fragment.
-     *
-     * @return Returns state.
-     */
-    @NonNull
-    public final TState getState() {
-        return fragment.getState();
-    }
-
-    /**
      * Returns fragment where {@link ViewController} could be.
      *
      * @return Returns fragment.
@@ -115,13 +105,23 @@ public class ViewController<
     }
 
     /**
+     * Returns state from fragment.
+     *
+     * @return Returns state.
+     */
+    @NonNull
+    protected final TState getState() {
+        return fragment.getState();
+    }
+
+    /**
      * Returns view instantiated in {@link #getFragment()} fragment attached to {@link #getActivity()} activity.
      * Use it to inflate your views into at construction of this {@link ViewController}.
      *
      * @return Returns view.
      */
     @NonNull
-    public final ViewGroup getContainer() {
+    protected final ViewGroup getContainer() {
         return container;
     }
 
@@ -131,7 +131,7 @@ public class ViewController<
      *
      * @param layoutResId Resource ID to be inflated.
      */
-    public final void setContentView(@LayoutRes final int layoutResId) {
+    protected final void setContentView(@LayoutRes final int layoutResId) {
         if (getContainer().getChildCount() > 0) {
             getContainer().removeAllViews();
         }
@@ -144,7 +144,7 @@ public class ViewController<
      *
      * @param view The desired content to display.
      */
-    public final void setContentView(@NonNull final View view) {
+    protected final void setContentView(@NonNull final View view) {
         setContentView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
@@ -155,7 +155,7 @@ public class ViewController<
      * @param view         The desired content to display;
      * @param layoutParams Layout parameters for the view.
      */
-    public final void setContentView(@NonNull final View view, @NonNull final ViewGroup.LayoutParams layoutParams) {
+    protected final void setContentView(@NonNull final View view, @NonNull final ViewGroup.LayoutParams layoutParams) {
         if (getContainer().getChildCount() > 0) {
             getContainer().removeAllViews();
         }
@@ -248,6 +248,14 @@ public class ViewController<
     @Nullable
     public final Drawable getDrawable(@DrawableRes final int resId) {
         return ContextCompat.getDrawable(activity, resId);
+    }
+
+    public final void startActivity(@NonNull final Intent intent) {
+        fragment.startActivity(intent);
+    }
+
+    public final void startActivityForResult(@NonNull final Intent intent, final int requestCode) {
+        fragment.startActivityForResult(intent, requestCode);
     }
 
     /**
