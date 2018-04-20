@@ -105,7 +105,7 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
 
     @Nullable
     private ViewController viewController;
-    private Class<ViewController<TActivity, ViewControllerFragment<TActivity, TState>, TState>> viewControllerClass;
+    private Class<ViewController<TActivity, TState>> viewControllerClass;
     private TState state;
     @Nullable
     private ActivityResult pendingActivityResult;
@@ -127,8 +127,7 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         setHasOptionsMenu(!isChildFragment());
 
         //noinspection unchecked
-        viewControllerClass = (Class<ViewController<TActivity, ViewControllerFragment<TActivity, TState>, TState>>)
-                getArguments().getSerializable(VIEW_CONTROLLER_CLASS_EXTRA);
+        viewControllerClass = (Class<ViewController<TActivity, TState>>) getArguments().getSerializable(VIEW_CONTROLLER_CLASS_EXTRA);
         state = savedInstanceState != null
                 ? savedInstanceState.getParcelable(VIEW_CONTROLLER_STATE_EXTRA)
                 : (getArguments() != null ? getArguments().getParcelable(VIEW_CONTROLLER_STATE_EXTRA) : null);

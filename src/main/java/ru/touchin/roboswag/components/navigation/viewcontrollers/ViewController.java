@@ -54,19 +54,16 @@ import ru.touchin.roboswag.core.log.Lc;
  * Class to control view of specific fragment, activity and application by logic bridge.
  *
  * @param <TActivity> Type of activity where such {@link ViewController} could be;
- * @param <TFragment> Type of fragment where such {@link ViewController} could be;
+ * @param <TState> Type of state;
  */
-public class ViewController<
-        TActivity extends FragmentActivity,
-        TFragment extends ViewControllerFragment<TActivity, TState>,
-        TState extends Parcelable> implements LifecycleOwner {
+public class ViewController<TActivity extends FragmentActivity, TState extends Parcelable> implements LifecycleOwner {
 
     @NonNull
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
     @NonNull
     private final TActivity activity;
     @NonNull
-    private final TFragment fragment;
+    private final ViewControllerFragment<TActivity, TState> fragment;
     @NonNull
     private final ViewGroup container;
 
@@ -74,7 +71,7 @@ public class ViewController<
     //UnusedFormalParameter: savedInstanceState could be used by children
     public ViewController(@NonNull final CreationContext creationContext, @Nullable final Bundle savedInstanceState) {
         this.activity = (TActivity) creationContext.activity;
-        this.fragment = (TFragment) creationContext.fragment;
+        this.fragment = creationContext.fragment;
         this.container = creationContext.container;
     }
 
@@ -100,7 +97,7 @@ public class ViewController<
      * @return Returns fragment.
      */
     @NonNull
-    public final TFragment getFragment() {
+    public final ViewControllerFragment<TActivity, TState> getFragment() {
         return fragment;
     }
 
@@ -111,7 +108,7 @@ public class ViewController<
      */
     @NonNull
     protected final TState getState() {
-        return fragment.getState();
+        return fragment.getState() ;
     }
 
     /**

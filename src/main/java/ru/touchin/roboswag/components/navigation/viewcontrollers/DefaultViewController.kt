@@ -4,13 +4,12 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.LayoutRes
 import android.support.v4.app.FragmentActivity
-import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment
 
 abstract class DefaultViewController<TActivity : FragmentActivity, TState : Parcelable>(
         @LayoutRes layoutRes: Int,
         creationContext: CreationContext,
         savedInstanceState: Bundle?
-) : ViewController<TActivity, ViewControllerFragment<TActivity, TState>, TState>(
+) : ViewController<TActivity, TState>(
         creationContext,
         savedInstanceState
 ) {
