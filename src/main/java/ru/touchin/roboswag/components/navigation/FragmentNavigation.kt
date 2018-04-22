@@ -128,7 +128,7 @@ open class FragmentNavigation(
      * @return True if it have back to some entry in stack.
      */
     fun back(): Boolean {
-        if (fragmentManager.backStackEntryCount > 1) {
+        if (fragmentManager.backStackEntryCount >= 1) {
             fragmentManager.popBackStack()
             return true
         }
