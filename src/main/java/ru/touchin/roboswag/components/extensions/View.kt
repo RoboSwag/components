@@ -13,10 +13,7 @@ private const val RIPPLE_EFFECT_DELAY = 150L
  */
 fun View.setOnRippleClickListener(delay: Long = RIPPLE_EFFECT_DELAY, listener: (View) -> Unit) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        setOnClickListener { view ->
-            handler?.removeCallbacksAndMessages(null)
-            postDelayed({ if (hasWindowFocus()) listener(view) }, delay)
-        }
+        setOnClickListener { view -> postDelayed({ if (hasWindowFocus()) listener(view) }, delay) }
     } else {
         setOnClickListener(listener)
     }
