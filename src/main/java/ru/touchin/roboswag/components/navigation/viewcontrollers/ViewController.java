@@ -108,7 +108,7 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
      */
     @NonNull
     protected final TState getState() {
-        return fragment.getState() ;
+        return fragment.getState();
     }
 
     /**
