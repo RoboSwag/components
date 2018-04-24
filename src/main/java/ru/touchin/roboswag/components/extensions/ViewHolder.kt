@@ -21,7 +21,8 @@ fun RecyclerView.ViewHolder.getText(@StringRes resId: Int): CharSequence = conte
 
 fun RecyclerView.ViewHolder.getString(@StringRes resId: Int): String = context.getString(resId)
 
-fun RecyclerView.ViewHolder.getString(@StringRes resId: Int, vararg args: Any): String = context.getString(resId, args)
+@SuppressWarnings("SpreadOperator") // it's OK for small arrays
+fun RecyclerView.ViewHolder.getString(@StringRes resId: Int, vararg args: Any): String = context.getString(resId, *args)
 
 @ColorInt
 fun RecyclerView.ViewHolder.getColor(@ColorRes resId: Int): Int = ContextCompat.getColor(context, resId)
