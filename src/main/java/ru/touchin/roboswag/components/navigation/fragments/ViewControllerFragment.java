@@ -197,7 +197,6 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
             viewController.onActivityResult(pendingActivityResult.requestCode, pendingActivityResult.resultCode, pendingActivityResult.data);
             pendingActivityResult = null;
         }
-        requireActivity().invalidateOptionsMenu();
     }
 
     @Override
