@@ -120,6 +120,11 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         return state;
     }
 
+    @NonNull
+    public Class<ViewController<TActivity, TState>> getViewControllerClass() {
+        return viewControllerClass;
+    }
+
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
