@@ -54,7 +54,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TState              Type of state of fragment.
      */
     fun <TState : Parcelable> pushViewController(
-            viewControllerClass: Class<out ViewController<TActivity, TState>>,
+            viewControllerClass: Class<out ViewController<out TActivity, TState>>,
             state: TState,
             addToStack: Boolean = true,
             transactionSetup: ((FragmentTransaction) -> Unit)? = null
@@ -82,7 +82,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TTargetFragment     Type of target fragment.
      */
     fun <TState : Parcelable, TTargetFragment : Fragment> pushViewControllerForResult(
-            viewControllerClass: Class<out ViewController<TActivity, TState>>,
+            viewControllerClass: Class<out ViewController<out TActivity, TState>>,
             state: TState,
             targetFragment: TTargetFragment,
             targetRequestCode: Int,
@@ -109,7 +109,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TState              Type of state of fragment.
      */
     fun <TState : Parcelable> setViewControllerAsTop(
-            viewControllerClass: Class<out ViewController<TActivity, TState>>,
+            viewControllerClass: Class<out ViewController<out TActivity, TState>>,
             state: TState,
             addToStack: Boolean = true,
             transactionSetup: ((FragmentTransaction) -> Unit)? = null
@@ -135,7 +135,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
      * @param TState              Type of state of fragment.
      */
     fun <TState : Parcelable> setInitialViewController(
-            viewControllerClass: Class<out ViewController<TActivity, TState>>,
+            viewControllerClass: Class<out ViewController<out TActivity, TState>>,
             state: TState,
             transactionSetup: ((FragmentTransaction) -> Unit)? = null
     ) {
