@@ -111,14 +111,14 @@ open class FragmentNavigation(
         }
 
         val fragmentTransaction = fragmentManager.beginTransaction()
-                .replace(containerViewId, fragment, null)
+        transactionSetup?.invoke(fragmentTransaction)
+        fragmentTransaction.replace(containerViewId, fragment, null)
         if (addToStack) {
             fragmentTransaction.addToBackStack(backStackTag)
         }
         if (fragmentManager.backStackEntryCount != 0) {
             fragmentTransaction.setTransition(transition)
         }
-        transactionSetup?.invoke(fragmentTransaction)
         fragmentTransaction.commit()
     }
 
