@@ -17,6 +17,8 @@ open class BaseDestroyable : Destroyable {
 
     private val subscriptions = CompositeDisposable()
 
+    override fun clearSubscriptions() = subscriptions.clear()
+
     /**
      * Call it on parent's onDestroy method.
      */

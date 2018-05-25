@@ -25,6 +25,11 @@ interface Destroyable {
     }
 
     /**
+     * Removes all subscriptions
+     */
+    fun clearSubscriptions()
+
+    /**
      * Method should be used to guarantee that observable won't be subscribed after onDestroy.
      * It is automatically subscribing to the observable and calls onNextAction and onErrorAction on observable events.
      * Don't forget to process errors if observable can emit them.
