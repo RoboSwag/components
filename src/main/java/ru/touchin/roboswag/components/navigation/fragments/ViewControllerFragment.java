@@ -19,6 +19,7 @@
 
 package ru.touchin.roboswag.components.navigation.fragments;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -29,16 +30,19 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
 
 import java.lang.reflect.Constructor;
 
+import ru.touchin.roboswag.components.R;
 import ru.touchin.roboswag.components.navigation.viewcontrollers.ViewController;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
@@ -51,6 +55,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  * @param <TState>    Type of object which is representing it's fragment state;
  * @param <TActivity> Type of {@link FragmentActivity} where fragment could be attached to.
  */
+@SuppressWarnings("PMD.TooManyMethods")
 public class ViewControllerFragment<TActivity extends FragmentActivity, TState extends Parcelable> extends ViewFragment<TActivity> {
 
     private static final String VIEW_CONTROLLER_CLASS_EXTRA = "VIEW_CONTROLLER_CLASS_EXTRA";
@@ -201,6 +206,31 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         if (pendingActivityResult != null) {
             viewController.onActivityResult(pendingActivityResult.requestCode, pendingActivityResult.resultCode, pendingActivityResult.data);
             pendingActivityResult = null;
+        }
+    }
+
+    @Nullable
+    @Override
+    public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
+        if (nextAnim == R.anim.fragment_slide_in_right_animation || nextAnim == R.anim.fragment_slide_out_right_animation) {
+            ViewCompat.setTranslationZ(getView(), 1F);
+        } else {
+            ViewCompat.setTranslationZ(getView(), 0F);
+        }
+        if (viewController != null) {
+            return viewController.onCreateAnimation(transit, enter, nextAnim);
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    @Override
+    public Animator onCreateAnimator(final int transit, final boolean enter, final int nextAnim) {
+        if (viewController != null) {
+            return viewController.onCreateAnimator(transit, enter, nextAnim);
+        } else {
+            return null;
         }
     }
 

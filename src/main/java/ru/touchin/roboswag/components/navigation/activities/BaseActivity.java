@@ -25,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArraySet;
 import android.support.v7.app.AppCompatActivity;
+ import android.view.MenuItem;
 
 import java.util.Set;
 
@@ -92,6 +93,16 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     public void addOnBackPressedListener(@NonNull final OnBackPressedListener onBackPressedListener) {

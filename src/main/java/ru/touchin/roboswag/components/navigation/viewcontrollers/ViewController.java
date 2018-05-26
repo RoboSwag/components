@@ -19,6 +19,7 @@
 
 package ru.touchin.roboswag.components.navigation.viewcontrollers;
 
+import android.animation.Animator;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LifecycleRegistry;
@@ -38,6 +39,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +47,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.animation.Animation;
 import ru.touchin.roboswag.components.navigation.fragments.ViewControllerFragment;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
@@ -274,6 +277,47 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
     public void onCreate() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);
+    }
+
+    /**
+     * Called when a fragment loads an animation. Note that if
+     * {@link FragmentTransaction#setCustomAnimations(int, int)} was called with
+     * {@link Animator} resources instead of {@link Animation} resources, {@code nextAnim}
+     * will be an animator resource.
+     *
+     * @param transit The value set in {@link FragmentTransaction#setTransition(int)} or 0 if not
+     *                set.
+     * @param enter {@code true} when the fragment is added/attached/shown or {@code false} when
+     *              the fragment is removed/detached/hidden.
+     * @param nextAnim The resource set in
+     *                 {@link FragmentTransaction#setCustomAnimations(int, int)},
+     *                 {@link FragmentTransaction#setCustomAnimations(int, int, int, int)}, or
+     *                 0 if neither was called. The value will depend on the current operation.
+     */
+    @Nullable
+    public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
+        return null;
+    }
+
+    /**
+     * Called when a fragment loads an animator. This will be called when
+     * {@link #onCreateAnimation(int, boolean, int)} returns null. Note that if
+     * {@link FragmentTransaction#setCustomAnimations(int, int)} was called with
+     * {@link Animation} resources instead of {@link Animator} resources, {@code nextAnim}
+     * will be an animation resource.
+     *
+     * @param transit The value set in {@link FragmentTransaction#setTransition(int)} or 0 if not
+     *                set.
+     * @param enter {@code true} when the fragment is added/attached/shown or {@code false} when
+     *              the fragment is removed/detached/hidden.
+     * @param nextAnim The resource set in
+     *                 {@link FragmentTransaction#setCustomAnimations(int, int)},
+     *                 {@link FragmentTransaction#setCustomAnimations(int, int, int, int)}, or
+     *                 0 if neither was called. The value will depend on the current operation.
+     */
+    @Nullable
+    public Animator onCreateAnimator(final int transit, final boolean enter, final int nextAnim) {
+        return null;
     }
 
     /**
