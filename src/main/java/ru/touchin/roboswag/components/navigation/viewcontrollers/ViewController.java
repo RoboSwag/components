@@ -412,7 +412,7 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
      */
     @CallSuper
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
-
+        //do nothing
     }
 
     /**
