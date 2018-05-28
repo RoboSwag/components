@@ -184,6 +184,11 @@ public abstract class ViewFragment<TActivity extends FragmentActivity> extends F
         super.onPause();
     }
 
+    @Override
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
     /**
      * Replacement of {@link #onPause} with non null activity as first parameter.
      *
