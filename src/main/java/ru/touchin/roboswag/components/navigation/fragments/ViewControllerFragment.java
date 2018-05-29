@@ -322,6 +322,14 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
     }
 
     @Override
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
+        if (viewController != null) {
+            viewController.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
     public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
         if (viewController != null) {
             viewController.onActivityResult(requestCode, resultCode, data);

@@ -405,6 +405,16 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY);
     }
 
+
+    /**
+     * Calls when {@link ViewController} have requested permissions results.
+     * Happens at {@link ViewControllerFragment#onRequestPermissionsResult(int, String[], int[])} ()}.
+     */
+    @CallSuper
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
+        //do nothing
+    }
+
     /**
      * Callback from parent fragment.
      */
