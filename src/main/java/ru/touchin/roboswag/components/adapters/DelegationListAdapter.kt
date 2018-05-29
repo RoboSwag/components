@@ -35,7 +35,9 @@ open class DelegationListAdapter<TItem>(config: AsyncDifferConfig<TItem>) : Recy
         val collectionPosition = getCollectionPosition(position)
         if (collectionPosition in 0 until getList().size) {
             if (itemClickListener != null) {
-                holder.itemView.setOnRippleClickListener { itemClickListener?.invoke(getList()[collectionPosition], holder) }
+                holder.itemView.setOnRippleClickListener {
+                    itemClickListener?.invoke(getList()[getCollectionPosition(holder.adapterPosition)], holder)
+                }
             } else {
                 holder.itemView.setOnClickListener(null)
             }
