@@ -411,6 +411,7 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
      * Happens at {@link ViewControllerFragment#onRequestPermissionsResult(int, String[], int[])} ()}.
      */
     @CallSuper
+    @SuppressWarnings("PMD.UseVarargs")
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
         //do nothing
     }
