@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView
 class OffsetAdapterUpdateCallback(private val adapter: RecyclerView.Adapter<*>, private val offsetProvider: () -> Int) : ListUpdateCallback  {
 
     override fun onInserted(position: Int, count: Int) {
-        adapter.notifyItemInserted(position + offsetProvider())
+        adapter.notifyItemRangeInserted(position + offsetProvider(), count)
     }
 
     override fun onRemoved(position: Int, count: Int) {
