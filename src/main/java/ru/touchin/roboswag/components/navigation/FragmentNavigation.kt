@@ -164,8 +164,11 @@ open class FragmentNavigation(
      *
      * @return True if it have back to some entry in stack.
      */
-    //ShortMethodName: it is ok because method name is good!
-    fun up(): Boolean = backTo { backStackEntry -> backStackEntry.name != null && backStackEntry.name.endsWith(TOP_FRAGMENT_TAG_MARK) }
+    fun up() {
+        if (!backTo { backStackEntry -> backStackEntry.name != null && backStackEntry.name.endsWith(TOP_FRAGMENT_TAG_MARK) }) {
+            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        }
+    }
 
     /**
      * Pushes [Fragment] on top of stack with specific arguments and transaction setup.
