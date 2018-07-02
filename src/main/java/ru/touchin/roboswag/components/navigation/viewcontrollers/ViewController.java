@@ -328,6 +328,7 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
     public void onStart() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START);
+        UiUtils.OfViews.hideSoftInput(activity);
     }
 
     /**
