@@ -24,51 +24,41 @@ open class BaseDestroyable : Destroyable {
      */
     fun onDestroy() = subscriptions.dispose()
 
-    override fun <T> untilDestroy(
-            flowable: Flowable<T>,
+    override fun <T> Flowable<T>.untilDestroy(
             onNextAction: (T) -> Unit,
             onErrorAction: (Throwable) -> Unit,
             onCompletedAction: () -> Unit
-    ): Disposable = flowable
-            .observeOn(AndroidSchedulers.mainThread())
+    ): Disposable = observeOn(AndroidSchedulers.mainThread())
             .subscribe(onNextAction, onErrorAction, onCompletedAction)
             .also { subscriptions.add(it) }
 
-    override fun <T> untilDestroy(
-            observable: Observable<T>,
+    override fun <T> Observable<T>.untilDestroy(
             onNextAction: (T) -> Unit,
             onErrorAction: (Throwable) -> Unit,
             onCompletedAction: () -> Unit
-    ): Disposable = observable
-            .observeOn(AndroidSchedulers.mainThread())
+    ): Disposable = observeOn(AndroidSchedulers.mainThread())
             .subscribe(onNextAction, onErrorAction, onCompletedAction)
             .also { subscriptions.add(it) }
 
-    override fun <T> untilDestroy(
-            single: Single<T>,
+    override fun <T> Single<T>.untilDestroy(
             onSuccessAction: (T) -> Unit,
             onErrorAction: (Throwable) -> Unit
-    ): Disposable = single
-            .observeOn(AndroidSchedulers.mainThread())
+    ): Disposable = observeOn(AndroidSchedulers.mainThread())
             .subscribe(onSuccessAction, onErrorAction)
             .also { subscriptions.add(it) }
 
-    override fun untilDestroy(
-            completable: Completable,
+    override fun Completable.untilDestroy(
             onCompletedAction: () -> Unit,
             onErrorAction: (Throwable) -> Unit
-    ): Disposable = completable
-            .observeOn(AndroidSchedulers.mainThread())
+    ): Disposable = observeOn(AndroidSchedulers.mainThread())
             .subscribe(onCompletedAction, onErrorAction)
             .also { subscriptions.add(it) }
 
-    override fun <T> untilDestroy(
-            maybe: Maybe<T>,
+    override fun <T> Maybe<T>.untilDestroy(
             onSuccessAction: (T) -> Unit,
             onErrorAction: (Throwable) -> Unit,
             onCompletedAction: () -> Unit
-    ): Disposable = maybe
-            .observeOn(AndroidSchedulers.mainThread())
+    ): Disposable = observeOn(AndroidSchedulers.mainThread())
             .subscribe(onSuccessAction, onErrorAction, onCompletedAction)
             .also { subscriptions.add(it) }
 

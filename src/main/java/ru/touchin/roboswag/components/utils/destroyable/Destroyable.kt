@@ -40,8 +40,7 @@ interface Destroyable {
      * @param T             Type of emitted by observable items;
      * @return [Disposable] which is wrapping source observable to unsubscribe from it onDestroy.
      */
-    fun <T> untilDestroy(
-            flowable: Flowable<T>,
+    fun <T> Flowable<T>.untilDestroy(
             onNextAction: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
             onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
             onCompletedAction: () -> Unit = Functions.EMPTY_ACTION::run
@@ -58,8 +57,7 @@ interface Destroyable {
      * @param T             Type of emitted by observable items;
      * @return [Disposable] which is wrapping source observable to unsubscribe from it onDestroy.
      */
-    fun <T> untilDestroy(
-            observable: Observable<T>,
+    fun <T> Observable<T>.untilDestroy(
             onNextAction: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
             onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
             onCompletedAction: () -> Unit = Functions.EMPTY_ACTION::run
@@ -76,8 +74,7 @@ interface Destroyable {
      * @param T               Type of emitted by single items;
      * @return [Disposable] which is wrapping source single to unsubscribe from it onDestroy.
      */
-    fun <T> untilDestroy(
-            single: Single<T>,
+    fun <T> Single<T>.untilDestroy(
             onSuccessAction: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
             onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2))
     ): Disposable
@@ -92,8 +89,7 @@ interface Destroyable {
      * @param onErrorAction     Action which will raise on every [io.reactivex.CompletableEmitter.onError] throwable;
      * @return [Disposable] which is wrapping source completable to unsubscribe from it onDestroy.
      */
-    fun untilDestroy(
-            completable: Completable,
+    fun Completable.untilDestroy(
             onCompletedAction: () -> Unit = Functions.EMPTY_ACTION::run,
             onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2))
     ): Disposable
@@ -108,8 +104,7 @@ interface Destroyable {
      * @param onErrorAction   Action which will raise on every [io.reactivex.MaybeEmitter.onError] throwable;
      * @return [Disposable] which is wrapping source maybe to unsubscribe from it onDestroy.
      */
-    fun <T> untilDestroy(
-            maybe: Maybe<T>,
+    fun <T> Maybe<T>.untilDestroy(
             onSuccessAction: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
             onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
             onCompletedAction: () -> Unit = Functions.EMPTY_ACTION::run

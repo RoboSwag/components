@@ -14,3 +14,11 @@ inline fun <T> Delegates.observable(
 ): ReadWriteProperty<Any?, T> = object : ObservableProperty<T>(initialValue) {
     override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) = onChange(newValue)
 }
+
+inline fun <T> Delegates.distinctUntilChanged(
+        initialValue: T,
+        crossinline onChange: (newValue: T) -> Unit
+): ReadWriteProperty<Any?, T> = object : ObservableProperty<T>(initialValue) {
+    override fun afterChange(property: KProperty<*>, oldValue: T, newValue: T) =
+            if (newValue != null && oldValue != newValue) onChange(newValue) else Unit
+}
