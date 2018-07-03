@@ -25,41 +25,41 @@ open class BaseDestroyable : Destroyable {
     fun onDestroy() = subscriptions.dispose()
 
     override fun <T> Flowable<T>.untilDestroy(
-            onNextAction: (T) -> Unit,
-            onErrorAction: (Throwable) -> Unit,
-            onCompletedAction: () -> Unit
+            onNext: (T) -> Unit,
+            onError: (Throwable) -> Unit,
+            onComplete: () -> Unit
     ): Disposable = observeOn(AndroidSchedulers.mainThread())
-            .subscribe(onNextAction, onErrorAction, onCompletedAction)
+            .subscribe(onNext, onError, onComplete)
             .also { subscriptions.add(it) }
 
     override fun <T> Observable<T>.untilDestroy(
-            onNextAction: (T) -> Unit,
-            onErrorAction: (Throwable) -> Unit,
-            onCompletedAction: () -> Unit
+            onNext: (T) -> Unit,
+            onError: (Throwable) -> Unit,
+            onComplete: () -> Unit
     ): Disposable = observeOn(AndroidSchedulers.mainThread())
-            .subscribe(onNextAction, onErrorAction, onCompletedAction)
+            .subscribe(onNext, onError, onComplete)
             .also { subscriptions.add(it) }
 
     override fun <T> Single<T>.untilDestroy(
-            onSuccessAction: (T) -> Unit,
-            onErrorAction: (Throwable) -> Unit
+            onSuccess: (T) -> Unit,
+            onError: (Throwable) -> Unit
     ): Disposable = observeOn(AndroidSchedulers.mainThread())
-            .subscribe(onSuccessAction, onErrorAction)
+            .subscribe(onSuccess, onError)
             .also { subscriptions.add(it) }
 
     override fun Completable.untilDestroy(
-            onCompletedAction: () -> Unit,
-            onErrorAction: (Throwable) -> Unit
+            onComplete: () -> Unit,
+            onError: (Throwable) -> Unit
     ): Disposable = observeOn(AndroidSchedulers.mainThread())
-            .subscribe(onCompletedAction, onErrorAction)
+            .subscribe(onComplete, onError)
             .also { subscriptions.add(it) }
 
     override fun <T> Maybe<T>.untilDestroy(
-            onSuccessAction: (T) -> Unit,
-            onErrorAction: (Throwable) -> Unit,
-            onCompletedAction: () -> Unit
+            onSuccess: (T) -> Unit,
+            onError: (Throwable) -> Unit,
+            onComplete: () -> Unit
     ): Disposable = observeOn(AndroidSchedulers.mainThread())
-            .subscribe(onSuccessAction, onErrorAction, onCompletedAction)
+            .subscribe(onSuccess, onError, onComplete)
             .also { subscriptions.add(it) }
 
 }

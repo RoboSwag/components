@@ -34,16 +34,15 @@ interface Destroyable {
      * It is automatically subscribing to the observable and calls onNextAction and onErrorAction on observable events.
      * Don't forget to process errors if observable can emit them.
      *
-     * @param flowable      [Flowable] to subscribe until onDestroy;
-     * @param onNextAction  Action which will raise on every [io.reactivex.Emitter.onNext] item;
-     * @param onErrorAction Action which will raise on every [io.reactivex.Emitter.onError] throwable;
-     * @param T             Type of emitted by observable items;
+     * @param onNext        Action which will raise on every [io.reactivex.Emitter.onNext] item;
+     * @param onError       Action which will raise on every [io.reactivex.Emitter.onError] throwable;
+     * @param onComplete    Action which will raise on every [io.reactivex.Emitter.onComplete] item;
      * @return [Disposable] which is wrapping source observable to unsubscribe from it onDestroy.
      */
     fun <T> Flowable<T>.untilDestroy(
-            onNextAction: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
-            onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
-            onCompletedAction: () -> Unit = Functions.EMPTY_ACTION::run
+            onNext: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
+            onError: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
+            onComplete: () -> Unit = Functions.EMPTY_ACTION::run
     ): Disposable
 
     /**
@@ -51,16 +50,15 @@ interface Destroyable {
      * It is automatically subscribing to the observable and calls onNextAction and onErrorAction on observable events.
      * Don't forget to process errors if observable can emit them.
      *
-     * @param observable    [Observable] to subscribe until onDestroy;
-     * @param onNextAction  Action which will raise on every [io.reactivex.Emitter.onNext] item;
-     * @param onErrorAction Action which will raise on every [io.reactivex.Emitter.onError] throwable;
-     * @param T             Type of emitted by observable items;
+     * @param onNext        Action which will raise on every [io.reactivex.Emitter.onNext] item;
+     * @param onError       Action which will raise on every [io.reactivex.Emitter.onError] throwable;
+     * @param onComplete    Action which will raise on every [io.reactivex.Emitter.onComplete] item;
      * @return [Disposable] which is wrapping source observable to unsubscribe from it onDestroy.
      */
     fun <T> Observable<T>.untilDestroy(
-            onNextAction: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
-            onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
-            onCompletedAction: () -> Unit = Functions.EMPTY_ACTION::run
+            onNext: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
+            onError: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
+            onComplete: () -> Unit = Functions.EMPTY_ACTION::run
     ): Disposable
 
     /**
@@ -68,15 +66,13 @@ interface Destroyable {
      * It is automatically subscribing to the single and calls onSuccessAction and onErrorAction on single events.
      * Don't forget to process errors if single can emit them.
      *
-     * @param single          [Single] to subscribe until onDestroy;
-     * @param onSuccessAction Action which will raise on every [io.reactivex.SingleEmitter.onSuccess] item;
-     * @param onErrorAction   Action which will raise on every [io.reactivex.SingleEmitter.onError] throwable;
-     * @param T               Type of emitted by single items;
+     * @param onSuccess     Action which will raise on every [io.reactivex.SingleEmitter.onSuccess] item;
+     * @param onError       Action which will raise on every [io.reactivex.SingleEmitter.onError] throwable;
      * @return [Disposable] which is wrapping source single to unsubscribe from it onDestroy.
      */
     fun <T> Single<T>.untilDestroy(
-            onSuccessAction: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
-            onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2))
+            onSuccess: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
+            onError: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2))
     ): Disposable
 
     /**
@@ -84,14 +80,13 @@ interface Destroyable {
      * It is automatically subscribing to the completable and calls onCompletedAction and onErrorAction on completable events.
      * Don't forget to process errors if completable can emit them.
      *
-     * @param completable       [Completable] to subscribe until onDestroy;
-     * @param onCompletedAction Action which will raise on every [io.reactivex.CompletableEmitter.onComplete] item;
-     * @param onErrorAction     Action which will raise on every [io.reactivex.CompletableEmitter.onError] throwable;
+     * @param onComplete    Action which will raise on every [io.reactivex.CompletableEmitter.onComplete] item;
+     * @param onError       Action which will raise on every [io.reactivex.CompletableEmitter.onError] throwable;
      * @return [Disposable] which is wrapping source completable to unsubscribe from it onDestroy.
      */
     fun Completable.untilDestroy(
-            onCompletedAction: () -> Unit = Functions.EMPTY_ACTION::run,
-            onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2))
+            onComplete: () -> Unit = Functions.EMPTY_ACTION::run,
+            onError: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2))
     ): Disposable
 
     /**
@@ -99,15 +94,15 @@ interface Destroyable {
      * It is automatically subscribing to the maybe and calls onSuccessAction and onErrorAction on maybe events.
      * Don't forget to process errors if completable can emit them.
      *
-     * @param maybe           [Maybe] to subscribe until onDestroy;
-     * @param onSuccessAction Action which will raise on every [io.reactivex.MaybeEmitter.onSuccess] ()} item;
-     * @param onErrorAction   Action which will raise on every [io.reactivex.MaybeEmitter.onError] throwable;
+     * @param onSuccess     Action which will raise on every [io.reactivex.MaybeEmitter.onSuccess] ()} item;
+     * @param onError       Action which will raise on every [io.reactivex.MaybeEmitter.onError] throwable;
+     * @param onComplete    Action which will raise on every [io.reactivex.MaybeEmitter.onComplete] item;
      * @return [Disposable] which is wrapping source maybe to unsubscribe from it onDestroy.
      */
     fun <T> Maybe<T>.untilDestroy(
-            onSuccessAction: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
-            onErrorAction: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
-            onCompletedAction: () -> Unit = Functions.EMPTY_ACTION::run
+            onSuccess: (T) -> Unit = Functions.emptyConsumer<T>()::accept,
+            onError: (Throwable) -> Unit = getActionThrowableForAssertion(Lc.getCodePoint(this, 2)),
+            onComplete: () -> Unit = Functions.EMPTY_ACTION::run
     ): Disposable
 
 }
