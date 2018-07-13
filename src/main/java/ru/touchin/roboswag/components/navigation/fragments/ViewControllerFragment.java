@@ -235,6 +235,14 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
     }
 
     @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (viewController != null) {
+            viewController.onViewStateRestored(savedInstanceState);
+        }
+    }
+
+    @Override
     protected void onStart(@NonNull final View view, @NonNull final TActivity activity) {
         super.onStart(view, activity);
         if (viewController != null) {

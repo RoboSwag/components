@@ -321,6 +321,15 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
     }
 
     /**
+     * Calls when {@link ViewController} saved state has been restored into the view hierarchy.
+     * Happens at {@link ViewControllerFragment#onViewStateRestored}.
+     */
+    @CallSuper
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        // do nothing
+    }
+
+    /**
      * Calls when {@link ViewController} have started.
      * Happens at {@link ViewControllerFragment#onStart()}.
      */
