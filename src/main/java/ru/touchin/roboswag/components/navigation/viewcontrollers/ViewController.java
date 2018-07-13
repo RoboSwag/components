@@ -325,7 +325,7 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
      * Happens at {@link ViewControllerFragment#onViewStateRestored}.
      */
     @CallSuper
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+    public void onViewStateRestored(@Nullable final Bundle savedInstanceState) {
         // do nothing
     }
 
