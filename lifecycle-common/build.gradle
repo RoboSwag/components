@@ -15,7 +15,7 @@ android {
 }
 
 dependencies {
-    api project(":components-navigation")
+    api project(":navigation")
 
     compileOnly "javax.inject:javax.inject:1"
 

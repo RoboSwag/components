@@ -5,20 +5,24 @@ if (gradle.ext.has('componentsRoot')) {
     rootDir = settingsDir
 }
 
-include ':components-logging'
-include ':components-utils'
-include ':components-navigation'
-include ':components-storable'
-include ':components-api-logansquare'
-include ':components-lifecycle-common'
-include ':components-lifecycle-rx'
-include ':components-views'
+include ':logging'
+include ':utils'
+include ':navigation'
+include ':storable'
+include ':api-logansquare'
+include ':lifecycle-common'
+include ':lifecycle-rx'
+include ':views'
+include ':recyclerview-adapters'
+include ':kotlin-extensions'
 
-project(':components-utils').projectDir = new File(rootDir, 'utils')
-project(':components-logging').projectDir = new File(rootDir, 'logging')
-project(':components-navigation').projectDir = new File(rootDir, 'navigation')
-project(':components-storable').projectDir = new File(rootDir, 'storable')
-project(':components-api-logansquare').projectDir = new File(rootDir, 'api-logansquare')
-project(':components-lifecycle-common').projectDir = new File(rootDir, 'lifecycle-common')
-project(':components-lifecycle-rx').projectDir = new File(rootDir, 'lifecycle-rx')
-project(':components-views').projectDir = new File(rootDir, 'views')
+project(':utils').projectDir = new File(rootDir, 'utils')
+project(':logging').projectDir = new File(rootDir, 'logging')
+project(':navigation').projectDir = new File(rootDir, 'navigation')
+project(':storable').projectDir = new File(rootDir, 'storable')
+project(':api-logansquare').projectDir = new File(rootDir, 'api-logansquare')
+project(':lifecycle-common').projectDir = new File(rootDir, 'lifecycle-common')
+project(':lifecycle-rx').projectDir = new File(rootDir, 'lifecycle-rx')
+project(':views').projectDir = new File(rootDir, 'views')
+project(':recyclerview-adapters').projectDir = new File(rootDir, 'recyclerview-adapters')
+project(':kotlin-extensions').projectDir = new File(rootDir, 'kotlin-extensions')

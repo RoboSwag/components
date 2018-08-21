@@ -14,8 +14,8 @@ android {
 }
 
 dependencies {
-    api project(":components-utils")
-    api project(":components-logging")
+    api project(":utils")
+    api project(":logging")
 
     implementation "com.android.support:design:$versions.supportLibrary"
 }

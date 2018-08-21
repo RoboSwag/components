@@ -10,8 +10,8 @@ android {
 }
 
 dependencies {
-    api project(":components-utils")
-    api project(":components-logging")
+    api project(":utils")
+    api project(":logging")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 

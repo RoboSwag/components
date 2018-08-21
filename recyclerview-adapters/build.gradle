@@ -7,18 +7,12 @@ android {
     defaultConfig {
         minSdkVersion versions.minSdk
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
 }
 
 dependencies {
-    api project(":utils")
-    api project(":logging")
+    api project(':kotlin-extensions')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation "com.android.support:appcompat-v7:$versions.supportLibrary"
+    implementation "com.android.support:recyclerview-v7:$versions.supportLibrary"
 }
