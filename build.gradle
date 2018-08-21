@@ -14,6 +14,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url "http://dl.bintray.com/touchin/touchin-tools" }
     }
 }
 
@@ -31,6 +32,7 @@ ext {
             dagger        : '2.16',
             retrofit      : '2.4.0',
             rxJava        : '2.1.17',
-            rxAndroid     : '2.0.2'
+            rxAndroid     : '2.0.2',
+            crashlytics   : '2.9.4'
     ]
 }

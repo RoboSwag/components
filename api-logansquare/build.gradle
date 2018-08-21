@@ -13,10 +13,6 @@ android {
     }
 }
 
-repositories {
-    maven { url "http://dl.bintray.com/touchin/touchin-tools" }
-}
-
 dependencies {
     api project(":storable")
     api 'net.danlew:android.joda:2.9.9.4'

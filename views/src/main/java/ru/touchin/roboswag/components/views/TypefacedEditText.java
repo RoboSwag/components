@@ -45,26 +45,12 @@ import ru.touchin.roboswag.core.log.Lc;
 
 /**
  * Created by Gavriil Sitnikov on 18/07/2014.
- * TextView that supports fonts from Typefaces class
- */
-
-/**
- * Created by Gavriil Sitnikov on 18/07/2014.
  * EditText that supports custom typeface and forces developer to specify if this view multiline or not.
  * Also in debug mode it has common checks for popular bugs.
  */
 @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
 //ConstructorCallsOverridableMethod: it's ok as we need to setTypeface
 public class TypefacedEditText extends AppCompatEditText {
-
-    private static boolean inDebugMode;
-
-    /**
-     * Enables debugging features like checking attributes on inflation.
-     */
-    public static void setInDebugMode() {
-        inDebugMode = true;
-    }
 
     private boolean multiline;
     private boolean constructed;
@@ -100,7 +86,7 @@ public class TypefacedEditText extends AppCompatEditText {
                 setSingleLine();
             }
             typedArray.recycle();
-            if (inDebugMode) {
+            if (BuildConfig.DEBUG) {
                 checkAttributes(context, attrs);
             }
         }

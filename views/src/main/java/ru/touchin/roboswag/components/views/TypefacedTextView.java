@@ -51,15 +51,6 @@ public class TypefacedTextView extends AppCompatTextView {
     private static final int UNSPECIFIED_MEASURE_SPEC = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
     private static final int START_SCALABLE_DIFFERENCE = 4;
 
-    private static boolean inDebugMode;
-
-    /**
-     * Enables debugging features like checking attributes on inflation.
-     */
-    public static void setInDebugMode() {
-        inDebugMode = true;
-    }
-
     private boolean constructed;
     @NonNull
     private LineStrategy lineStrategy = LineStrategy.SINGLE_LINE_ELLIPSIZE;
@@ -92,7 +83,7 @@ public class TypefacedTextView extends AppCompatTextView {
                 setLineStrategy(lineStrategy);
             }
             typedArray.recycle();
-            if (inDebugMode) {
+            if (BuildConfig.DEBUG) {
                 checkAttributes(context, attrs);
             }
         }
