@@ -9,10 +9,10 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import ru.touchin.livedata.destroyable.BaseDestroyable
 import ru.touchin.livedata.destroyable.Destroyable
-import ru.touchin.livedata.event.CompletableEvent
-import ru.touchin.livedata.event.MaybeEvent
-import ru.touchin.livedata.event.ObservableEvent
-import ru.touchin.livedata.event.SingleEvent
+import ru.touchin.templates.livedata.event.CompletableEvent
+import ru.touchin.templates.livedata.event.MaybeEvent
+import ru.touchin.templates.livedata.event.ObservableEvent
+import ru.touchin.templates.livedata.event.SingleEvent
 
 class BaseLiveDataDispatcher(private val destroyable: BaseDestroyable = BaseDestroyable()) : LiveDataDispatcher, Destroyable by destroyable {
 

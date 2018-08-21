@@ -1,1 +1,3 @@
-include ':sample', ':utils', ':logging', ':navigation', ':storable', ':api-logansquare', ':lifecycle-common', ':lifecycle-rx', ':views'
+apply from: 'modules.gradle'
+
+include 'sample'

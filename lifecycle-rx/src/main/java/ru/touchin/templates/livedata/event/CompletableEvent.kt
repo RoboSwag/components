@@ -1,4 +1,4 @@
-package ru.touchin.livedata.event
+package ru.touchin.templates.livedata.event
 
 /**
  * Event class that emits from [io.reactivex.Completable].

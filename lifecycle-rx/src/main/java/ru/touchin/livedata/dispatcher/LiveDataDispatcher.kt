@@ -7,10 +7,10 @@ import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import ru.touchin.livedata.event.CompletableEvent
-import ru.touchin.livedata.event.MaybeEvent
-import ru.touchin.livedata.event.ObservableEvent
-import ru.touchin.livedata.event.SingleEvent
+import ru.touchin.templates.livedata.event.CompletableEvent
+import ru.touchin.templates.livedata.event.MaybeEvent
+import ru.touchin.templates.livedata.event.ObservableEvent
+import ru.touchin.templates.livedata.event.SingleEvent
 
 interface LiveDataDispatcher {
 
