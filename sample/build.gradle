@@ -28,4 +28,5 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 }
 
-apply from: "$rootDir/BuildScripts/gradle/staticAnalysis.gradle"
+ext.buildScriptsDir = "$rootDir/BuildScripts"
+apply from: "$buildScriptsDir/gradle/staticAnalysis.gradle"
