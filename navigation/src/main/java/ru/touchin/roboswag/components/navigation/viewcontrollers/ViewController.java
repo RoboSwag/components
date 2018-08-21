@@ -222,7 +222,7 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
 
     /**
      * Returns a color state list associated with a particular resource ID.
-     * <p>
+     *
      * <p>Starting in {@link android.os.Build.VERSION_CODES#M}, the returned
      * color state list will be styled for the specified Context's theme.
      *

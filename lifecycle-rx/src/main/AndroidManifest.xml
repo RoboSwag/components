@@ -1,3 +1,1 @@
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru.touchin.lifecycle"/>
+<manifest package="ru.touchin.lifecycle.rx"/>

@@ -47,41 +47,21 @@ public final class DeviceUtils {
             return NetworkType.UNKNOWN;
         }
         final ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) {
+            return NetworkType.UNKNOWN;
+        }
         @SuppressLint("MissingPermission") final NetworkInfo info = cm.getActiveNetworkInfo();
         if (info == null || !info.isConnected()) {
             return NetworkType.NONE;
         }
-        if (info.getType() == ConnectivityManager.TYPE_WIFI) {
-            return NetworkType.WI_FI;
+        switch (info.getType()) {
+            case ConnectivityManager.TYPE_WIFI:
+                return NetworkType.WI_FI;
+            case ConnectivityManager.TYPE_MOBILE:
+                return getMobileNetworkType(info);
+            default:
+                return NetworkType.UNKNOWN;
         }
-        if (info.getType() == ConnectivityManager.TYPE_MOBILE) {
-            final int networkType = info.getSubtype();
-            switch (networkType) {
-                case TelephonyManager.NETWORK_TYPE_GPRS:
-                case TelephonyManager.NETWORK_TYPE_EDGE:
-                case TelephonyManager.NETWORK_TYPE_CDMA:
-                case TelephonyManager.NETWORK_TYPE_1xRTT:
-                case TelephonyManager.NETWORK_TYPE_IDEN:
-                    return NetworkType.MOBILE_2G;
-                case TelephonyManager.NETWORK_TYPE_UMTS:
-                case TelephonyManager.NETWORK_TYPE_EVDO_0:
-                case TelephonyManager.NETWORK_TYPE_EVDO_A:
-                case TelephonyManager.NETWORK_TYPE_HSDPA:
-                case TelephonyManager.NETWORK_TYPE_HSUPA:
-                case TelephonyManager.NETWORK_TYPE_HSPA:
-                case TelephonyManager.NETWORK_TYPE_EVDO_B:
-                case TelephonyManager.NETWORK_TYPE_EHRPD:
-                case TelephonyManager.NETWORK_TYPE_HSPAP:
-                    return NetworkType.MOBILE_3G;
-                case TelephonyManager.NETWORK_TYPE_LTE:
-                case 19: // NETWORK_TYPE_LTE_CA is hide
-                    return NetworkType.MOBILE_LTE;
-                case TelephonyManager.NETWORK_TYPE_UNKNOWN:
-                default:
-                    return NetworkType.UNKNOWN;
-            }
-        }
-        return NetworkType.UNKNOWN;
     }
 
     /**
@@ -92,6 +72,34 @@ public final class DeviceUtils {
      */
     public static boolean isNetworkConnected(@NonNull final Context context) {
         return getNetworkType(context) != NetworkType.NONE;
+    }
+
+    @NonNull
+    private static NetworkType getMobileNetworkType(@NonNull final NetworkInfo info) {
+        switch (info.getSubtype()) {
+            case TelephonyManager.NETWORK_TYPE_GPRS:
+            case TelephonyManager.NETWORK_TYPE_EDGE:
+            case TelephonyManager.NETWORK_TYPE_CDMA:
+            case TelephonyManager.NETWORK_TYPE_1xRTT:
+            case TelephonyManager.NETWORK_TYPE_IDEN:
+                return NetworkType.MOBILE_2G;
+            case TelephonyManager.NETWORK_TYPE_UMTS:
+            case TelephonyManager.NETWORK_TYPE_EVDO_0:
+            case TelephonyManager.NETWORK_TYPE_EVDO_A:
+            case TelephonyManager.NETWORK_TYPE_HSDPA:
+            case TelephonyManager.NETWORK_TYPE_HSUPA:
+            case TelephonyManager.NETWORK_TYPE_HSPA:
+            case TelephonyManager.NETWORK_TYPE_EVDO_B:
+            case TelephonyManager.NETWORK_TYPE_EHRPD:
+            case TelephonyManager.NETWORK_TYPE_HSPAP:
+                return NetworkType.MOBILE_3G;
+            case TelephonyManager.NETWORK_TYPE_LTE:
+            case 19: // NETWORK_TYPE_LTE_CA is hide
+                return NetworkType.MOBILE_LTE;
+            case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+            default:
+                return NetworkType.UNKNOWN;
+        }
     }
 
     private DeviceUtils() {
