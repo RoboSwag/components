@@ -15,10 +15,13 @@ android {
 }
 
 dependencies {
-    api project(":utils")
-    api project(":logging")
+    api project(":navigation")
+
+    compileOnly "javax.inject:javax.inject:1"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation "com.android.support:appcompat-v7:$versions.supportLibrary"
+
+    implementation "android.arch.lifecycle:extensions:$versions.lifecycle"
 }

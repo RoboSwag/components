@@ -20,6 +20,8 @@
 package ru.touchin.roboswag.components.navigation.fragments;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
+import android.arch.lifecycle.Lifecycle;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -27,8 +29,10 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.SystemClock;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +45,7 @@ import android.widget.FrameLayout;
 
 import java.lang.reflect.Constructor;
 
+import ru.touchin.roboswag.components.navigation.BuildConfig;
 import ru.touchin.roboswag.components.navigation.viewcontrollers.ViewController;
 import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.log.LcGroup;
@@ -54,24 +59,15 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  * @param <TActivity> Type of {@link FragmentActivity} where fragment could be attached to.
  */
 @SuppressWarnings("PMD.TooManyMethods")
-public class ViewControllerFragment<TActivity extends FragmentActivity, TState extends Parcelable> extends ViewFragment<TActivity> {
+public class ViewControllerFragment<TActivity extends FragmentActivity, TState extends Parcelable> extends Fragment {
 
     private static final String VIEW_CONTROLLER_CLASS_EXTRA = "VIEW_CONTROLLER_CLASS_EXTRA";
     private static final String VIEW_CONTROLLER_STATE_EXTRA = "VIEW_CONTROLLER_STATE_EXTRA";
 
-    private static boolean inDebugMode;
     private static long acceptableUiCalculationTime = 100;
 
     /**
-     * Enables debugging features like serialization of {@link #getState()} every creation.
-     */
-    public static void setInDebugMode() {
-        inDebugMode = true;
-    }
-
-    /**
      * Sets acceptable UI calculation time so there will be warnings in logs if ViewController's inflate/layout actions will take more than that time.
-     * Works only if {@link #setInDebugMode()} called.
      * It's 100ms by default.
      */
     public static void setAcceptableUiCalculationTime(final long acceptableUiCalculationTime) {
@@ -113,6 +109,8 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
     @Nullable
     private ActivityResult pendingActivityResult;
 
+    private boolean appeared;
+
     /**
      * Returns specific {@link Parcelable} which contains state of fragment and it's {@link ViewController}.
      *
@@ -128,60 +126,23 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         return viewControllerClass;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(!isChildFragment());
 
-        //noinspection unchecked
         viewControllerClass = (Class<ViewController<TActivity, TState>>) getArguments().getSerializable(VIEW_CONTROLLER_CLASS_EXTRA);
         state = savedInstanceState != null
                 ? savedInstanceState.getParcelable(VIEW_CONTROLLER_STATE_EXTRA)
                 : (getArguments() != null ? getArguments().getParcelable(VIEW_CONTROLLER_STATE_EXTRA) : null);
         if (state != null) {
-            if (inDebugMode) {
+            if (BuildConfig.DEBUG) {
                 state = reserialize(state);
             }
         } else {
             Lc.assertion("State is required and null");
-        }
-    }
-
-    @NonNull
-    private ViewController createViewController(
-            @NonNull final FragmentActivity activity,
-            @NonNull final PlaceholderView view,
-            @Nullable final Bundle savedInstanceState
-    ) {
-        if (viewControllerClass.getConstructors().length != 1) {
-            throw new ShouldNotHappenException("There should be single constructor for " + viewControllerClass);
-        }
-        final Constructor<?> constructor = viewControllerClass.getConstructors()[0];
-        final ViewController.CreationContext creationContext = new ViewController.CreationContext(activity, this, view);
-        final long creationTime = inDebugMode ? SystemClock.elapsedRealtime() : 0;
-        try {
-            switch (constructor.getParameterTypes().length) {
-                case 2:
-                    return (ViewController) constructor.newInstance(creationContext, savedInstanceState);
-                case 3:
-                    return (ViewController) constructor.newInstance(this, creationContext, savedInstanceState);
-                default:
-                    throw new ShouldNotHappenException("Wrong constructor parameters count: " + constructor.getParameterTypes().length);
-            }
-        } catch (@NonNull final Exception exception) {
-            throw new ShouldNotHappenException(exception);
-        } finally {
-            checkCreationTime(creationTime);
-        }
-    }
-
-    private void checkCreationTime(final long creationTime) {
-        if (inDebugMode) {
-            final long creationPeriod = SystemClock.elapsedRealtime() - creationTime;
-            if (creationPeriod > acceptableUiCalculationTime) {
-                LcGroup.UI_METRICS.w("Creation of %s took too much: %dms", viewControllerClass, creationPeriod);
-            }
         }
     }
 
@@ -199,7 +160,7 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //noinspection ConstantConditions
-        viewController = createViewController(requireActivity(), (PlaceholderView) getView(), savedInstanceState);
+        viewController = createViewController(requireActivity(), (ViewGroup) getView(), savedInstanceState);
         viewController.onCreate();
         if (pendingActivityResult != null) {
             viewController.onActivityResult(pendingActivityResult.requestCode, pendingActivityResult.resultCode, pendingActivityResult.data);
@@ -235,25 +196,33 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
-    protected void onStart(@NonNull final View view, @NonNull final TActivity activity) {
-        super.onStart(view, activity);
+    public void onStart() {
+        super.onStart();
+        if (!appeared && isMenuVisible()) {
+            onAppear();
+        }
         if (viewController != null) {
             viewController.onStart();
         }
     }
 
-    @Override
-    protected void onAppear(@NonNull final View view, @NonNull final TActivity activity) {
-        super.onAppear(view, activity);
+    /**
+     * Called when fragment is moved in started state and it's {@link #isMenuVisible()} sets to true.
+     * Usually it is indicating that user can't see fragment on screen and useful to track analytics events.
+     */
+    @CallSuper
+    protected void onAppear() {
+        appeared = true;
         if (viewController != null) {
             viewController.onAppear();
         }
     }
 
     @Override
-    protected void onResume(@NonNull final View view, @NonNull final TActivity activity) {
-        super.onResume(view, activity);
+    public void onResume() {
+        super.onResume();
         if (viewController != null) {
             viewController.onResume();
         }
@@ -281,8 +250,8 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
     }
 
     @Override
-    protected void onPause(@NonNull final View view, @NonNull final TActivity activity) {
-        super.onPause(view, activity);
+    public void onPause() {
+        super.onPause();
         if (viewController != null) {
             viewController.onPause();
         }
@@ -297,20 +266,27 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         savedInstanceState.putParcelable(VIEW_CONTROLLER_STATE_EXTRA, state);
     }
 
-    @Override
-    protected void onDisappear(@NonNull final View view, @NonNull final TActivity activity) {
-        super.onDisappear(view, activity);
+    /**
+     * Called when fragment is moved in stopped state or it's {@link #isMenuVisible()} sets to false.
+     * Usually it is indicating that user can't see fragment on screen and useful to track analytics events.
+     */
+    @CallSuper
+    protected void onDisappear() {
+        appeared = false;
         if (viewController != null) {
             viewController.onDisappear();
         }
     }
 
     @Override
-    protected void onStop(@NonNull final View view, @NonNull final TActivity activity) {
+    public void onStop() {
+        if (appeared) {
+            onDisappear();
+        }
         if (viewController != null) {
             viewController.onStop();
         }
-        super.onStop(view, activity);
+        super.onStop();
     }
 
     @Override
@@ -339,6 +315,66 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         }
     }
 
+    @Override
+    public void setMenuVisibility(final boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+        if (getActivity() != null && getView() != null) {
+            final boolean started = getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED);
+            if (!appeared && menuVisible && started) {
+                onAppear();
+            }
+            if (appeared && (!menuVisible || !started)) {
+                onDisappear();
+            }
+        }
+    }
+
+    /**
+     * Returns if fragment have parent fragment.
+     *
+     * @return Returns true if fragment is in some fragment's children stack.
+     */
+    public boolean isChildFragment() {
+        return getParentFragment() != null;
+    }
+
+    @NonNull
+    private ViewController createViewController(
+            @NonNull final FragmentActivity activity,
+            @NonNull final ViewGroup view,
+            @Nullable final Bundle savedInstanceState
+    ) {
+        if (viewControllerClass.getConstructors().length != 1) {
+            throw new ShouldNotHappenException("There should be single constructor for " + viewControllerClass);
+        }
+        final Constructor<?> constructor = viewControllerClass.getConstructors()[0];
+        final ViewController.CreationContext creationContext = new ViewController.CreationContext(activity, this, view);
+        final long creationTime = BuildConfig.DEBUG ? SystemClock.elapsedRealtime() : 0;
+        try {
+            switch (constructor.getParameterTypes().length) {
+                case 2:
+                    return (ViewController) constructor.newInstance(creationContext, savedInstanceState);
+                case 3:
+                    return (ViewController) constructor.newInstance(this, creationContext, savedInstanceState);
+                default:
+                    throw new ShouldNotHappenException("Wrong constructor parameters count: " + constructor.getParameterTypes().length);
+            }
+        } catch (@NonNull final Exception exception) {
+            throw new ShouldNotHappenException(exception);
+        } finally {
+            checkCreationTime(creationTime);
+        }
+    }
+
+    private void checkCreationTime(final long creationTime) {
+        if (BuildConfig.DEBUG) {
+            final long creationPeriod = SystemClock.elapsedRealtime() - creationTime;
+            if (creationPeriod > acceptableUiCalculationTime) {
+                LcGroup.UI_METRICS.w("Creation of %s took too much: %dms", viewControllerClass, creationPeriod);
+            }
+        }
+    }
+
     private static class PlaceholderView extends FrameLayout {
 
         @NonNull
@@ -353,7 +389,7 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         @Override
         protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            if (inDebugMode && lastMeasureTime == 0) {
+            if (BuildConfig.DEBUG && lastMeasureTime == 0) {
                 lastMeasureTime = SystemClock.uptimeMillis();
             }
         }
@@ -361,7 +397,7 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         @Override
         protected void onDraw(@NonNull final Canvas canvas) {
             super.onDraw(canvas);
-            if (inDebugMode && lastMeasureTime > 0) {
+            if (BuildConfig.DEBUG && lastMeasureTime > 0) {
                 final long layoutTime = SystemClock.uptimeMillis() - lastMeasureTime;
                 if (layoutTime > acceptableUiCalculationTime) {
                     LcGroup.UI_METRICS.w("Measure and layout of %s took too much: %dms", tagName, layoutTime);

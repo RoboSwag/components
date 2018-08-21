@@ -1,1 +1,1 @@
-include ':sample', ':utils', ':logging', ':navigation', ':storable'
+include ':sample', ':utils', ':logging', ':navigation', ':storable', ':api-logansquare', ':lifecycle-common', ':lifecycle-rx'

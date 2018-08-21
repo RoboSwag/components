@@ -25,7 +25,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArraySet;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 
 import java.util.Set;
 
@@ -96,13 +95,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     public void addOnBackPressedListener(@NonNull final OnBackPressedListener onBackPressedListener) {
@@ -121,20 +116,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
         super.onBackPressed();
-    }
-
-    /*
-     * Interface to be implemented for someone who want to intercept device back button pressing event.
-     */
-    public interface OnBackPressedListener {
-
-        /**
-         * Calls when user presses device back button.
-         *
-         * @return True if it is processed by this object.
-         */
-        boolean onBackPressed();
-
     }
 
 }

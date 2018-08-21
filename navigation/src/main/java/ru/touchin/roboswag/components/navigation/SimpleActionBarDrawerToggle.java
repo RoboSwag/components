@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import ru.touchin.roboswag.components.navigation.activities.BaseActivity;
+import ru.touchin.roboswag.components.navigation.activities.OnBackPressedListener;
 import ru.touchin.roboswag.components.utils.UiUtils;
 
 /**
@@ -36,7 +37,7 @@ import ru.touchin.roboswag.components.utils.UiUtils;
  * Simple realization of one-side {@link ActionBarDrawerToggle}.
  */
 public class SimpleActionBarDrawerToggle extends ActionBarDrawerToggle
-        implements FragmentManager.OnBackStackChangedListener, BaseActivity.OnBackPressedListener {
+        implements FragmentManager.OnBackStackChangedListener, OnBackPressedListener {
 
     @NonNull
     private final BaseActivity activity;

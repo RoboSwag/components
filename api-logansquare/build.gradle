@@ -13,12 +13,15 @@ android {
     }
 }
 
+repositories {
+    maven { url "http://dl.bintray.com/touchin/touchin-tools" }
+}
+
 dependencies {
-    api project(":utils")
-    api project(":logging")
+    api project(":storable")
+    api 'net.danlew:android.joda:2.9.9.4'
 
     implementation "com.android.support:support-annotations:$versions.supportLibrary"
-
-    implementation "io.reactivex.rxjava2:rxjava:$versions.rxJava"
-    implementation "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid"
+    implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
+    implementation 'ru.touchin:logansquare:1.4.3'
 }

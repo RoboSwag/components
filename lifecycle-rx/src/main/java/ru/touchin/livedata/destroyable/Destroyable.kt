@@ -1,4 +1,4 @@
-package ru.touchin.roboswag.components.utils.destroyable
+package ru.touchin.livedata.destroyable
 
 import io.reactivex.Completable
 import io.reactivex.Flowable
