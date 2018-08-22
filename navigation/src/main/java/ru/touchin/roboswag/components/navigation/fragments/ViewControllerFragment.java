@@ -375,6 +375,12 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         }
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return super.toString() + " ViewController: " + getViewControllerClass();
+    }
+
     private static class PlaceholderView extends FrameLayout {
 
         @NonNull
