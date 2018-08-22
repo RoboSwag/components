@@ -39,6 +39,7 @@ import ru.touchin.roboswag.core.utils.ShouldNotHappenException;
  * Created by Gavriil Sitnikov on 13/06/2016.
  * Bunch of inner helper library methods to validate attributes of custom views.
  */
+@Deprecated
 public final class AttributesUtils {
 
     /**

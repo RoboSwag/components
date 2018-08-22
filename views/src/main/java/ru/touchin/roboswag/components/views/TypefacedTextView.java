@@ -43,6 +43,7 @@ import ru.touchin.roboswag.core.log.Lc;
  * Also in debug mode it has common checks for popular bugs.
  */
 @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
+@Deprecated
 //ConstructorCallsOverridableMethod: it's ok as we need to setTypeface
 public class TypefacedTextView extends AppCompatTextView {
 
