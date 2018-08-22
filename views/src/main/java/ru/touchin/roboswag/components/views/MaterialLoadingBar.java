@@ -116,13 +116,4 @@ public class MaterialLoadingBar extends AppCompatImageView {
         progressDrawable.setColor(colorInt);
     }
 
-    /**
-     * Set color of loader.
-     *
-     * @param colorInt Color of loader to be set.
-     */
-    public void setColor(@ColorInt final int colorInt) {
-        progressDrawable.setColor(colorInt);
-    }
-
 }
