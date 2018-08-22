@@ -67,4 +67,23 @@ public interface Store<TKey, TStoreObject> {
     @NonNull
     Single<Optional<TStoreObject>> loadObject(@NonNull Type storeObjectType, @NonNull TKey key);
 
+    /**
+     * Stores object to store with related key.
+     *
+     * @param storeObjectType Type of object to store;
+     * @param key             Key related to object;
+     * @param storeObject     Object to store;
+     */
+    void setObject(@NonNull Type storeObjectType, @NonNull TKey key, @Nullable TStoreObject storeObject);
+
+    /**
+     * Gets object from store by key.
+     *
+     * @param storeObjectType Type of object to store;
+     * @param key             Key related to object;
+     * @return Object from store found by key;
+     */
+    @Nullable
+    TStoreObject getObject(@NonNull Type storeObjectType, @NonNull TKey key);
+
 }

@@ -298,10 +298,18 @@ public abstract class BaseStorable<TKey, TObject, TStoreObject, TReturnObject> {
      *
      * @param newValue Value to set;
      */
-    @Deprecated
-    //deprecation: it should be used for debug only and in very rare cases.
     public void setSync(@Nullable final TObject newValue) {
-        set(newValue).blockingAwait();
+        final TStoreObject newStoreValue;
+        try {
+            newStoreValue = converter.toStoreObject(objectType, storeObjectType, newValue);
+        } catch (final Converter.ConversionException exception) {
+            STORABLE_LC_GROUP.w(exception, "Exception while trying to store value of '%s' from store %s by %s",
+                    key, newValue, store, converter);
+            return;
+        }
+        store.setObject(storeObjectType, key, newStoreValue);
+        newStoreValueEvent.onNext(new Optional<>(newStoreValue));
+        STORABLE_LC_GROUP.i("Value of '%s' force changed to '%s'", key, newStoreValue);
     }
 
     @NonNull
@@ -334,11 +342,16 @@ public abstract class BaseStorable<TKey, TObject, TStoreObject, TReturnObject> {
      *
      * @return Returns value;
      */
-    @Deprecated
-    //deprecation: it should be used for debug only and in very rare cases.
     @Nullable
-    public TReturnObject getSync() {
-        return get().blockingGet();
+    public TObject getSync() {
+        final TStoreObject storeObject = store.getObject(storeObjectType, key);
+        try {
+            return converter.toObject(objectType, storeObjectType, storeObject);
+        } catch (final Converter.ConversionException exception) {
+            STORABLE_LC_GROUP.w(exception, "Exception while trying to converting value of '%s' from store %s by %s",
+                    key, storeObject, store, converter);
+            return null;
+        }
     }
 
     /**

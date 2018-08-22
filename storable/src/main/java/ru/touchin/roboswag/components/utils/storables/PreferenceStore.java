@@ -25,11 +25,11 @@ import android.support.annotation.Nullable;
 
 import java.lang.reflect.Type;
 
+import io.reactivex.Completable;
+import io.reactivex.Single;
 import ru.touchin.roboswag.core.log.Lc;
 import ru.touchin.roboswag.core.observables.storable.Store;
 import ru.touchin.roboswag.core.utils.Optional;
-import io.reactivex.Completable;
-import io.reactivex.Single;
 
 /**
  * Created by Gavriil Sitnikov on 18/03/16.
@@ -71,52 +71,54 @@ public class PreferenceStore<T> implements Store<String, T> {
     @NonNull
     @Override
     public Completable storeObject(@NonNull final Type storeObjectType, @NonNull final String key, @Nullable final T storeObject) {
-        return Completable.fromAction(() -> {
-            if (storeObject == null) {
-                preferences.edit().remove(key).apply();
-                return;
-            }
-
-            if (isTypeBoolean(storeObjectType)) {
-                preferences.edit().putBoolean(key, (Boolean) storeObject).apply();
-            } else if (storeObjectType.equals(String.class)) {
-                preferences.edit().putString(key, (String) storeObject).apply();
-            } else if (isTypeInteger(storeObjectType)) {
-                preferences.edit().putInt(key, (Integer) storeObject).apply();
-            } else if (isTypeLong(storeObjectType)) {
-                preferences.edit().putLong(key, (Long) storeObject).apply();
-            } else if (isTypeFloat(storeObjectType)) {
-                preferences.edit().putFloat(key, (Float) storeObject).apply();
-            } else {
-                Lc.assertion("Unsupported type of object " + storeObjectType);
-            }
-        });
+        return Completable.fromAction(() -> setObject(storeObjectType, key, storeObject));
     }
 
     @NonNull
     @Override
-    @SuppressWarnings("unchecked")
-    //unchecked: it is checking class in if-else statements
     public Single<Optional<T>> loadObject(@NonNull final Type storeObjectType, @NonNull final String key) {
-        return Single.fromCallable(() -> {
-            if (!preferences.contains(key)) {
-                return new Optional<>(null);
-            }
+        return Single.fromCallable(() -> new Optional<>(!preferences.contains(key) ? null : getObject(storeObjectType, key)));
+    }
 
-            if (isTypeBoolean(storeObjectType)) {
-                return new Optional<>((T) ((Boolean) preferences.getBoolean(key, false)));
-            } else if (storeObjectType.equals(String.class)) {
-                return new Optional<>((T) (preferences.getString(key, null)));
-            } else if (isTypeInteger(storeObjectType)) {
-                return new Optional<>((T) ((Integer) preferences.getInt(key, 0)));
-            } else if (isTypeLong(storeObjectType)) {
-                return new Optional<>((T) ((Long) preferences.getLong(key, 0L)));
-            } else if (isTypeFloat(storeObjectType)) {
-                return new Optional<>((T) ((Float) preferences.getFloat(key, 0f)));
-            }
+    @Override
+    public void setObject(@NonNull final Type storeObjectType, @NonNull final String key, @Nullable final T storeObject) {
+        if (storeObject == null) {
+            preferences.edit().remove(key).apply();
+            return;
+        }
+        if (isTypeBoolean(storeObjectType)) {
+            preferences.edit().putBoolean(key, (Boolean) storeObject).apply();
+        } else if (storeObjectType.equals(String.class)) {
+            preferences.edit().putString(key, (String) storeObject).apply();
+        } else if (isTypeInteger(storeObjectType)) {
+            preferences.edit().putInt(key, (Integer) storeObject).apply();
+        } else if (isTypeLong(storeObjectType)) {
+            preferences.edit().putLong(key, (Long) storeObject).apply();
+        } else if (isTypeFloat(storeObjectType)) {
+            preferences.edit().putFloat(key, (Float) storeObject).apply();
+        } else {
             Lc.assertion("Unsupported type of object " + storeObjectType);
-            return new Optional<>(null);
-        });
+        }
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked") //unchecked: it is checking class in if-else statements
+    @Override
+    public T getObject(@NonNull final Type storeObjectType, @NonNull final String key) {
+        if (isTypeBoolean(storeObjectType)) {
+            return (T) ((Boolean) preferences.getBoolean(key, false));
+        } else if (storeObjectType.equals(String.class)) {
+            return (T) (preferences.getString(key, null));
+        } else if (isTypeInteger(storeObjectType)) {
+            return (T) ((Integer) preferences.getInt(key, 0));
+        } else if (isTypeLong(storeObjectType)) {
+            return (T) ((Long) preferences.getLong(key, 0L));
+        } else if (isTypeFloat(storeObjectType)) {
+            return (T) ((Float) preferences.getFloat(key, 0f));
+        } else {
+            Lc.assertion("Unsupported type of object " + storeObjectType);
+            return null;
+        }
     }
 
 }

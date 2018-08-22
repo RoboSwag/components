@@ -49,7 +49,7 @@ public final class PreferenceUtils {
                 name,
                 String.class,
                 String.class,
-                new PreferenceStore<String>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).build();
     }
@@ -72,7 +72,7 @@ public final class PreferenceUtils {
                 name,
                 String.class,
                 String.class,
-                new PreferenceStore<String>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).setDefaultValue(defaultValue).build();
     }
@@ -90,7 +90,7 @@ public final class PreferenceUtils {
                 name,
                 Long.class,
                 Long.class,
-                new PreferenceStore<Long>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).build();
     }
@@ -113,7 +113,7 @@ public final class PreferenceUtils {
                 name,
                 Long.class,
                 Long.class,
-                new PreferenceStore<Long>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).setDefaultValue(defaultValue).build();
     }
@@ -131,7 +131,7 @@ public final class PreferenceUtils {
                 name,
                 Boolean.class,
                 Boolean.class,
-                new PreferenceStore<Boolean>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).build();
     }
@@ -154,7 +154,7 @@ public final class PreferenceUtils {
                 name,
                 Boolean.class,
                 Boolean.class,
-                new PreferenceStore<Boolean>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).setDefaultValue(defaultValue).build();
     }
@@ -172,7 +172,7 @@ public final class PreferenceUtils {
                 name,
                 Integer.class,
                 Integer.class,
-                new PreferenceStore<Integer>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).build();
     }
@@ -195,7 +195,7 @@ public final class PreferenceUtils {
                 name,
                 Integer.class,
                 Integer.class,
-                new PreferenceStore<Integer>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).setDefaultValue(defaultValue).build();
     }
@@ -213,7 +213,7 @@ public final class PreferenceUtils {
                 name,
                 Float.class,
                 Float.class,
-                new PreferenceStore<Float>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).build();
     }
@@ -236,7 +236,7 @@ public final class PreferenceUtils {
                 name,
                 Float.class,
                 Float.class,
-                new PreferenceStore<Float>(preferences),
+                new PreferenceStore<>(preferences),
                 new SameTypesConverter<>()
         ).setDefaultValue(defaultValue).build();
     }
@@ -258,7 +258,7 @@ public final class PreferenceUtils {
                 name,
                 enumClass,
                 String.class,
-                new PreferenceStore<String>(preferences),
+                new PreferenceStore<>(preferences),
                 new EnumToStringConverter<>()
         ).build();
     }
@@ -282,7 +282,7 @@ public final class PreferenceUtils {
                 name,
                 enumClass,
                 String.class,
-                new PreferenceStore<String>(preferences),
+                new PreferenceStore<>(preferences),
                 new EnumToStringConverter<>()
         ).setDefaultValue(defaultValue).build();
     }
