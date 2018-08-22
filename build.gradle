@@ -1,24 +1,39 @@
-apply plugin: 'com.android.library'
-
-android {
-    compileSdkVersion compileSdk
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+buildscript {
+    ext.kotlin_version = '1.2.61'
+    repositories {
+        google()
+        jcenter()
     }
-
-    defaultConfig {
-        minSdkVersion 16
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'de.aaschmid:gradle-cpd-plugin:1.0'
     }
 }
 
-dependencies {
-    api project(':libraries:core')
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url "http://dl.bintray.com/touchin/touchin-tools" }
+    }
+}
 
-    compileOnly "com.android.support:appcompat-v7:$supportLibraryVersion"
-    compileOnly "com.android.support:recyclerview-v7:$supportLibraryVersion"
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
 
-    compileOnly "io.reactivex:rxandroid:$rxAndroidVersion"
-    compileOnly "io.reactivex:rxjava:$rxJavaVersion"
+ext {
+    versions = [
+            compileSdk    : 27,
+            minSdk        : 16,
+            supportLibrary: '27.1.1',
+            navigation    : '1.0.0-alpha04',
+            lifecycle     : '1.1.1',
+            dagger        : '2.16',
+            retrofit      : '2.4.0',
+            rxJava        : '2.1.17',
+            rxAndroid     : '2.0.2',
+            crashlytics   : '2.9.4'
+    ]
 }
