@@ -384,6 +384,12 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         super.onDestroy();
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return super.toString() + "ViewController: " + getViewControllerClass();
+    }
+
     private static class PlaceholderView extends FrameLayout {
 
         @NonNull
