@@ -41,6 +41,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -59,7 +60,7 @@ import ru.touchin.roboswag.core.log.Lc;
  * @param <TActivity> Type of activity where such {@link ViewController} could be;
  * @param <TState> Type of state;
  */
-public class ViewController<TActivity extends FragmentActivity, TState extends Parcelable> implements LifecycleOwner {
+public abstract class ViewController<TActivity extends FragmentActivity, TState extends Parcelable> implements LifecycleOwner {
 
     @NonNull
     private final LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
@@ -68,14 +69,14 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
     @NonNull
     private final ViewControllerFragment<TActivity, TState> fragment;
     @NonNull
-    private final ViewGroup container;
+    private final View view;
 
     @SuppressWarnings({"unchecked", "PMD.UnusedFormalParameter"})
     //UnusedFormalParameter: savedInstanceState could be used by children
-    public ViewController(@NonNull final CreationContext creationContext, @Nullable final Bundle savedInstanceState) {
+    public ViewController(@NonNull final CreationContext creationContext, @Nullable final Bundle savedInstanceState, @LayoutRes final int layoutRes) {
         this.activity = (TActivity) creationContext.activity;
         this.fragment = creationContext.fragment;
-        this.container = creationContext.container;
+        view = creationContext.inflater.inflate(layoutRes, creationContext.container, false);
     }
 
     @NonNull
@@ -110,7 +111,7 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
      * @return Returns state.
      */
     @NonNull
-    protected final TState getState() {
+    public final TState getState() {
         return fragment.getState();
     }
 
@@ -121,45 +122,8 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
      * @return Returns view.
      */
     @NonNull
-    protected final ViewGroup getContainer() {
-        return container;
-    }
-
-    /**
-     * Set the view controller content from a layout resource.
-     * This layout is placed directly into the container's ({@link #getContainer()}) view hierarchy.
-     *
-     * @param layoutResId Resource ID to be inflated.
-     */
-    protected final void setContentView(@LayoutRes final int layoutResId) {
-        if (getContainer().getChildCount() > 0) {
-            getContainer().removeAllViews();
-        }
-        UiUtils.inflateAndAdd(layoutResId, getContainer());
-    }
-
-    /**
-     * Set the view controller content to an explicit view.
-     * This view is placed directly into the container's ({@link #getContainer()}) view hierarchy.
-     *
-     * @param view The desired content to display.
-     */
-    protected final void setContentView(@NonNull final View view) {
-        setContentView(view, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-    }
-
-    /**
-     * Set the view controller content to an explicit view with specific layout parameters.
-     * This view is placed directly into the container's ({@link #getContainer()}) view hierarchy.
-     *
-     * @param view         The desired content to display;
-     * @param layoutParams Layout parameters for the view.
-     */
-    protected final void setContentView(@NonNull final View view, @NonNull final ViewGroup.LayoutParams layoutParams) {
-        if (getContainer().getChildCount() > 0) {
-            getContainer().removeAllViews();
-        }
-        getContainer().addView(view, layoutParams);
+    public final View getView() {
+        return view;
     }
 
     /**
@@ -170,7 +134,7 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
      */
     @NonNull
     public final <T extends View> T findViewById(@IdRes final int id) {
-        return getContainer().findViewById(id);
+        return getView().findViewById(id);
     }
 
     /**
@@ -337,7 +301,7 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
     public void onStart() {
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START);
-        UiUtils.OfViews.hideSoftInput(getContainer());
+        UiUtils.OfViews.hideSoftInput(getView());
     }
 
     /**
@@ -453,15 +417,19 @@ public class ViewController<TActivity extends FragmentActivity, TState extends P
         @NonNull
         private final ViewControllerFragment fragment;
         @NonNull
+        private final LayoutInflater inflater;
+        @Nullable
         private final ViewGroup container;
 
         public CreationContext(
                 @NonNull final FragmentActivity activity,
                 @NonNull final ViewControllerFragment fragment,
-                @NonNull final ViewGroup container
+                @NonNull final LayoutInflater inflater,
+                @Nullable final ViewGroup container
         ) {
             this.activity = activity;
             this.fragment = fragment;
+            this.inflater = inflater;
             this.container = container;
         }
 

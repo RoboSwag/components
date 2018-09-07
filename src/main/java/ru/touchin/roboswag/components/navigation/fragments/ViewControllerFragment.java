@@ -20,9 +20,7 @@
 package ru.touchin.roboswag.components.navigation.fragments;
 
 import android.animation.Animator;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -30,7 +28,6 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,11 +35,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.widget.FrameLayout;
 
 import java.lang.reflect.Constructor;
 
-import ru.touchin.roboswag.components.R;
 import ru.touchin.roboswag.components.navigation.viewcontrollers.ViewController;
 import ru.touchin.roboswag.components.utils.UiUtils;
 import ru.touchin.roboswag.core.log.Lc;
@@ -152,15 +147,13 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
 
     @NonNull
     private ViewController createViewController(
-            @NonNull final FragmentActivity activity,
-            @NonNull final PlaceholderView view,
+            @NonNull final ViewController.CreationContext creationContext,
             @Nullable final Bundle savedInstanceState
     ) {
         if (viewControllerClass.getConstructors().length != 1) {
             throw new ShouldNotHappenException("There should be single constructor for " + viewControllerClass);
         }
         final Constructor<?> constructor = viewControllerClass.getConstructors()[0];
-        final ViewController.CreationContext creationContext = new ViewController.CreationContext(activity, this, view);
         final long creationTime = inDebugMode ? SystemClock.elapsedRealtime() : 0;
         try {
             switch (constructor.getParameterTypes().length) {
@@ -194,16 +187,16 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
             @Nullable final ViewGroup container,
             @Nullable final Bundle savedInstanceState
     ) {
-        return new PlaceholderView(inflater.getContext(), viewControllerClass.getName());
+        viewController = createViewController(
+                new ViewController.CreationContext(requireActivity(), this, inflater, container), savedInstanceState);
+        viewController.onCreate();
+        return viewController.getView();
     }
 
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //noinspection ConstantConditions
-        viewController = createViewController(requireActivity(), (PlaceholderView) getView(), savedInstanceState);
-        viewController.onCreate();
-        if (pendingActivityResult != null) {
+        if (viewController != null && pendingActivityResult != null) {
             viewController.onActivityResult(pendingActivityResult.requestCode, pendingActivityResult.resultCode, pendingActivityResult.data);
             pendingActivityResult = null;
         }
@@ -212,11 +205,6 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
     @Nullable
     @Override
     public Animation onCreateAnimation(final int transit, final boolean enter, final int nextAnim) {
-        if (nextAnim == R.anim.fragment_slide_in_right_animation || nextAnim == R.anim.fragment_slide_out_right_animation) {
-            ViewCompat.setTranslationZ(getView(), 1F);
-        } else {
-            ViewCompat.setTranslationZ(getView(), 0F);
-        }
         if (viewController != null) {
             return viewController.onCreateAnimation(transit, enter, nextAnim);
         } else {
@@ -344,39 +332,6 @@ public class ViewControllerFragment<TActivity extends FragmentActivity, TState e
         } else {
             pendingActivityResult = new ActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    private static class PlaceholderView extends FrameLayout {
-
-        @NonNull
-        private final String tagName;
-        private long lastMeasureTime;
-
-        public PlaceholderView(@NonNull final Context context, @NonNull final String tagName) {
-            super(context);
-            this.tagName = tagName;
-        }
-
-        @Override
-        protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            if (inDebugMode && lastMeasureTime == 0) {
-                lastMeasureTime = SystemClock.uptimeMillis();
-            }
-        }
-
-        @Override
-        protected void onDraw(@NonNull final Canvas canvas) {
-            super.onDraw(canvas);
-            if (inDebugMode && lastMeasureTime > 0) {
-                final long layoutTime = SystemClock.uptimeMillis() - lastMeasureTime;
-                if (layoutTime > acceptableUiCalculationTime) {
-                    UiUtils.UI_METRICS_LC_GROUP.w("Measure and layout of %s took too much: %dms", tagName, layoutTime);
-                }
-                lastMeasureTime = 0;
-            }
-        }
-
     }
 
     private static class ActivityResult {
