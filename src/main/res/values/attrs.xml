@@ -26,4 +26,9 @@
         <attr name="materialLoadingBarStyle" format="reference"/>
     </declare-styleable>
 
+    <declare-styleable name="Switcher">
+        <attr name="defaultChild" format="reference"/>
+        <attr name="transition" format="reference"/>
+    </declare-styleable>
+
 </resources>
