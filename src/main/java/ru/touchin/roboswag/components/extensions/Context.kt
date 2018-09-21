@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 
 fun Context.safeStartActivity(intent: Intent, flags: Int = 0): Boolean =
-        if (packageManager.resolveActivity(intent, 0) != null) {
+        if (packageManager.resolveActivity(intent, flags) != null) {
             startActivity(intent)
             true
         } else {
