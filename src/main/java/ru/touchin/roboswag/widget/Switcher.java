@@ -21,13 +21,11 @@ import ru.touchin.roboswag.components.R;
 
 public class Switcher extends FrameLayout {
 
-    private static final Transition DEFAULT_TRANSITION = new Fade();
-
     @IdRes
     private final int defaultChild;
 
     @NonNull
-    private Transition transition = DEFAULT_TRANSITION;
+    private Transition transition;
 
     public Switcher(@NonNull final Context context) {
         this(context, null);
@@ -44,6 +42,8 @@ public class Switcher extends FrameLayout {
         final int transitionId = array.getResourceId(R.styleable.Switcher_transition, 0);
         if (transitionId != 0) {
             transition = TransitionInflater.from(context).inflateTransition(transitionId);
+        } else {
+            transition = new Fade();
         }
         array.recycle();
     }
