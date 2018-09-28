@@ -145,24 +145,23 @@ public class FragmentNavigation {
             fragment.setTargetFragment(targetFragment, 0);
         }
 
-        final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction()
-                .replace(containerViewId, fragment, null);
-        if (addToStack) {
-            fragmentTransaction.addToBackStack(backStackTag);
-        }
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (fragmentManager.getBackStackEntryCount() != 0) {
             fragmentTransaction.setTransition(getDefaultTransition());
         }
         if (transactionSetup != null) {
             try {
-                transactionSetup.apply(fragmentTransaction).commit();
+                fragmentTransaction = transactionSetup.apply(fragmentTransaction);
             } catch (final Exception exception) {
                 Lc.assertion(exception);
-                fragmentTransaction.commit();
             }
-        } else {
-            fragmentTransaction.commit();
         }
+
+        fragmentTransaction.replace(containerViewId, fragment, null);
+        if (addToStack) {
+            fragmentTransaction.addToBackStack(backStackTag);
+        }
+        fragmentTransaction.commit();
     }
 
     /**
