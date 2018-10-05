@@ -69,7 +69,7 @@ public class Switcher extends FrameLayout {
 
     public void showChild(@IdRes final int... ids) {
         if (ViewCompat.isLaidOut(this)) {
-            TransitionManager.beginDelayedTransition(this, transition);
+            TransitionManager.beginDelayedTransition(this, transition.clone());
         }
         boolean found = false;
         for (int index = 0; index < getChildCount(); index++) {
