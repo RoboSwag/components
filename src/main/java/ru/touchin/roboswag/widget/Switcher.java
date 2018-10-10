@@ -5,14 +5,12 @@ import android.content.res.TypedArray;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.transition.Fade;
-import android.support.transition.Transition;
-import android.support.transition.TransitionInflater;
-import android.support.transition.TransitionManager;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
 import java.util.NoSuchElementException;
@@ -24,27 +22,22 @@ public class Switcher extends FrameLayout {
     @IdRes
     private final int defaultChild;
 
-    @NonNull
-    private Transition transition;
+    @Nullable
+    private Animation inAnimation;
+
+    @Nullable
+    private Animation outAnimation;
 
     public Switcher(@NonNull final Context context) {
         this(context, null);
     }
 
     public Switcher(@NonNull final Context context, @Nullable final AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public Switcher(@NonNull final Context context, @Nullable final AttributeSet attrs, final int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        final TypedArray array = getContext().obtainStyledAttributes(attrs, R.styleable.Switcher, defStyleAttr, 0);
+        super(context, attrs);
+        final TypedArray array = getContext().obtainStyledAttributes(attrs, R.styleable.Switcher, 0, R.style.Switcher);
+        inAnimation = AnimationUtils.loadAnimation(context, array.getResourceId(R.styleable.Switcher_android_inAnimation, View.NO_ID));
+        outAnimation = AnimationUtils.loadAnimation(context, array.getResourceId(R.styleable.Switcher_android_outAnimation, View.NO_ID));
         defaultChild = array.getResourceId(R.styleable.Switcher_defaultChild, View.NO_ID);
-        final int transitionId = array.getResourceId(R.styleable.Switcher_transition, 0);
-        if (transitionId != 0) {
-            transition = TransitionInflater.from(context).inflateTransition(transitionId);
-        } else {
-            transition = new Fade();
-        }
         array.recycle();
     }
 
@@ -58,27 +51,23 @@ public class Switcher extends FrameLayout {
         super.addView(child, index, params);
     }
 
-    @NonNull
-    public Transition getTransition() {
-        return transition;
-    }
-
-    public void setTransition(@NonNull final Transition transition) {
-        this.transition = transition;
-    }
-
-    public void showChild(@IdRes final int... ids) {
-        if (ViewCompat.isLaidOut(this)) {
-            TransitionManager.beginDelayedTransition(this, transition.clone());
-        }
+    public void showChild(@IdRes final int id) {
         boolean found = false;
         for (int index = 0; index < getChildCount(); index++) {
             final View child = getChildAt(index);
-            for (final int id : ids) {
-                if (child.getId() == id) {
-                    found = true;
+            if (child.getId() == id) {
+                found = true;
+                if (child.getVisibility() != View.VISIBLE) {
+                    if (ViewCompat.isLaidOut(this) && inAnimation != null) {
+                        child.startAnimation(inAnimation);
+                    }
                     child.setVisibility(View.VISIBLE);
-                } else {
+                }
+            } else {
+                if (child.getVisibility() != View.GONE) {
+                    if (ViewCompat.isLaidOut(this) && outAnimation != null) {
+                        child.startAnimation(outAnimation);
+                    }
                     child.setVisibility(View.GONE);
                 }
             }
