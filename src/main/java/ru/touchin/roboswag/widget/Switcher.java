@@ -57,23 +57,23 @@ public class Switcher extends FrameLayout {
             final View child = getChildAt(index);
             if (child.getId() == id) {
                 found = true;
-                if (child.getVisibility() != View.VISIBLE) {
-                    if (ViewCompat.isLaidOut(this) && inAnimation != null) {
-                        child.startAnimation(inAnimation);
-                    }
-                    child.setVisibility(View.VISIBLE);
-                }
+                setVisibilityWithAnimation(child, View.VISIBLE);
             } else {
-                if (child.getVisibility() != View.GONE) {
-                    if (ViewCompat.isLaidOut(this) && outAnimation != null) {
-                        child.startAnimation(outAnimation);
-                    }
-                    child.setVisibility(View.GONE);
-                }
+                setVisibilityWithAnimation(child, View.GONE);
             }
         }
         if (!found) {
             throw new NoSuchElementException();
+        }
+    }
+
+    private void setVisibilityWithAnimation(@NonNull final View view, final int targetVisibility) {
+        final Animation animation = targetVisibility == View.VISIBLE ? inAnimation : outAnimation;
+        if (view.getVisibility() != targetVisibility) {
+            if (ViewCompat.isLaidOut(this) && animation != null) {
+                view.startAnimation(animation);
+            }
+            view.setVisibility(targetVisibility);
         }
     }
 
