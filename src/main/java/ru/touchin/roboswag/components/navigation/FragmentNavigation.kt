@@ -84,7 +84,7 @@ open class FragmentNavigation(
      * @param targetFragment   Target fragment to be set as [Fragment.getTargetFragment] of instantiated [Fragment];
      * @param addToStack       Flag to add this transaction to the back stack;
      * @param args             Bundle to be set as [Fragment.getArguments] of instantiated [Fragment];
-     * @param backStackTag     Tag of [Fragment] in back stack;
+     * @param backStackName    Name of [Fragment] in back stack;
      * @param transactionSetup Function to setup transaction before commit. It is useful to specify transition animations or additional info.
      */
     fun addToStack(
@@ -93,7 +93,7 @@ open class FragmentNavigation(
             targetRequestCode: Int,
             addToStack: Boolean,
             args: Bundle?,
-            backStackTag: String?,
+            backStackName: String?,
             transactionSetup: ((FragmentTransaction) -> Unit)?
     ) {
         if (fragmentManager.isDestroyed) {
@@ -102,23 +102,19 @@ open class FragmentNavigation(
         }
 
         val fragment = Fragment.instantiate(context, fragmentClass.name, args)
-        if (targetFragment != null) {
-            if (fragmentManager !== targetFragment.fragmentManager) {
-                Lc.assertion("FragmentManager of target is differ then of creating fragment. Target will be lost after restoring activity. "
-                        + targetFragment.fragmentManager + " != " + fragmentManager)
-            }
-            fragment.setTargetFragment(targetFragment, targetRequestCode)
-        }
+        fragment.setTargetFragment(targetFragment, targetRequestCode)
 
         val fragmentTransaction = fragmentManager.beginTransaction()
         transactionSetup?.invoke(fragmentTransaction)
         fragmentTransaction.replace(containerViewId, fragment, null)
         if (addToStack) {
-            fragmentTransaction.addToBackStack(backStackTag).setTransition(transition)
-        } else {
-            fragmentTransaction.setPrimaryNavigationFragment(fragment)
+            fragmentTransaction
+                    .addToBackStack(backStackName)
+                    .setTransition(transition)
         }
-        fragmentTransaction.commit()
+        fragmentTransaction
+                .setPrimaryNavigationFragment(fragment)
+                .commit()
     }
 
     /**
@@ -164,10 +160,8 @@ open class FragmentNavigation(
      *
      * @return True if it have back to some entry in stack.
      */
-    fun up() {
-        if (!backTo { backStackEntry -> backStackEntry.name?.endsWith(TOP_FRAGMENT_TAG_MARK) == true }) {
-            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-        }
+    fun up(name: String? = null, inclusive: Boolean = false) {
+        fragmentManager.popBackStack(name, if (inclusive) FragmentManager.POP_BACK_STACK_INCLUSIVE else 0)
     }
 
     /**
@@ -226,7 +220,7 @@ open class FragmentNavigation(
             addToStack: Boolean = true,
             transactionSetup: ((FragmentTransaction) -> Unit)? = null
     ) {
-        addToStack(fragmentClass, null, 0, addToStack, args, "${fragmentClass.name};$TOP_FRAGMENT_TAG_MARK", transactionSetup)
+        addToStack(fragmentClass, null, 0, addToStack, args, TOP_FRAGMENT_TAG_MARK, transactionSetup)
     }
 
     /**
