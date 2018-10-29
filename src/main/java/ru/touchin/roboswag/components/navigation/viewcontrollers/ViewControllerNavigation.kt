@@ -57,6 +57,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
             viewControllerClass: Class<out ViewController<out TActivity, TState>>,
             state: TState,
             addToStack: Boolean = true,
+            backStackName: String? = null,
             transactionSetup: ((FragmentTransaction) -> Unit)? = null
     ) {
         addToStack(
@@ -65,7 +66,7 @@ open class ViewControllerNavigation<TActivity : FragmentActivity>(
                 0,
                 addToStack,
                 ViewControllerFragment.args(viewControllerClass, state),
-                null,
+                backStackName,
                 transactionSetup
         )
     }

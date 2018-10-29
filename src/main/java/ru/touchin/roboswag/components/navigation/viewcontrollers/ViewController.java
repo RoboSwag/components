@@ -433,6 +433,10 @@ public abstract class ViewController<TActivity extends FragmentActivity, TState 
             this.container = container;
         }
 
+        @Nullable
+        public ViewGroup getContainer() {
+            return container;
+        }
     }
 
 }
