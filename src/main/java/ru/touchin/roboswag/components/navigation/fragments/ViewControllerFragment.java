@@ -411,17 +411,13 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
 
         public final int requestCode;
         public final int resultCode;
-        private final Intent data;
+        @Nullable
+        public final Intent data;
 
         ActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
             this.requestCode = requestCode;
             this.resultCode = resultCode;
             this.data = data;
-        }
-
-        @Nullable
-        public Intent getData() {
-            return data;
         }
 
     }
