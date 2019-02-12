@@ -19,6 +19,7 @@
 
 package ru.touchin.roboswag.components.navigation;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -327,6 +328,13 @@ public class ViewController<TActivity extends ViewControllerActivity<?>,
         UiUtils.UI_LIFECYCLE_LC_GROUP.i(Lc.getCodePoint(this));
         baseLifecycleBindable.onDestroy();
         destroyed = true;
+    }
+
+    /**
+     * Callback from parent fragment.
+     */
+    public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
+        // do nothing
     }
 
     /**

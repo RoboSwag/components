@@ -20,6 +20,7 @@
 package ru.touchin.roboswag.components.navigation.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -122,6 +123,8 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     private TState state;
     private boolean started;
     private boolean stateCreated;
+    @Nullable
+    private ActivityResult pendingActivityResult;
 
     private void tryCreateState(@Nullable final Context context) {
         if (!stateCreated && state != null && context != null) {
@@ -256,6 +259,10 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
     public void onActivityCreated(@NonNull final View view, @NonNull final TActivity activity, @Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(view, activity, savedInstanceState);
         activitySubject.onNext(new Optional<>(activity));
+        if (viewController != null && pendingActivityResult != null) {
+            viewController.onActivityResult(pendingActivityResult.requestCode, pendingActivityResult.resultCode, pendingActivityResult.data);
+            pendingActivityResult = null;
+        }
     }
 
     @Override
@@ -384,10 +391,39 @@ public abstract class ViewControllerFragment<TState extends AbstractState, TActi
         super.onDestroy();
     }
 
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
+        if (viewController != null) {
+            viewController.onActivityResult(requestCode, resultCode, data);
+        } else {
+            pendingActivityResult = new ActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     @NonNull
     @Override
     public String toString() {
         return super.toString() + "ViewController: " + getViewControllerClass();
+    }
+
+    private static class ActivityResult {
+
+        public final int requestCode;
+        public final int resultCode;
+        private final Intent data;
+
+        ActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
+            this.requestCode = requestCode;
+            this.resultCode = resultCode;
+            this.data = data;
+        }
+
+        @Nullable
+        public Intent getData() {
+            return data;
+        }
+
     }
 
     private static class PlaceholderView extends FrameLayout {
