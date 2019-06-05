@@ -19,8 +19,8 @@
 
 package ru.touchin.roboswag.components.navigation.activities;
 
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
 import android.view.Menu;
 import android.view.View;
 

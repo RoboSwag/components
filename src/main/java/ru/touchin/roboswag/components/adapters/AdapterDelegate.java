@@ -19,7 +19,7 @@
 
 package ru.touchin.roboswag.components.adapters;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 
 import ru.touchin.roboswag.components.utils.LifecycleBindable;

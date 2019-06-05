@@ -22,7 +22,7 @@ package ru.touchin.roboswag.components.deeplinks;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import ru.touchin.roboswag.components.navigation.activities.BaseActivity;
 
